@@ -6,6 +6,13 @@ import LoginPage from "./pages/LoginPage"
 import ProfilePage from "./pages/ProfilePage"
 import HomePage from "./pages/HomePage"
 import ProtectedRoute from "./ProtectedRoute"
+import Historial from "./pages/Historial"
+import RegistroMantenimiento from "./pages/RegistroMantenimiento"
+import GestionMaquinas from "./pages/GestionMaquinas" 
+
+
+
+
 function App() {
   return (
     <AuthProvider>
@@ -17,7 +24,10 @@ function App() {
 
 
       <Route element={<ProtectedRoute/>}>
-      <Route path='/HomePage' element={<HomePage/>}/>
+      <Route path='/' element={<HomePage/>}/>
+      <Route path='/GestionMaquinas' element={<GestionMaquinas/>}/>
+      <Route path='/Historial' element={<Historial/>}/>
+      <Route path='/RegistroMantenimiento' element={<RegistroMantenimiento/>}/>
       <Route path='/profile' element={<ProfilePage/>}/>
       </Route>
       

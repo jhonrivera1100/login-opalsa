@@ -9,8 +9,7 @@ const {loading, isAuthenticated} = useAuth()
 if (loading) return <h1> loading...</h1>;
 if(!loading && !isAuthenticated) return <Navigate to='/login' replace/>
 
-  return 
-   <Outlet/>;
+  return <Outlet/>;
 }
 
 export default ProtectedRoute

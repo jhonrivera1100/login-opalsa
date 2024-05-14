@@ -23,7 +23,7 @@ import React, { useEffect } from "react";
   // Redirigir al usuario a la página de inicio si está autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/HomePage");
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
