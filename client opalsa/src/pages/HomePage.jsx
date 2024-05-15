@@ -14,14 +14,7 @@ function HomePage() {
             className="border border-gray-300 rounded-md py-2 px-4 mr-2 focus:outline-none focus:border-blue-300 w-full"
           />
           {/* Aquí va el botón de agregar */}
-          <button className="bg-green-800 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-full flex items-center text-sm transition-transform transform hover:scale-105">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 fill-current mr-1"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 4v16m8-8H4" />
-            </svg>
+          <button className="bg-green-800 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-full flex items-center text-sm transition-transform transform hover:scale-105"> Agregar
           </button>
         </div>
       </div>
