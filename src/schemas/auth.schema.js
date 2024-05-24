@@ -14,6 +14,12 @@ password: z.string({
 }).min(6,{
     message: "la contraseña tiene que tener 6 caracteres minimo"
 }),
+cedula: z.string({
+    required_error:'cedula es requerida'
+}),
+cargo:z.string({
+required_error:'cargo es requerido'
+})
 });
 
 

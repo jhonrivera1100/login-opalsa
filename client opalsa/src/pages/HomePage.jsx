@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 
 function HomePage() {
   return (
-    <div style={{ backgroundColor: "#FFFFFF" }}>
+    <div className="bg-white ">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col items-center">
         <div className="max-w-xl w-full flex items-center">

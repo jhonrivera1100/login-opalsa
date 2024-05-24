@@ -5,38 +5,47 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 
 
+export const register = async (req, res) => {
+  const { email, password, username, cedula, cargo } = req.body;
+  try {
+    const emailFound = await User.findOne({ email });
+    const usernameFound = await User.findOne({ username });
 
+    if (emailFound) {
+      return res.status(400).json(["El email ya está en uso"]);
+    }
 
-export const register = async (req,res) =>  {
-  const{email,password,username} = req.body;
-try {
+    if (usernameFound) {
+      return res.status(400).json(["El nombre de usuario ya está en uso"]);
+    }
 
-const userFound = await User.findOne({email});
-if (userFound)
-    return res.status(400).json(["el email ya esta en uso"]);
-
-const passwordHash = await bcrypt.hash(password,10) 
+    const passwordHash = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-        username,
-        email,
-        password: passwordHash,
-      });
-      const userSaved = await newUser.save();
-     const token = await createAccessToken({id:userSaved._id})
-    res.cookie("token",token)
+      username,
+      email,
+      password: passwordHash,
+      cedula,
+      cargo,
+    });
+    const userSaved = await newUser.save();
+    const token = await createAccessToken({ id: userSaved._id });
+    res.cookie("token", token);
 
-     res.json({
-        id: userSaved._id,
-        username: userSaved.username,
-        email: userSaved.email,
-        createdAt: userSaved.createdAt,
-        updateAt: userSaved.updatedAt,
-})   
-} catch (error) {
-    res.status(500).json({message: error.message});
-}
+    res.json({
+      id: userSaved._id,
+      username: userSaved.username,
+      email: userSaved.email,
+      cedula: userSaved.cedula,
+      cargo: userSaved.cargo,
+      createdAt: userSaved.createdAt,
+      updatedAt: userSaved.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
 
 export const login = async (req,res) =>  {
   const{email,password} = req.body;
@@ -78,10 +87,18 @@ export const profile = async (req, res) =>{
         updateAt: userFound.updatedAt,
  })
 };
+export const getUserCount = async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    res.status(200).json({ count: userCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const verifyToken = async (req,res) =>{
   const {token} = req.cookies 
-
   if (!token) return res.status(401).json({ message: "Unauthorized"});
   
   jwt.verify(token,TOKEN_SECRET, async (err, user)=>{

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
+const {logout} = useAuth();
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -88,15 +89,17 @@ function Navbar() {
                     Perfil
                   </Link>
                   <Link
-                    to="/admin"
+                    to="/Admin"
                     onClick={closeMenu}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                   >
                     Administrador
                   </Link>
                   <Link
-                    to="/cerrar-sesion"
-                    onClick={closeMenu}
+                    to="/login"
+                    onClick={() =>{
+                      logout();
+                    }}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                   >
                     Cerrar Sesión
@@ -130,22 +133,24 @@ function Navbar() {
                 <div className="absolute top-20 right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
                   <div className="py-1">
                     <Link
-                      to="/perfil"
+                      to="/profile"
                       onClick={closeMenu}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                     >
                       Perfil
                     </Link>
                     <Link
-                      to="/admin"
+                      to="/Admin"
                       onClick={closeMenu}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                     >
                       Administrador
                     </Link>
                     <Link
-                      to="/cerrar-sesion"
-                      onClick={closeMenu}
+                      to="/login"
+                      onClick={() =>{
+                        logout();
+                      }}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                     >
                       Cerrar Sesión

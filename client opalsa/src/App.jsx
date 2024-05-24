@@ -9,6 +9,9 @@ import ProtectedRoute from "./ProtectedRoute"
 import Historial from "./pages/Historial"
 import RegistroMantenimiento from "./pages/RegistroMantenimiento"
 import GestionMaquinas from "./pages/GestionMaquinas" 
+import AppAdmin from "./pages/appAdmin"
+import GestionUsuarios from "./pages/GestionUsuarios"
+import NotificacionesAdmin from "./pages/notificacionesAdmin"
 
 
 
@@ -29,6 +32,9 @@ function App() {
       <Route path='/Historial' element={<Historial/>}/>
       <Route path='/RegistroMantenimiento' element={<RegistroMantenimiento/>}/>
       <Route path='/profile' element={<ProfilePage/>}/>
+      <Route path='/admin' element={<AppAdmin/>}/>
+      <Route path='/Usuarios' element={<GestionUsuarios />}/>
+      <Route path='/notifi' element={<NotificacionesAdmin />}/>
       </Route>
       
     </Routes>
