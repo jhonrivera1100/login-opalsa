@@ -71,7 +71,7 @@ function SearchBar() {
   };
 
   return (
-    <div className="mt-16">
+    <div className="bg-white">
       <div className="max-w-xl mx-auto flex items-center justify-center">
         <div className="flex items-center">
           <input
@@ -89,7 +89,7 @@ function SearchBar() {
       </div>
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-4 rounded-md max-h-screen overflow-auto w-96">
+          <div className="bg-white p-4 rounded-md max-h-screen overflow-auto w-120">
             <h2 className="text-lg font-semibold mb-4">Modal de Agregar</h2>
             <div className="flex flex-col">
               <label className="mb-2">Selecciona una opción:</label>
@@ -133,130 +133,226 @@ function SearchBar() {
             </div>
             {selectedOption === "maquina" && (
               <div>
-                <form onSubmit={onSubmit}>
-                <input
-                    type="text"
-                    name="imgMaquina"
-                    value={formData.maquina.imgMaquina}
-                    {...register("imgMaquina")}
-                    autoFocus
-                    placeholder="imagen maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="nroSerieMaquina"
-                    value={formData.maquina.nroSerieMaquina}
-                    {...register("nroSerieMaquina")}
-                    autoFocus
-                    placeholder="Número de Serie"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="nombreMaquina"
-                    value={formData.maquina.nombreMaquina}
-                    {...register("nombreMaquina")}
-                    autoFocus
-                    placeholder="Nombre de la Máquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="modeloMaquina"
-                    value={formData.maquina.modeloMaquina}
-                    {...register("modeloMaquina")}
-                    autoFocus
-                    placeholder="Modelo de la Máquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="marcaMaquina"
-                    value={formData.maquina.marcaMaquina}
-                    {...register("marcaMaquina")}
-                    autoFocus
-                    placeholder="Marca de la Máquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="softwareMaquina"
-                    value={formData.maquina.softwareMaquina}
-                    {...register("softwareMaquina")}
-                    autoFocus
-                    placeholder="Software de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="juegoMaquina"
-                    value={formData.maquina.juegoMaquina}
-                    {...register("juegoMaquina")}
-                    autoFocus
-                    placeholder="Juego de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="estadoMaquina"
-                    value={formData.maquina.estadoMaquina}
-                    {...register("estadoMaquina")}
-                    autoFocus
-                    placeholder="Estado de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="descripcionMaquina"
-                    value={formData.maquina.descripcionMaquina}
-                    {...register("descripcionMaquina")}
-                    autoFocus
-                    placeholder="Descripcion de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="ubicacionMaquina"
-                    value={formData.maquina.ubicacionMaquina}
-                    {...register("ubicacionMaquina")}
-                    autoFocus
-                    placeholder="Ubicacion de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="fechaInstalacionMaquina"
-                    value={formData.maquina.fechaInstalacionMaquina}
-                    {...register("fechaInstalacionMaquina")}
-                    autoFocus
-                    placeholder="Fecha de instalacion"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
-                  <input
-                    type="text"
-                    name="proveedorMaquina"
-                    value={formData.maquina.proveedorMaquina}
-                    {...register("proveedorMaquina")}
-                    autoFocus
-                    placeholder="Proveedor de la Maquina"
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                  />
+                <form onSubmit={onSubmit} className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      htmlFor="imgMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Imagen de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="imgMaquina"
+                      value={formData.maquina.imgMaquina}
+                      {...register("imgMaquina")}
+                      autoFocus
+                      placeholder="Imagen de la máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="nroSerieMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Número de Serie:
+                    </label>
+                    <input
+                      type="text"
+                      name="nroSerieMaquina"
+                      value={formData.maquina.nroSerieMaquina}
+                      {...register("nroSerieMaquina")}
+                      autoFocus
+                      placeholder="Número de Serie"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="nombreMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Nombre de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="nombreMaquina"
+                      value={formData.maquina.nombreMaquina}
+                      {...register("nombreMaquina")}
+                      autoFocus
+                      placeholder="Nombre de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="modeloMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Modelo de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="modeloMaquina"
+                      value={formData.maquina.modeloMaquina}
+                      {...register("modeloMaquina")}
+                      autoFocus
+                      placeholder="Modelo de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="marcaMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Marca de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="marcaMaquina"
+                      value={formData.maquina.marcaMaquina}
+                      {...register("marcaMaquina")}
+                      autoFocus
+                      placeholder="Marca de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="softwareMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Software de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="softwareMaquina"
+                      value={formData.maquina.softwareMaquina}
+                      {...register("softwareMaquina")}
+                      autoFocus
+                      placeholder="Software de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="juegoMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Juego de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="juegoMaquina"
+                      value={formData.maquina.juegoMaquina}
+                      {...register("juegoMaquina")}
+                      autoFocus
+                      placeholder="Juego de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="estadoMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Estado de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="estadoMaquina"
+                      value={formData.maquina.estadoMaquina}
+                      {...register("estadoMaquina")}
+                      autoFocus
+                      placeholder="Estado de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="descripcionMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Descripción de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="descripcionMaquina"
+                      value={formData.maquina.descripcionMaquina}
+                      {...register("descripcionMaquina")}
+                      autoFocus
+                      placeholder="Descripción de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="ubicacionMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Ubicación de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="ubicacionMaquina"
+                      value={formData.maquina.ubicacionMaquina}
+                      {...register("ubicacionMaquina")}
+                      autoFocus
+                      placeholder="Ubicación de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="fechaInstalacionMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Fecha de Instalación:
+                    </label>
+                    <input
+                      type="text"
+                      name="fechaInstalacionMaquina"
+                      value={formData.maquina.fechaInstalacionMaquina}
+                      {...register("fechaInstalacionMaquina")}
+                      autoFocus
+                      placeholder="Fecha de Instalación"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="proveedorMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Proveedor de la Máquina:
+                    </label>
+                    <input
+                      type="text"
+                      name="proveedorMaquina"
+                      value={formData.maquina.proveedorMaquina}
+                      {...register("proveedorMaquina")}
+                      autoFocus
+                      placeholder="Proveedor de la Máquina"
+                      onChange={handleInputChange}
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
                   <button
-                    type="submit" // Asegúrate de que sea un botón de tipo "submit" para enviar el formulario
-                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md"
+                    type="submit"
+                    className="col-span-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md"
                   >
                     Guardar
                   </button>

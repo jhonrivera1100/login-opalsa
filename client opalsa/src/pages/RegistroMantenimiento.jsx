@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import Navbar from "../components/Navbar";
 
 function RegistroMantenimiento() {
   return (
-    <div>
-     <h1> aqui va el formulario de registro </h1>
+        <div style={{ backgroundColor: "#FFFFFF" }}>
+      <Navbar /> {/* Componente Navbar */}
     </div>
   )
 }

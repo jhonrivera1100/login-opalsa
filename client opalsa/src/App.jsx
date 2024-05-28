@@ -10,28 +10,31 @@ import Historial from "./pages/Historial";
 import RegistroMantenimiento from "./pages/RegistroMantenimiento";
 import GestionMaquinas from "./pages/GestionMaquinas";
 import { MaquinasProvider } from "./context/MaquinasContext";
+import { ComponentesProvider } from "./context/ComponentesContext";
 
 function App() {
   return (
     <AuthProvider>
       <MaquinasProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+        <ComponentesProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/GestionMaquinas" element={<GestionMaquinas />} />
-              <Route path="/Historial" element={<Historial />} />
-              <Route
-                path="/RegistroMantenimiento"
-                element={<RegistroMantenimiento />}
-              />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/GestionMaquinas" element={<GestionMaquinas />} />
+                <Route path="/Historial" element={<Historial />} />
+                <Route
+                  path="/RegistroMantenimiento"
+                  element={<RegistroMantenimiento />}
+                />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ComponentesProvider>
       </MaquinasProvider>
     </AuthProvider>
   );

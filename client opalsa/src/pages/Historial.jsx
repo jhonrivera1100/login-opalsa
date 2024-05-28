@@ -1,11 +1,15 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../components/Navbar";
+import UserHeader from "../components/UserHeader";
 
 function Historial() {
   return (
-    <div>
-     <h1 className='text-white'> aqui va el historial de mantenimiento</h1>
+    <div style={{ backgroundColor: "#FFFFFF" }}>
+      <Navbar /> {/* Componente Navbar */}
+      <UserHeader />
+      
     </div>
-  )
+  );
 }
 
 export default Historial;

@@ -1,11 +1,22 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../components/Navbar"; // Importa el componente Navbar
+import SearchBar from "../components/SearchBar"; // Importa el componente SearchBar
+import SeccionesHome from "../components/SeccionesHome";
+import UserHeader from "../components/UserHeader"; // Importa el componente UserHeader
 
 function GestionMaquinas() {
   return (
     <div>
-     <h1> aqui va toda la gestion de maquinas</h1> 
+      <Navbar /> {/* Componente Navbar */}
+      <UserHeader /> {/* Componente UserHeader */}
+      <SearchBar /> {/* Componente SearchBar */}
+      <SeccionesHome />
+      {/* Aquí puedes agregar el contenido específico para la gestión de máquinas */}
+      <div>
+        <h1> Aquí va toda la gestión de máquinas </h1>
+      </div>
     </div>
-  )
+  );
 }
 
-export default GestionMaquinas
+export default GestionMaquinas;

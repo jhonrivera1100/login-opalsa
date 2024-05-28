@@ -32,10 +32,12 @@ function SeccionesHome() {
       
       <div className="mt-4">
         {section === "Maquinas" && (
-          <div className="flex flex-wrap justify-center">
-            {maquinas.map((maquina) => (
-              <MaquinaCard key={maquina._id} maquina={maquina} />
-            ))}
+          <div className="mx-auto border border-black w-3/4 h-144 overflow-auto">
+            <div className="max-w-full grid grid-cols-3 gap-4">
+              {maquinas.map((maquina) => (
+                <MaquinaCard key={maquina._id} maquina={maquina} />
+              ))}
+            </div>
           </div>
         )}
       </div>
