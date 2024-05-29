@@ -42,7 +42,7 @@ function Navbar() {
               className={`text-lg font-bold ${
                 isHovered ? "" : "justify-center"
               } mb-2`}
-            ></span>
+            >l</span>
           )}
         </div>
         {/* Links del menú */}

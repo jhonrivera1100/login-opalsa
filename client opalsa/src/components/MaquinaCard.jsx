@@ -17,13 +17,13 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className={`max-w-sm rounded overflow-hidden shadow-lg mx-4 my-4 transition duration-300 transform hover:shadow-xl`}
+        className={`max-w-sm rounded overflow-hidden shadow-lg mx-4 my-4 transition duration-300 transform hover:shadow-xl bg-white rounded-lg`}
         onClick={toggleModal}
       >
         <img
           src={maquina.imgMaquina}
           alt={maquina.nombreMaquina}
-          className="w-full"
+          className="w-full h-64 object-cover"
         />
         <div className="px-6 py-4">
           <div className="font-bold text-xl mb-2">{maquina.nombreMaquina}</div>

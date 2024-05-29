@@ -38,9 +38,8 @@ const maquinaSchema = mongoose.Schema(
       trim: true,
     },
     imgMaquina: {
-      type: String,
-      required: true,
-      trim: true,
+      url: String,
+      public_id: String,
     },
     descripcionMaquina: {
       type: String,
