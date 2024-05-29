@@ -38,7 +38,7 @@ import React, { useEffect } from "react";
         </div>
     ))
 }
-<h1 className="text-3xl font-bold">Login</h1>
+<h1 className="text-3xl text-white font-bold">Login</h1>
 
       <form onSubmit={onSubmit}>
 
@@ -69,7 +69,7 @@ placeholder='Contraseña'
 
 
 </form>
-<p className="flex gap-x-2 justify-between ">
+<p className="flex gap-x-2 text-white justify-between ">
   ¿no tienes una cuenta aun? <Link  className="text-sky-500" to="/register">Registrate </Link>
 </p>
       </div>

@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { FaTrashAlt } from 'react-icons/fa';
 import HeaderUsuarios from '../components/HeaderUsuarios';
 import { FiSearch } from 'react-icons/fi';
+import { Tooltip } from 'react-tooltip'; 
 
 function GestionUsuarios() {
   const [users, setUsers] = useState([]);
@@ -11,6 +12,8 @@ function GestionUsuarios() {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [showFullEmail, setShowFullEmail] = useState(false);
+  const [tooltipId, setTooltipId] = useState(null);
 
   const permissionsList = [
     'Permiso 1',
@@ -40,6 +43,11 @@ function GestionUsuarios() {
     } catch (error) {
       console.error('Error al eliminar el usuario:', error);
     }
+  };
+
+  const handleToggleEmail = (tooltipId) => {
+    setShowFullEmail(!showFullEmail);
+    setTooltipId(tooltipId); // Actualiza el estado con el ID del tooltip
   };
 
   const handleSearchChange = (e) => {
@@ -100,7 +108,7 @@ function GestionUsuarios() {
             </div>
           </div>
         </div>
-        <div className='overflow-x-auto'>
+        <div className='overflow-x-auto pt-14'>
           <div className='min-w-full'>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 text-left pl-5'>
               <div className='font-semibold'>Nombre</div>
@@ -110,34 +118,36 @@ function GestionUsuarios() {
               <div className='font-semibold'>Permisos</div>
               <div className='font-semibold'>Eliminar</div>
             </div>
-            {filteredUsers.map(user => (
-              <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
+            <div className='overflow-y-auto max-h-[700px]'>
+              {filteredUsers.map(user => (
+                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">{user.cedula}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">{user.cargo}</p>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => handleShowPermissions(user)}
+                      className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
+                      Ver Permisos
+                    </button>
+                  </div>
+                  <div className='flex justify-center lg:justify-start'>
+                    <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-600">{user.cedula}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">{user.email}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">{user.cargo}</p>
-                </div>
-                <div>
-                  <button
-                    onClick={() => handleShowPermissions(user)}
-                    className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
-                    Ver Permisos
-                  </button>
-                </div>
-                <div className='flex justify-center lg:justify-start'>
-                  <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

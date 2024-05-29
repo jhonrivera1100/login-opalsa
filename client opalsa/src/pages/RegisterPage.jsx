@@ -42,7 +42,7 @@ function RegisterPage() {
             Usuario Creado exitosamente
           </div>
         )}
-        <h1 className='text-3xl font-bold my-2'>
+        <h1 className='text-3xl text-white font-bold my-2'>
           Registrarse
         </h1>
         <form onSubmit={onSubmit}>
@@ -85,7 +85,7 @@ function RegisterPage() {
             Registrarse
           </button>
         </form>
-        <p className="flex gap-x-2 justify-between">
+        <p className="flex gap-x-2 text-white justify-between">
           ¿Ya tienes una cuenta? <Link className="text-sky-500" to="/login">Iniciar Sesión</Link>
         </p>
       </div>

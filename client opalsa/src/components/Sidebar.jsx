@@ -7,7 +7,7 @@ import { IoNotificationsOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { AiOutlineMenu } from "react-icons/ai";
 import { VscClose } from "react-icons/vsc";
-
+import { CgEreader } from "react-icons/cg";
 function Sidebar() {
   const [showMenu, setShowMenu] = useState(false);
   const { logout, user } = useAuth();
@@ -19,7 +19,7 @@ function Sidebar() {
         {user && (
           <div className=' p-4 rounded-lg drop-shadow-xl flex flex-col items-center gap-3'>
             <h3 className="text-xl font-semibold text-white">{user.username}</h3>
-            <p className="text-white">{user.email}</p>
+            <p className="text-white overflow-hidden truncate">{user.email}</p>
             <p className='bg-sidebar-100 py-1 px-2 rounded-full text-white'>Administrador</p>
           </div>
         )}
@@ -27,8 +27,8 @@ function Sidebar() {
 
       {/* MENU */}
       <div className='pt-8'>
-      <div className='bg-sidebar-300/60 p-8 pt-[30px] rounded-tr-[100px] h-[90vh] flex flex-col justify-between gap-8'>
-        <nav className='flex flex-col gap-16 pt-14'>
+      <div className='bg-sidebar-300/60 p-8 pt-[30px] rounded-tr-[100px] h-[90vh] flex flex-col justify-between gap-6'>
+        <nav className='flex flex-col gap-12 pt-14'>
           <Link to="/admin" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <RiHome4Line /> Home
           </Link>
@@ -37,6 +37,9 @@ function Sidebar() {
           </Link>
           <Link to="/notifi" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <IoNotificationsOutline /> Notificaciones
+          </Link>
+          <Link to="/" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+            <CgEreader /> Aplicacion
           </Link>
           <Link to="/login" onClick={logout} className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <FiLogOut /> Logout

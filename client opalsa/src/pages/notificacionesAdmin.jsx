@@ -76,7 +76,7 @@ function NotificacionesAdmin() {
           </div>
         </div>
         <div className='flex pt-[50px] pl-9'>
-          <div className='w-[500px] h-[400px] p-8 bg-white rounded-xl shadow-lg'>
+          <div className='w-[500px] h-[435px] p-8 bg-white rounded-xl shadow-lg'>
             <h2 className="text-2xl font-bold mb-4">Crear Recordatorio</h2>
             <form onSubmit={handleSubmit}>
               <div className='mb-4'>
@@ -104,21 +104,23 @@ function NotificacionesAdmin() {
               </button>
             </form>
           </div>
-          <div className='w-[600px] pl-[80px] pt-6'>
+          <div className='w-[600px] pl-[80px] '>
             <h2 className="text-2xl font-bold mb-4">Recordatorios</h2>
-            <ul>
-              {filteredRecordatorios.map(recordatorio => (
-                <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
-                  <div>
-                    <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
-                    <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                  </div>
-                  <button onClick={() => handleDelete(recordatorio._id)} className="text-red-500 hover:text-red-700">
-                    <FaTrashAlt />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className='overflow-y-auto max-h-[400px]'>
+              <ul>
+                {filteredRecordatorios.map(recordatorio => (
+                  <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
+                    <div>
+                      <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
+                      <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
+                    </div>
+                    <button onClick={() => handleDelete(recordatorio._id)} className="text-red-500 hover:text-red-700">
+                      <FaTrashAlt />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
