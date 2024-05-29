@@ -1,9 +1,28 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaCog, FaHistory, FaTools, FaUser, FaUserShield, FaSignOutAlt, FaHome } from 'react-icons/fa';
+import {
+  FaCog,
+  FaHistory,
+  FaTools,
+  FaUser,
+  FaUserShield,
+  FaSignOutAlt,
+  FaHome,
+} from "react-icons/fa";
+import { useAuth } from "../context/AuthContext"; // Asegúrate de que esta ruta sea correcta
 
 function Navbar() {
   const [isHovered, setIsHovered] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { logout } = useAuth();
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
 
   return (
     <nav
@@ -19,12 +38,19 @@ function Navbar() {
           {isHovered ? (
             <span className="text-lg font-bold mb-2">OPALSA</span>
           ) : (
-            <span className={`text-lg font-bold ${isHovered ? "" : "justify-center"} mb-2`}>®️</span>
+            <span
+              className={`text-lg font-bold ${
+                isHovered ? "" : "justify-center"
+              } mb-2`}
+            ></span>
           )}
         </div>
         {/* Links del menú */}
         <div className="flex flex-col flex-grow p-4 space-y-2">
-          <Link to="/" className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded">
+          <Link
+            to="/"
+            className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded"
+          >
             <FaHome className="h-6 w-6 mr-1" />
             {isHovered && <span>Inicio</span>}
           </Link>
@@ -56,21 +82,33 @@ function Navbar() {
             <FaUser className="h-6 w-6 mr-1" />
             {isHovered && <span>Perfil</span>}
           </Link>
-          <Link
-            to="/admin"
-            className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded"
-          >
-            <FaUserShield className="h-6 w-6 mr-1" />
-            {isHovered && <span>Administrador</span>}
-          </Link>
           <div className="flex-grow"></div> {/* Elemento de separación */}
-          <Link
-            to="/cerrar-sesion"
-            className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded"
-          >
-            <FaSignOutAlt className="h-6 w-6 mr-1" />
-            {isHovered && <span>Cerrar Sesión</span>}
-          </Link>
+          <div className={`flex flex-col ${menuOpen ? "block" : "hidden"} md:hidden`}>
+            <Link
+              to="/login"
+              onClick={logout}
+              className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded"
+            >
+              <FaSignOutAlt className="h-6 w-6 mr-1" />
+              {isHovered && <span>Cerrar Sesión</span>}
+            </Link>
+          </div>
+          <div className={`hidden md:flex flex-col space-y-2 ${menuOpen ? "block" : "hidden"}`}>
+            <Link
+              to="/admin"
+              className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded"
+            >
+              <FaUserShield className="h-6 w-6 mr-1" />
+              {isHovered && <span>Administrador</span>}
+            </Link>
+            <div
+              onClick={logout}
+              className="flex items-center text-md transition duration-300 ease-in-out transform hover:bg-gray-800 hover:text-white p-2 rounded cursor-pointer"
+            >
+              <FaSignOutAlt className="h-6 w-6 mr-1" />
+              {isHovered && <span>Cerrar Sesión</span>}
+            </div>
+          </div>
         </div>
       </div>
     </nav>

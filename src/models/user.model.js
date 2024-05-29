@@ -4,7 +4,8 @@ const userSchema = new mongoose.Schema({
     username:{
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique:true
     },
     email:{
         type:String,
@@ -15,6 +16,15 @@ const userSchema = new mongoose.Schema({
     password:{
         type: String,
         required: true,
+    },
+    cedula:{
+        type: Number,
+        required: true,
+        unique:true
+    },
+    cargo:{
+        type: String,
+        required: true
     }
 },{
     timestamps:true
