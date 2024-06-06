@@ -11,7 +11,7 @@ export const createMaquinaSchema = z.object({
   descripcionMaquina: z.string().min(1, { message: "La descripción de la máquina es obligatoria" }),
   ubicacionMaquina: z.string().min(1, { message: "La ubicación de la máquina es obligatoria" }),
   imgMaquina: z.object({
-    url: z.string().url(),
+    url: z.string(),
     public_id: z.string()
   }).optional(),
   fechaInstalacionMaquina: z.string().min(1, { message: "La fecha de instalación de la máquina es obligatoria" }),

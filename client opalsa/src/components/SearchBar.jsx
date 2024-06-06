@@ -9,19 +9,8 @@ function SearchBar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("maquina");
   const [formData, setFormData] = useState({
-    empresa: {
-      nombreEmpresa: "",
-      ciudadEmpresa: "",
-      direccionEmpresa: "",
-      imgEmpresa: "",
-    },
-    casino: {
-      nombreCasino: "",
-      ciudadCasino: "",
-      direccionCasino: "",
-    },
     maquina: {
-      imgMaquina: "",
+      imgMaquina: null,
       nroSerieMaquina: "",
       nombreMaquina: "",
       modeloMaquina: "",
@@ -34,24 +23,61 @@ function SearchBar() {
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
     },
+    empresa: {
+      nombreEmpresa: "",
+      ciudadEmpresa: "",
+      direccionEmpresa: "",
+      imgEmpresa: "",
+    },
+    casino: {
+      nombreCasino: "",
+      ciudadCasino: "",
+      direccionCasino: "",
+    },
   });
+  
 
   const openModal = () => {
     setModalOpen(true);
   };
 
-  const onSubmit = handleSubmit((data) => {
-    createMaquina(data);
+  const onSubmit = handleSubmit(() => {
+    const formDataToSend = new FormData();
+    formDataToSend.append("imgMaquina", formData.maquina.imgMaquina);
+    formDataToSend.append("nroSerieMaquina", formData.maquina.nroSerieMaquina);
+    formDataToSend.append("nombreMaquina", formData.maquina.nombreMaquina);
+    formDataToSend.append("modeloMaquina", formData.maquina.modeloMaquina);
+    formDataToSend.append("marcaMaquina", formData.maquina.marcaMaquina);
+    formDataToSend.append("softwareMaquina", formData.maquina.softwareMaquina);
+    formDataToSend.append("juegoMaquina", formData.maquina.juegoMaquina);
+    formDataToSend.append("estadoMaquina", formData.maquina.estadoMaquina);
+    formDataToSend.append(
+      "descripcionMaquina",
+      formData.maquina.descripcionMaquina
+    );
+    formDataToSend.append(
+      "ubicacionMaquina",
+      formData.maquina.ubicacionMaquina
+    );
+    formDataToSend.append(
+      "fechaInstalacionMaquina",
+      formData.maquina.fechaInstalacionMaquina
+    );
+    formDataToSend.append(
+      "proveedorMaquina",
+      formData.maquina.proveedorMaquina
+    );
+    createMaquina(formDataToSend);
   });
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event, isFile = false) => {
     const { name, value } = event.target;
     const section = getSelectedSection();
     setFormData({
       ...formData,
       [section]: {
         ...formData[section],
-        [name]: value,
+        [name]: isFile ? event.target.files[0] : value,
       },
     });
   };
@@ -142,16 +168,13 @@ function SearchBar() {
                       Imagen de la Máquina:
                     </label>
                     <input
-                      type="text"
+                      type="file"
                       name="imgMaquina"
-                      value={formData.maquina.imgMaquina}
-                      {...register("imgMaquina")}
-                      autoFocus
-                      placeholder="Imagen de la máquina"
-                      onChange={handleInputChange}
+                      onChange={(e) => handleInputChange(e, true)} // true indica que es un cambio de archivo
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                     />
                   </div>
+
                   <div>
                     <label
                       htmlFor="nroSerieMaquina"
@@ -322,7 +345,7 @@ function SearchBar() {
                       Fecha de Instalación:
                     </label>
                     <input
-                      type="text"
+                      type="date"
                       name="fechaInstalacionMaquina"
                       value={formData.maquina.fechaInstalacionMaquina}
                       {...register("fechaInstalacionMaquina")}
