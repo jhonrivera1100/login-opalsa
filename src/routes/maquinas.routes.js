@@ -6,6 +6,7 @@ import {
   crearMaquina,
   eliminarMaquina,
   actualizarMaquina,
+  getMaquinaByNroSerie,
 } from "../controllers/maquinas.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createMaquinaSchema } from "../schemas/maquinas.schema.js";
@@ -21,5 +22,7 @@ router.post(
 );
 router.delete("/maquina/:id", authRequired, eliminarMaquina);
 router.put("/maquina/:id", authRequired, actualizarMaquina);
+router.get('/maquina/:nroSerie', getMaquinaByNroSerie);
+
 
 export default router;
