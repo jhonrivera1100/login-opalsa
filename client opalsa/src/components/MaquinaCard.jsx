@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ModalMaquina from "./ModalMaquina"; // Asegúrate de importar correctamente
+import ModalMaquina from "./ModalMaquina";
 
 function MaquinaCard({ maquina }) {
   const [showModal, setShowModal] = useState(false);
@@ -17,24 +17,35 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className={`max-w-sm rounded overflow-hidden shadow-lg mx-4 my-4 transition duration-300 transform hover:shadow-xl bg-white rounded-lg`}
+        className={`max-w-[18rem] rounded-lg overflow-hidden shadow-lg mx-2 my-4 transition duration-300 transform hover:shadow-xl hover:-translate-y-1 bg-gray-700 text-white rounded-lg cursor-pointer`}
         onClick={toggleModal}
       >
-        <img
-          src={maquina.imgMaquina}
-          alt={maquina.nombreMaquina}
-          className="w-full h-64 object-cover"
-        />
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2">{maquina.nombreMaquina}</div>
-          <p className="text-gray-700 text-base">
-            <strong>Número de Serie:</strong> {maquina.nroSerieMaquina}
+        <div className="bg-gray-900 text-white py-2 px-4 text-center font-bold">
+          Serial: {maquina.nroSerieMaquina}
+        </div>
+        <div className="relative">
+          <img
+            src={maquina.imgMaquina.url}
+            alt={maquina.nombreMaquina}
+            className="w-full h-96 object-cover"
+          />
+          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white py-1 px-4 font-bold text-xl text-center">
+            {maquina.marcaMaquina}
+          </div>
+        </div>
+        <div className="px-4 py-2">
+          <p className="text-sm">
+            <strong className="text-sky-300">Nombre:</strong>{" "}
+            <span className="text-white">{maquina.nombreMaquina}</span>
             <br />
-            <strong>Marca:</strong> {maquina.marcaMaquina}
+            <strong className="text-sky-300">Estado:</strong>{" "}
+            <span className="text-white">{maquina.estadoMaquina}</span>
             <br />
-            <strong>Estado:</strong> {maquina.estadoMaquina}
+            <strong className="text-sky-300">Ubicada en:</strong>{" "}
+            <span className="text-white">{maquina.ubicacionMaquina}</span>
             <br />
-            <strong>Ubicación:</strong> {maquina.ubicacionMaquina}
+            <strong className="text-sky-300">Fecha de Instalación:</strong>{" "}
+            <span className="text-white">{maquina.fechaInstalacionMaquina}</span>
             <br />
           </p>
         </div>

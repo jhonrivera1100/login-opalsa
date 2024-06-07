@@ -23,17 +23,31 @@ function SeccionesHome() {
 
   return (
     <div style={{ backgroundColor: "#FFFFFF" }}>
-      
       <div className="flex justify-center mt-4">
-        <button className={section === "Empresas" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"} onClick={() => setSection("Empresas")}>Empresas</button>
-        <button className={section === "Casinos" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"} onClick={() => setSection("Casinos")}>Casinos</button>
-        <button className={section === "Maquinas" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"} onClick={() => setSection("Maquinas")}>Máquinas</button>
+        <button
+          className={section === "Empresas" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"}
+          onClick={() => setSection("Empresas")}
+        >
+          Empresas
+        </button>
+        <button
+          className={section === "Casinos" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"}
+          onClick={() => setSection("Casinos")}
+        >
+          Casinos
+        </button>
+        <button
+          className={section === "Maquinas" ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded" : "text-blue-500 font-bold py-2 px-4 mx-2"}
+          onClick={() => setSection("Maquinas")}
+        >
+          Máquinas
+        </button>
       </div>
-      
+
       <div className="mt-4">
         {section === "Maquinas" && (
-          <div className="mx-auto border border-black w-3/4 h-144 overflow-auto rounded-lg bg-slate-300">
-            <div className="max-w-full grid grid-cols-3 gap-4">
+          <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-300 p-4">
+            <div className="grid grid-cols-4 gap-1">
               {maquinas.map((maquina) => (
                 <MaquinaCard key={maquina._id} maquina={maquina} />
               ))}

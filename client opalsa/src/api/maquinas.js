@@ -1,7 +1,7 @@
 import axios from './axios';
 
 export const getMaquinasRequest = () => axios.get('/maquina')
-export const updateMaquinaRequest = (id) => axios.get(`/maquina/${id}`)
+export const getMaquinaRequest = (id) => axios.get(`/maquina/${id}`)
 export const createMaquinasRequest = (formData) => {
     return axios.post('/maquina', formData, {
       headers: {
