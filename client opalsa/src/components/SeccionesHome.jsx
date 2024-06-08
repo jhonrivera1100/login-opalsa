@@ -1,25 +1,55 @@
 import React, { useState, useEffect } from "react";
 import MaquinaCard from "../components/MaquinaCard";
 import { getMaquinasRequest } from "../api/maquinas";
+import { getCasinosRequest } from "../api/casinos";
+import CasinoCard from "../components/casinoCard"; // Asegúrate de que este sea el camino correcto al componente
 
 function SeccionesHome() {
   const [section, setSection] = useState("Empresas");
   const [maquinas, setMaquinas] = useState([]);
+  const [casinos, setCasinos] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await getMaquinasRequest();
-        setMaquinas(response.data);
-      } catch (error) {
-        console.error("Error al cargar las máquinas:", error);
+      if (section === "Maquinas") {
+        try {
+          const response = await getMaquinasRequest();
+          setMaquinas(response.data);
+        } catch (error) {
+          console.error("Error al cargar las máquinas:", error);
+        }
+      } else if (section === "Casinos") {
+        try {
+          const response = await getCasinosRequest();
+          setCasinos(response.data);
+        } catch (error) {
+          console.error("Error al cargar los casinos:", error);
+        }
       }
     };
 
-    if (section === "Maquinas") {
-      fetchData();
-    }
+    fetchData();
   }, [section]);
+
+  // Contenedor común para cada sección
+  const renderSectionContent = () => {
+    return (
+      <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-300 p-4">
+        <div className="grid grid-cols-4 gap-1">
+          {/* Aquí irá el contenido específico de cada sección */}
+          {section === "Maquinas" && maquinas.map((maquina) => (
+            <MaquinaCard key={maquina._id} maquina={maquina} />
+          ))}
+          {section === "Casinos" && casinos.map((casino) => (
+            <CasinoCard key={casino._id} casino={casino} />
+          ))}
+          {section === "Empresas" && (
+            <p>Empresas placeholder content</p>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ backgroundColor: "#FFFFFF" }}>
@@ -45,15 +75,7 @@ function SeccionesHome() {
       </div>
 
       <div className="mt-4">
-        {section === "Maquinas" && (
-          <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-300 p-4">
-            <div className="grid grid-cols-4 gap-1">
-              {maquinas.map((maquina) => (
-                <MaquinaCard key={maquina._id} maquina={maquina} />
-              ))}
-            </div>
-          </div>
-        )}
+        {renderSectionContent()}
       </div>
     </div>
   );
