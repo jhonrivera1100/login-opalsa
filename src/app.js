@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.routes.js';
 import recordatorioRoutes from './routes/recordatorio.routes.js';
 import userRoutes from './routes/user.routes.js';
 import maquinaRoutes from './routes/maquinas.routes.js';
+import casinosRoutes from './routes/casinos.routes.js';
 import componenteRoutes from './routes/componente.routes.js';
 import mantenimientoRoutes from './routes/mantenimiento.routes.js';
 
@@ -34,6 +35,7 @@ app.use('/api', authRoutes);
 app.use('/api', recordatorioRoutes);
 app.use('/api', userRoutes);
 app.use('/api', maquinaRoutes);
+app.use('/api', casinosRoutes);
 app.use('/api', componenteRoutes);
 app.use('/api', mantenimientoRoutes);
 
