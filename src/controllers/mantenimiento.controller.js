@@ -1,10 +1,9 @@
 import Mantenimiento from '../models/mantenimiento.model.js';
-import Maquina from '../models/maquina.model.js'; // Importa el modelo de Maquina
+import Maquina from '../models/maquina.model.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Definir __dirname en ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,11 +18,11 @@ export const getMantenimientos = async (req, res) => {
 
 export const createMantenimiento = async (req, res) => {
   try {
-    const { tipoMantenimiento, fechaMantenimiento, descripcion, numeroSerie } = req.body;
+    const { tipoMantenimiento, fechaMantenimiento, descripcion, nroSerieMaquina, nombreMaquina, ubicacionMaquina } = req.body;
     const archivo = req.files ? req.files.archivo : null;
 
-    // Buscar la máquina por número de serie
-    const maquina = await Maquina.findOne({ nroSerieMaquina: numeroSerie });
+    // Buscar la máquina por número de serie (este paso puede omitirse ya que ya tienes nombre y ubicación)
+    const maquina = await Maquina.findOne({ nroSerieMaquina });
     if (!maquina) {
       return res.status(404).json({ message: 'Máquina no encontrada' });
     }
@@ -32,14 +31,14 @@ export const createMantenimiento = async (req, res) => {
       tipoMantenimiento,
       fechaMantenimiento,
       descripcion,
-      nroSerieMaquina: numeroSerie,
-      nombreMaquina: maquina.nombreMaquina,
-      ubicacionMaquina: maquina.ubicacionMaquina,
+      nroSerieMaquina,
+      nombreMaquina,
+      ubicacionMaquina,
       archivo: archivo ? archivo.name : null,
     });
 
     if (archivo) {
-      const uploadPath = `./upload/${archivo.name}`;
+      const uploadPath = path.join(__dirname, '../upload', archivo.name);
       archivo.mv(uploadPath, async (err) => {
         if (err) {
           return res.status(500).json({ message: 'Error al guardar el archivo', error: err });

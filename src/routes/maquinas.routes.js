@@ -6,11 +6,12 @@ import {
   crearMaquina,
   eliminarMaquina,
   actualizarMaquina,
-  getMaquinaByNroSerie,
-} from "../controllers/maquinas.controller.js";
+  } from "../controllers/maquinas.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createMaquinaSchema } from "../schemas/maquinas.schema.js";
+
 const router = Router();
+
 
 router.get("/maquina", authRequired, traerMaquinas);
 router.get("/maquina/:id", authRequired, traerMaquina);
@@ -21,8 +22,7 @@ router.post(
   crearMaquina
 );
 router.delete("/maquina/:id", authRequired, eliminarMaquina);
-router.put("/maquina/:id", authRequired, actualizarMaquina);
-router.get('/maquina/:nroSerie', getMaquinaByNroSerie);
+router.put("/maquina/:id", authRequired, actualizarMaquina); 
 
 
 export default router;
