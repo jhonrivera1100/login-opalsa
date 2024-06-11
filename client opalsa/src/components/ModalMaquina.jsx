@@ -24,7 +24,7 @@ function ModalMaquina({ maquina, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="bg-sky-100 shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 relative text-sm">
+      <div className="bg-sky-50 shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 relative text-sm">
         <button
           onClick={onClose}
           className="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-800 focus:outline-none"
@@ -45,9 +45,9 @@ function ModalMaquina({ maquina, onClose }) {
           </svg>
         </button>
 
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full ">
           {/* Parte superior: Imagen y datos de la máquina con fondo común */}
-          <div className="flex mb-6 h-1/2 bg-slate-600 p-4 rounded-lg relative">
+          <div className="flex mb-6 h-1/2 border-gray-900 border-4 bg-slate-600 p-4 rounded-lg relative ">
             {" "}
             {/* Fondo común y padding */}
             <div className="w-1/3 pr-4 flex flex-col items-center justify-center relative">

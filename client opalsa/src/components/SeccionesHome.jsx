@@ -34,7 +34,7 @@ function SeccionesHome() {
   // Contenedor común para cada sección
   const renderSectionContent = () => {
     return (
-      <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-300 p-4">
+      <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-200 p-4">
         <div className="grid grid-cols-4 gap-1">
           {/* Aquí irá el contenido específico de cada sección */}
           {section === "Maquinas" && maquinas.map((maquina) => (

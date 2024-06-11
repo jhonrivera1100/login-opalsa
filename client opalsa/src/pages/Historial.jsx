@@ -6,7 +6,7 @@ import MantenimientosList from "../components/mantenimientoLista";
 
 function Historial() {
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div>
       <Navbar /> {/* Componente Navbar */}
       <UserHeader /> {/* Componente UserHeader */}
       <div className="w-[600px] h-[800px]">
