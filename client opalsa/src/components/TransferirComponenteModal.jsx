@@ -2,7 +2,6 @@ import axios from "../api/axios";
 import React, { useState, useEffect } from "react";
 import { getMaquinasRequest } from "../api/maquinas";
 
-
 function TransferirComponenteModal({ maquina, componentes, onClose }) {
   const [numerosDeSerie, setNumerosDeSerie] = useState([]);
   const [maquinas, setMaquinas] = useState([]);
@@ -54,6 +53,22 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
 
       console.log("Componente transferido exitosamente:", formData.serialComponente);
       console.log("Nueva máquina:", formData.nuevaMaquinaSerial);
+
+      // Obtener los datos de las máquinas involucradas
+      const oldMaquina = maquinas.find(m => m._id === maquina._id);
+      const newMaquina = maquinas.find(m => m._id === formData.nuevaMaquinaSerial);
+
+      // Registro en el historial
+      await axios.post('/historial', {
+        componenteId: componenteAActualizar._id,
+        oldMaquinaId: oldMaquina._id,
+        oldMaquinaSerial: oldMaquina.nroSerieMaquina,
+        newMaquinaId: newMaquina._id,
+        newMaquinaSerial: newMaquina.nroSerieMaquina,
+        nombreComponente: componenteAActualizar.nombreComponente,
+        serialComponente: componenteAActualizar.serialComponente,
+      });
+
     } catch (error) {
       console.error("Error al transferir el componente:", error);
     }
