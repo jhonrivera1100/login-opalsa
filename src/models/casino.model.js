@@ -1,31 +1,36 @@
-const casinoSchema = mongoose.casinoSchema({
+import mongoose from "mongoose";
+
+const casinoSchema = mongoose.Schema(
+  {
     nombreCasino: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
     imgCasino: {
-        type: String,
-        required: true,
-        trim: true
+      url: String,
+      public_id: String,
     },
     ciudadCasino: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
     direccionCasino: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
     documentacionCasino: {
-        type: String,
-        required: true,
-        trim: true
-    }
-},{
-    timestamps:true
-})
+      type: String,
+      required: true,
+      trim: true,
+    },
+    maquinas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Maquinas" }],
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model('casinos', casinoSchema)
+export default mongoose.model("Casinos", casinoSchema);

@@ -53,10 +53,34 @@ export const createComponente = async (req, res) => {
 // Actualizar un componente por ID
 export const updateComponenteById = async (req, res) => {
   try {
-    const componenteActualizado = await Componente.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!componenteActualizado) return res.status(404).json({ message: 'Componente no encontrado' });
+    const { id } = req.params;
+    const { maquina: nuevaMaquina } = req.body;
+
+    // Obtener el componente actual
+    const componente = await Componente.findById(id);
+    if (!componente) return res.status(404).json({ message: 'Componente no encontrado' });
+
+    // Si la máquina está cambiando, actualizar las máquinas involucradas
+    if (componente.maquina.toString() !== nuevaMaquina) {
+      // Remover el componente de la máquina actual
+      const maquinaActual = await Maquinas.findById(componente.maquina);
+      if (maquinaActual) {
+        maquinaActual.componentes.pull(componente._id);
+        await maquinaActual.save();
+      }
+
+      // Agregar el componente a la nueva máquina
+      const maquinaNueva = await Maquinas.findById(nuevaMaquina);
+      if (maquinaNueva) {
+        maquinaNueva.componentes.push(componente._id);
+        await maquinaNueva.save();
+      }
+    }
+
+    // Actualizar el componente con la nueva máquina
+    componente.maquina = nuevaMaquina;
+    const componenteActualizado = await componente.save();
+
     res.json(componenteActualizado);
   } catch (error) {
     res.status(400).json({ message: 'Error al actualizar el componente', error });
