@@ -96,18 +96,3 @@ export const eliminarMaquina = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar la máquina", error: error.message });
   }
 };
-
-// traer maquinas en mantenimientos
-export const getMaquinaByNroSerie = async (req, res) => {
-  try {
-    const { nroSerie } = req.params;
-    console.log('Número de Serie recibido:', nroSerie); // Debugging
-    const maquina = await Maquina.findOne({ nroSerieMaquina: nroSerie });
-    if (!maquina) {
-      return res.status(404).json({ message: 'Máquina no encontrada' });
-    }
-    res.json(maquina);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener la máquina', error });
-  }
-};

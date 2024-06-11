@@ -5,6 +5,9 @@ const mantenimientoSchema = new mongoose.Schema({
   fechaMantenimiento: { type: Date, default: Date.now, required: true },
   descripcion: { type: String, required: true },
   archivo: { type: String},
+  nroSerieMaquina: { type: String, required: true }, // Agregado
+  nombreMaquina: { type: String, required: true }, // Agregado
+  ubicacionMaquina: { type: String, required: true }, // Agregado
 
 });
 

@@ -9,7 +9,7 @@ function Historial() {
     <div>
       <Navbar /> {/* Componente Navbar */}
       <UserHeader /> {/* Componente UserHeader */}
-      <div className="w-[600px] h-[800px]">
+      <div className="flex items-center justify-end">
           <MantenimientosList />
         </div>
     </div>

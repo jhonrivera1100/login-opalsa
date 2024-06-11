@@ -13,14 +13,13 @@ const MantenimientosList = () => {
           response.data.map(async (mantenimiento) => {
             if (mantenimiento.nroSerieMaquina) {
               try {
-                const machineResponse = await axios.get(`http://localhost:4000/api/maquinas/nroSerie/${mantenimiento.nroSerieMaquina}`);
+                const machineResponse = await axios.get(`http://localhost:4000/api/maquina/${mantenimiento.nroSerieMaquina}`);
                 return {
                   ...mantenimiento,
                   nombreMaquina: machineResponse.data.nombreMaquina,
                   ubicacionMaquina: machineResponse.data.ubicacionMaquina,
                 };
               } catch (error) {
-                console.error(`Error al obtener detalles de la máquina con número de serie ${mantenimiento.nroSerieMaquina}:`, error);
                 return mantenimiento; // Devolver el mantenimiento original si falla la solicitud
               }
             } else {
@@ -48,34 +47,33 @@ const MantenimientosList = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-lg">
-      <h2 className="text-xl font-bold mb-4">Mantenimientos</h2>
-      <ul>
+    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center">Mantenimientos</h2>
+      <ul className="space-y-4">
         {mantenimientos.map((mantenimiento) => (
-          <li key={mantenimiento._id} className="border border-gray-300 rounded-md p-2 mb-2 flex justify-between items-center">
-            <div>
-              <strong>Tipo:</strong> {mantenimiento.tipoMantenimiento}, 
-              <strong>Fecha:</strong> {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}, 
-              <strong>Descripción:</strong> {mantenimiento.descripcion}, 
+          <li key={mantenimiento._id} className="border border-gray-200 rounded-lg p-4 flex justify-between items-center bg-gray-50 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="space-y-2">
+              <p><strong>Tipo:</strong> {mantenimiento.tipoMantenimiento}</p>
+              <p><strong>Fecha:</strong> {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</p>
+              <p><strong>Descripción:</strong> {mantenimiento.descripcion}</p>
               {mantenimiento.nombreMaquina && (
-                <>
-                  <strong>Nombre de la Máquina:</strong> {mantenimiento.nombreMaquina}, 
-                </>
+                <p><strong>Nombre de la Máquina:</strong> {mantenimiento.nombreMaquina}</p>
               )}
-              <strong>Número de Serie:</strong> {mantenimiento.nroSerieMaquina}, 
+              <p><strong>Número de Serie:</strong> {mantenimiento.nroSerieMaquina}</p>
               {mantenimiento.ubicacionMaquina && (
-                <>
-                  <strong>Ubicación:</strong> {mantenimiento.ubicacionMaquina}, 
-                </>
+                <p><strong>Ubicación:</strong> {mantenimiento.ubicacionMaquina}</p>
               )}
-              <strong>Documento:</strong> {mantenimiento.archivo && (
-                <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer">
-                  {mantenimiento.archivo}
-                </a>
+              {mantenimiento.archivo && (
+                <p>
+                  <strong>Documento:</strong> 
+                  <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">
+                    {mantenimiento.archivo}
+                  </a>
+                </p>
               )}
             </div>
             <button
-              className="bg-red-500 text-white py-1 px-2 rounded-md"
+              className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
               onClick={() => handleDelete(mantenimiento._id)}
             >
               Eliminar
