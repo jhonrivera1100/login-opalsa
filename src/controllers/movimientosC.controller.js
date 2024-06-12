@@ -1,4 +1,4 @@
-import MovimientosC from '../models/movimientosC.model';
+import MovimientosC from '../models/movimientosC.model.js';
 
 export const getMovimientosC = async (req, res) => {
   try {
@@ -9,10 +9,10 @@ export const getMovimientosC = async (req, res) => {
   }
 };
 
- export const addMovimientosC = async (req, res) => {
+export const addMovimientosC = async (req, res) => {
   const { componenteId, oldMaquinaId, oldMaquinaSerial, newMaquinaId, newMaquinaSerial, nombreComponente, serialComponente } = req.body;
 
-  const newMovientosC = new MovimientosC({
+  const newMovimientosC = new MovimientosC({
     componenteId,
     oldMaquinaId,
     oldMaquinaSerial,
@@ -23,10 +23,9 @@ export const getMovimientosC = async (req, res) => {
   });
 
   try {
-    const savedMovimientosC = await newMovientosC.save();
+    const savedMovimientosC = await newMovimientosC.save();
     res.status(201).json(savedMovimientosC);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-

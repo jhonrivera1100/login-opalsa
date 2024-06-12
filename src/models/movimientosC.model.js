@@ -38,4 +38,4 @@ const MovimientosCSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('MovimientosC', MovimientosCSchema);
+export default mongoose.model('MovimientosC', MovimientosCSchema);
