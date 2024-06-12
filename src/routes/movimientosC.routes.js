@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMovimientosC, addMovimientosC  } from '../controllers/movimientosC.controller';
+import { getMovimientosC, addMovimientosC } from '../controllers/movimientosC.controller.js';
 
 const router = Router();
 
