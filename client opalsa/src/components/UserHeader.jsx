@@ -33,7 +33,7 @@ function UserHeader() {
   }
 
   return (
-    <div className="bg-black p-1 flex justify-between items-center">
+    <div className="bg-slate-200 p-1 flex justify-between items-center">
       <div className="flex items-center w-1/3"></div> {/* Espacio vacío para mantener los elementos a la derecha */}
       <div className="text-white font-bold flex-grow text-center w-1/3">{title}</div> {/* Mostrar el título centrado */}
       <div className="flex items-center w-1/3 justify-end"> {/* Alineación hacia la derecha */}

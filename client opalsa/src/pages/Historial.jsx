@@ -7,7 +7,7 @@ import HistorialComponentes from "../components/movimientosLista";
 
 function Historial() {
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div>
       <Navbar /> {/* Componente Navbar */}
       <UserHeader /> {/* Componente UserHeader */}
       <div className="flex items-center justify-end">
