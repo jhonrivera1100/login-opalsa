@@ -96,3 +96,4 @@ export const eliminarMaquina = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar la máquina", error: error.message });
   }
 };
+  

@@ -47,40 +47,44 @@ const MantenimientosList = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Mantenimientos</h2>
-      <ul className="space-y-4">
+    <div className="max-w-8xl mx-auto mt-10 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {mantenimientos.map((mantenimiento) => (
-          <li key={mantenimiento._id} className="border border-gray-200 rounded-lg p-4 flex justify-between items-center bg-gray-50 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="space-y-2">
-              <p><strong>Tipo:</strong> {mantenimiento.tipoMantenimiento}</p>
-              <p><strong>Fecha:</strong> {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</p>
-              <p><strong>Descripción:</strong> {mantenimiento.descripcion}</p>
-              {mantenimiento.nombreMaquina && (
-                <p><strong>Nombre de la Máquina:</strong> {mantenimiento.nombreMaquina}</p>
-              )}
-              <p><strong>Número de Serie:</strong> {mantenimiento.nroSerieMaquina}</p>
-              {mantenimiento.ubicacionMaquina && (
-                <p><strong>Ubicación:</strong> {mantenimiento.ubicacionMaquina}</p>
-              )}
-              {mantenimiento.archivo && (
-                <p>
-                  <strong>Documento:</strong> 
-                  <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">
-                    {mantenimiento.archivo}
-                  </a>
-                </p>
-              )}
+          <div key={mantenimiento._id} className="border border-gray-200 rounded-lg shadow-lg hover:shadow-md transition-shadow duration-300">
+            <div className="bg-gray-900 text-white w-full py-2 px-2 text-center font-bold rounded-t-lg">
+              <h3 className="text-lg font-bold">Mantenimiento</h3>
             </div>
-            <button
-              className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
-              onClick={() => handleDelete(mantenimiento._id)}
-            >
-              Eliminar
-            </button>
-          </li>
+            <div className="p-4 bg-gray-50">
+              <div className="space-y-2">
+                <p><strong>Tipo:</strong> {mantenimiento.tipoMantenimiento}</p>
+                <p><strong>Fecha:</strong> {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</p>
+                <p><strong>Descripción:</strong> {mantenimiento.descripcion}</p>
+                {mantenimiento.nombreMaquina && (
+                  <p><strong>Nombre de la Máquina:</strong> {mantenimiento.nombreMaquina}</p>
+                )}
+                <p><strong>Número de Serie:</strong> {mantenimiento.nroSerieMaquina}</p>
+                {mantenimiento.ubicacionMaquina && (
+                  <p><strong>Ubicación:</strong> {mantenimiento.ubicacionMaquina}</p>
+                )}
+                {mantenimiento.archivo && (
+                  <p>
+                    <strong>Documento:</strong> 
+                    <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">
+                      {mantenimiento.archivo}
+                    </a>
+                  </p>
+                )}
+              </div>
+              <button
+                className="mt-4 bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+                onClick={() => handleDelete(mantenimiento._id)}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

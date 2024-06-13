@@ -12,6 +12,7 @@ import maquinaRoutes from './routes/maquinas.routes.js';
 import casinosRoutes from './routes/casinos.routes.js';
 import componenteRoutes from './routes/componente.routes.js';
 import mantenimientoRoutes from './routes/mantenimiento.routes.js';
+import movimientosCRoutes from './routes/movimientosC.routes.js'; // Importar rutas de movimientos
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api', maquinaRoutes);
 app.use('/api', casinosRoutes);
 app.use('/api', componenteRoutes);
 app.use('/api', mantenimientoRoutes);
+app.use('/api', movimientosCRoutes); // Usar rutas de movimientos
 
 // Middleware para servir archivos estáticos
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
