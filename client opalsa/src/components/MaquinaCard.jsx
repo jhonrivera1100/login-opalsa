@@ -17,10 +17,10 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className={`max-w-[18rem] rounded-lg overflow-hidden shadow-lg mx-2 my-4 transition duration-300 transform hover:shadow-xl hover:-translate-y-1 bg-gray-700 text-white rounded-lg cursor-pointer`}
+        className={`max-w-[18rem] rounded-lg overflow-hidden shadow-lg mx-2 my-4 transition duration-300 transform hover:shadow-xl hover:-translate-y-1 bg-gray-700 text-white cursor-pointer`}
         onClick={toggleModal}
       >
-        <div className="bg-gray-900 text-white py-2 px-4 text-center font-bold">
+        <div className="bg-gray-900 text-white py-2 px-4 text-center font-semibold truncate">
           Serial: {maquina.nroSerieMaquina}
         </div>
         <div className="relative">
@@ -29,25 +29,27 @@ function MaquinaCard({ maquina }) {
             alt={maquina.nombreMaquina}
             className="w-full h-96 object-cover"
           />
-          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white py-1 px-4 font-bold text-xl text-center">
+          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white py-1 px-4 font-semibold text-lg text-center truncate">
             {maquina.marcaMaquina}
           </div>
         </div>
         <div className="px-4 py-2">
-          <p className="text-sm">
-            <strong className="text-sky-300">Nombre:</strong>{" "}
-            <span className="text-white">{maquina.nombreMaquina}</span>
-            <br />
-            <strong className="text-sky-300">Estado:</strong>{" "}
-            <span className="text-white">{maquina.estadoMaquina}</span>
-            <br />
-            <strong className="text-sky-300">Ubicada en:</strong>{" "}
-            <span className="text-white">{maquina.ubicacionMaquina}</span>
-            <br />
-            <strong className="text-sky-300">Fecha de Instalación:</strong>{" "}
-            <span className="text-white">{maquina.fechaInstalacionMaquina}</span>
-            <br />
-          </p>
+          <div className="flex text-sm">
+            <strong className="text-sky-300 mr-1">Nombre: </strong>{" "}
+            <span className="text-white truncate">{maquina.nombreMaquina}</span>
+          </div>
+          <div className="flex text-sm">
+            <strong className="text-sky-300 mr-1">Estado: </strong>{" "}
+            <span className="text-white truncate">{maquina.estadoMaquina}</span>
+          </div>
+          <div className="flex text-sm">
+            <strong className="text-sky-300 mr-1">Ubicacion: </strong>{" "}
+            <span className="text-white truncate">{maquina.ubicacionMaquina}</span>
+          </div>
+          <div className="flex text-sm">
+            <strong className="text-sky-300 mr-1">Fecha de Instalación: </strong>{" "}
+            <span className="text-white truncate">{maquina.fechaInstalacionMaquina}</span>
+          </div>
         </div>
       </div>
       {showModal && <ModalMaquina maquina={maquina} onClose={toggleModal} />}

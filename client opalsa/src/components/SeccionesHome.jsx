@@ -8,6 +8,7 @@ function SeccionesHome() {
   const [section, setSection] = useState("Empresas");
   const [maquinas, setMaquinas] = useState([]);
   const [casinos, setCasinos] = useState([]);
+  const [startIndex, setStartIndex] = useState(0); // Índice de la primera máquina a mostrar
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,20 +34,46 @@ function SeccionesHome() {
 
   // Contenedor común para cada sección
   const renderSectionContent = () => {
+    let sectionData = [];
+    if (section === "Maquinas") {
+      sectionData = maquinas.slice(startIndex, startIndex + 8);
+    } else if (section === "Casinos") {
+      sectionData = casinos;
+    } else {
+      return <p>Empresas placeholder content</p>;
+    }
+
     return (
       <div className="mx-auto border border-gray-200 w-9/12 h-144 overflow-auto bg-slate-200 p-4">
         <div className="grid grid-cols-4 gap-1">
           {/* Aquí irá el contenido específico de cada sección */}
-          {section === "Maquinas" && maquinas.map((maquina) => (
-            <MaquinaCard key={maquina._id} maquina={maquina} />
-          ))}
-          {section === "Casinos" && casinos.map((casino) => (
-            <CasinoCard key={casino._id} casino={casino} />
-          ))}
-          {section === "Empresas" && (
-            <p>Empresas placeholder content</p>
-          )}
+          {section === "Maquinas" &&
+            sectionData.map((maquina) => (
+              <MaquinaCard key={maquina._id} maquina={maquina} />
+            ))}
+          {section === "Casinos" &&
+            sectionData.map((casino) => (
+              <CasinoCard key={casino._id} casino={casino} />
+            ))}
         </div>
+        {section === "Maquinas" && (
+          <div className="flex justify-center mt-4">
+            <button
+              className="bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
+              onClick={() => setStartIndex(startIndex - 8)}
+              disabled={startIndex === 0}
+            >
+              Anterior
+            </button>
+            <button
+              className="bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
+              onClick={() => setStartIndex(startIndex + 8)}
+              disabled={startIndex + 8 >= maquinas.length}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
     );
   };
