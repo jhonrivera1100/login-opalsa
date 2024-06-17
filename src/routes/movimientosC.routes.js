@@ -4,9 +4,9 @@ import { getMovimientosC, addMovimientosC } from '../controllers/movimientosC.co
 const router = Router();
 
 // Obtener el historial
-router.get('/movimientosC', getMovimientosC);
+router.get('/api/historial', getMovimientosC);
 
 // Crear un nuevo registro en el historial
-router.post('/movimientosC', addMovimientosC);
+router.post('/api/historial', addMovimientosC);
 
 export default router;

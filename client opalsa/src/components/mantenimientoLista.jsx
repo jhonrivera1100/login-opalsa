@@ -47,32 +47,52 @@ const MantenimientosList = () => {
   };
 
   return (
-    <div className="max-w-8xl mx-auto mt-10 p-6">
+    <div className="max-w-7xl mx-auto mt-10 p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {mantenimientos.map((mantenimiento) => (
           <div key={mantenimiento._id} className="border border-gray-200 rounded-lg shadow-lg hover:shadow-md transition-shadow duration-300">
-            <div className="bg-gray-900 text-white w-full py-2 px-2 text-center font-bold rounded-t-lg">
+            <div className="bg-blue-500 text-white w-[300px] py-2 px-2 text-center font-bold rounded-t-lg">
               <h3 className="text-lg font-bold">Mantenimiento</h3>
             </div>
-            <div className="p-4 bg-gray-50">
+            <div className="p-6 w-[300px] bg-gray-50">
               <div className="space-y-2">
-                <p><strong>Tipo:</strong> {mantenimiento.tipoMantenimiento}</p>
-                <p><strong>Fecha:</strong> {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</p>
-                <p><strong>Descripción:</strong> {mantenimiento.descripcion}</p>
+                <div>
+                  <strong>Tipo:</strong>
+                  <div>{mantenimiento.tipoMantenimiento}</div>
+                </div>
+                <div>
+                  <strong>Fecha:</strong>
+                  <div>{new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</div>
+                </div>
+                <div>
+                  <strong>Descripción:</strong>
+                  <div>{mantenimiento.descripcion}</div>
+                </div>
                 {mantenimiento.nombreMaquina && (
-                  <p><strong>Nombre de la Máquina:</strong> {mantenimiento.nombreMaquina}</p>
+                  <div>
+                    <strong>Nombre de la Máquina:</strong>
+                    <div>{mantenimiento.nombreMaquina}</div>
+                  </div>
                 )}
-                <p><strong>Número de Serie:</strong> {mantenimiento.nroSerieMaquina}</p>
+                <div>
+                  <strong>Número de Serie:</strong>
+                  <div>{mantenimiento.nroSerieMaquina}</div>
+                </div>
                 {mantenimiento.ubicacionMaquina && (
-                  <p><strong>Ubicación:</strong> {mantenimiento.ubicacionMaquina}</p>
+                  <div>
+                    <strong>Ubicación:</strong>
+                    <div>{mantenimiento.ubicacionMaquina}</div>
+                  </div>
                 )}
                 {mantenimiento.archivo && (
-                  <p>
-                    <strong>Documento:</strong> 
-                    <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline ml-1">
-                      {mantenimiento.archivo}
-                    </a>
-                  </p>
+                  <div>
+                    <strong>Documento:</strong>
+                    <div>
+                      <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                        {mantenimiento.archivo}
+                      </a>
+                    </div>
+                  </div>
                 )}
               </div>
               <button

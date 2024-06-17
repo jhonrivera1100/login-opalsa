@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
+import React from "react";
 import Navbar from "../components/Navbar";
 import UserHeader from "../components/UserHeader";
 import MantenimientosList from "../components/mantenimientoLista";
-import HistorialComponentes from "../components/movimientosLista";
+import HistorialComponentes from "../components/MovimientosLista";
 
 function Historial() {
   return (

@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     cedula:{
         type: Number,
         required: true,
-        unique:true
+        unique:true // Garantiza que la cédula sea única
     },
     cargo:{
         type: String,
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     }
 },{
     timestamps:true
-}
-)
+});
 
-export default mongoose.model('user',userSchema)
+
+export default mongoose.model('user',userSchema);

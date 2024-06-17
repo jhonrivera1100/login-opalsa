@@ -1,16 +1,25 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const recordatorioSchema = new mongoose.Schema({
+const RecordatorioSchema = new mongoose.Schema({
   titulo: {
     type: String,
-    required: true,
+    required: true
+  },
+  descripcion: {
+    type: String,
+    required: true
   },
   fechaRecordatorio: {
     type: Date,
-    required: true,
+    required: true
   },
-}, {
-  timestamps: true
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true
+  }
 });
 
-export default mongoose.model('Recordatorio', recordatorioSchema);
+const Recordatorio = mongoose.model('Recordatorio', RecordatorioSchema);
+
+export default Recordatorio;
