@@ -78,7 +78,7 @@ const RegistroMantenimiento = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 ">
       <Navbar />
       <UserHeader />
       <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-lg">

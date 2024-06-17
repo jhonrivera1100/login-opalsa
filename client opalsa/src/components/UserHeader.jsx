@@ -20,8 +20,8 @@ function UserHeader() {
       <div className="flex items-center w-1/3 justify-end">
         <FaBell className="text-gray-900 mr-8 text-2xl" /> {/* Ajusta el tamaño del icono de la campana y el margen */}
         {user ? (
-          <div className="flex items-center bg-white rounded-lg p-1 mr-8">
-            <FaUser className="text-blue-500 mr-2 w-7 h-7" /> {/* Ajusta el tamaño del icono de usuario */}
+          <div className="flex items-center rounded-lg p-1 mr-8">
+            <FaUser className="w-7 h-7 bg-white rounded-full mr-2 text-blue-500" /> {/* Icono de usuario en lugar del logo */}
             <div className="text-sm text-black flex items-center">
               <span className="text-blue-500 font-semibold">¡Hola,</span>{" "}
               <span className="ml-1 font-semibold text-black">{firstName}!</span> {/* Primer nombre en negro */}

@@ -9,7 +9,7 @@ function MaquinaCard({ maquina }) {
   };
 
   return (
-    <div>
+    <div>  
       {showModal && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-70"
@@ -17,10 +17,10 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className={`max-w-[18rem] rounded-lg overflow-hidden shadow-lg mx-2 my-4 transition duration-300 transform hover:shadow-xl hover:-translate-y-1 bg-gray-700 text-white cursor-pointer`}
+        className={`max-w-[18rem] overflow-hidden shadow-lg mx-1 my-1 rounded-lg transition duration-300 transform hover:-translate-y-2 bg-gray-700 text-white cursor-pointer`}
         onClick={toggleModal}
       >
-        <div className="bg-gray-900 text-white py-2 px-4 text-center font-semibold truncate">
+        <div className="bg-gray-900 text-white py-1 px-4 text-center font-semibold truncate">
           Serial: {maquina.nroSerieMaquina}
         </div>
         <div className="relative">
@@ -29,7 +29,7 @@ function MaquinaCard({ maquina }) {
             alt={maquina.nombreMaquina}
             className="w-full h-96 object-cover"
           />
-          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white py-1 px-4 font-semibold text-lg text-center truncate">
+          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white px-4 font-semibold text-lg text-center truncate">
             {maquina.marcaMaquina}
           </div>
         </div>
