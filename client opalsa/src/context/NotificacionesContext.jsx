@@ -1,23 +1,19 @@
-import React, { createContext, useState, useEffect } from 'react';
+// context/NotificacionesContext.jsx
+import React, { createContext, useState } from 'react';
 
-// Crear el contexto
+// Crea el contexto
 export const NotificacionesContext = createContext();
 
 // Proveedor del contexto
 export const NotificacionesProvider = ({ children }) => {
   const [notificaciones, setNotificaciones] = useState([]);
 
-  useEffect(() => {
-    // Aquí podrías hacer una llamada a una API para obtener las notificaciones
-    // Para este ejemplo, usaremos datos estáticos
-    setNotificaciones([
-      { user: { username: 'user1' }, message: 'Mensaje 1' },
-      { user: { username: 'user2' }, message: 'Mensaje 2' },
-    ]);
-  }, []);
+  const agregarNotificacion = (notificacion) => {
+    setNotificaciones([...notificaciones, notificacion]);
+  };
 
   return (
-    <NotificacionesContext.Provider value={{ notificaciones }}>
+    <NotificacionesContext.Provider value={{ notificaciones, agregarNotificacion }}>
       {children}
     </NotificacionesContext.Provider>
   );

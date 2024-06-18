@@ -27,7 +27,7 @@ function ModalMaquina({ maquina, onClose }) {
       <div className="bg-sky-50 shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 relative text-sm">
         <button
           onClick={onClose}
-          className="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-800 focus:outline-none"
+          className="fixed top-4 right-4 text-blue-200 hover:text-white focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -45,13 +45,13 @@ function ModalMaquina({ maquina, onClose }) {
           </svg>
         </button>
 
-        <div className="flex flex-col h-full ">
+        <div className="flex flex-col h-full">
           {/* Parte superior: Imagen y datos de la máquina con fondo común */}
-          <div className="flex mb-6 h-1/2 border-gray-900 border-4 bg-slate-600 p-4 rounded-lg relative ">
+          <div className="flex mb-6 h-1/2 border-gray-900 border-4 bg-slate-600 p-4 rounded-lg relative">
             {" "}
             {/* Fondo común y padding */}
             <div className="w-1/3 pr-4 flex flex-col items-center justify-center relative">
-              <div className="absolute top-0 left-0 w-[90%] bg-gray-900 text-white text-center py-1 rounded-t-lg">
+              <div className="absolute top-0 left-[16%] w-[62%] bg-gray-900 text-white text-center py-1 rounded-t-lg">
                 {" "}
                 {/* Anchura ajustada */}
                 <strong>Serial: {maquina.nroSerieMaquina}</strong>{" "}
@@ -62,7 +62,7 @@ function ModalMaquina({ maquina, onClose }) {
                 alt={maquina.nombreMaquina}
                 className="w-40 h-60 object-cover mb-4 bg-white mt-7" // Fondo de la imagen
               />
-              <div className="absolute bottom-0 left-0 w-[90%] bg-gray-900 text-white text-center py-1 rounded-b-lg mx-auto">
+              <div className="absolute bottom-0 left-[16%] w-[62%] bg-gray-900 text-white text-center py-1 rounded-b-lg mx-auto">
                 {" "}
                 {/* Anchura ajustada */}
                 <strong>Marca: {maquina.marcaMaquina}</strong>{" "}
@@ -70,42 +70,50 @@ function ModalMaquina({ maquina, onClose }) {
               </div>
             </div>
             <div className="w-2/3 pl-4 overflow-auto text-white">
-              <h2 className="text-xl font-bold mb-2">Datos de la maquina:</h2>
+              <h2 className="text-xl font-semibold mb-2">Datos de la maquina</h2>
               <div className="space-y-0.5">
                 <p>
                   <strong className="text-sky-300">Nombre:</strong>{" "}
                   {maquina.nombreMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Modelo:</strong>{" "}
                   {maquina.modeloMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Software:</strong>{" "}
                   {maquina.softwareMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Juego:</strong>{" "}
                   {maquina.juegoMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Estado:</strong>{" "}
                   {maquina.estadoMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Descripción:</strong>{" "}
                   {maquina.descripcionMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Ubicación:</strong>{" "}
                   {maquina.ubicacionMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">
                     Fecha de Instalación:
                   </strong>{" "}
                   {maquina.fechaInstalacionMaquina}
                 </p>
+                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
                   <strong className="text-sky-300">Proveedor:</strong>{" "}
                   {maquina.proveedorMaquina}

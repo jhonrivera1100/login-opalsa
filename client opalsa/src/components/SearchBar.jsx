@@ -100,17 +100,13 @@ function SearchBar() {
     <div className="bg-white">
       <div className="max-w-xl mx-auto flex items-center justify-center">
         <div className="flex items-center">
-          <input
-            type="text"
-            placeholder="Buscar..."
-            className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:border-blue-300 w-96"
-          />
           <img
             src={AgregarIcon}
             alt="Guardar"
             className="h-8 w-8 cursor-pointer transition-transform transform hover:scale-110 ml-4"
             onClick={openModal}
           />
+          <h2 className="font-semibold p-6">Agregar</h2>
         </div>
       </div>
       {modalOpen && (

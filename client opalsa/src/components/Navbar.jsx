@@ -104,7 +104,7 @@ function Navbar() {
             <div className={getIconBgClass("/RegistroMantenimiento")}>
               <FaTools className="h-5 w-5 text-black" />
             </div>
-            {isHovered && <span className="ml-2">Mantenimientos</span>}
+            {isHovered && <span className="ml-2">Reportes</span>}
           </Link>
           {/* Otros enlaces con estructura similar */}
           <Link to="/profile" className={getLinkClass("/profile")}>
