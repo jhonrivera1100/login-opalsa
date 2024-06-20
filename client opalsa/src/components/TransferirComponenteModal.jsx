@@ -46,20 +46,20 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
       const componenteAActualizar = componentes.find(
         (componente) => componente.serialComponente === formData.serialComponente
       );
-
+  
       await axios.put(`/componentes/${componenteAActualizar._id}`, {
         maquina: formData.nuevaMaquinaSerial
       });
-
+  
       console.log("Componente transferido exitosamente:", formData.serialComponente);
       console.log("Nueva máquina:", formData.nuevaMaquinaSerial);
-
+  
       // Obtener los datos de las máquinas involucradas
       const oldMaquina = maquinas.find(m => m._id === maquina._id);
       const newMaquina = maquinas.find(m => m._id === formData.nuevaMaquinaSerial);
-
+  
       // Registro en el historial
-      await axios.post('/historial', {
+      const response = await axios.post('/movimientos', {
         componenteId: componenteAActualizar._id,
         oldMaquinaId: oldMaquina._id,
         oldMaquinaSerial: oldMaquina.nroSerieMaquina,
@@ -68,7 +68,9 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
         nombreComponente: componenteAActualizar.nombreComponente,
         serialComponente: componenteAActualizar.serialComponente,
       });
-
+  
+      console.log("Historial de movimientos guardado:", response.data);
+  
     } catch (error) {
       console.error("Error al transferir el componente:", error);
     }

@@ -1,31 +1,39 @@
+// controllers/movimientosC.controller.js
 import MovimientosC from '../models/movimientosC.model.js';
+import Maquinas from '../models/maquina.model.js'; // Asegúrate de que la ruta es correcta
+import Componente from '../models/componente.model.js'; // Asegúrate de que la ruta es correcta
 
 export const getMovimientosC = async (req, res) => {
   try {
-    const movimientosC = await MovimientosC.find().populate('componenteId oldMaquinaId newMaquinaId');
-    res.json(movimientosC);
+    const movimientos = await MovimientosC.find()
+      .populate('componenteId')
+      .populate('oldMaquinaId')
+      .populate('newMaquinaId');
+    res.status(200).json(movimientos);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener los movimientos' });
   }
 };
 
 export const addMovimientosC = async (req, res) => {
-  const { componenteId, oldMaquinaId, oldMaquinaSerial, newMaquinaId, newMaquinaSerial, nombreComponente, serialComponente } = req.body;
-
-  const newMovimientosC = new MovimientosC({
-    componenteId,
-    oldMaquinaId,
-    oldMaquinaSerial,
-    newMaquinaId,
-    newMaquinaSerial,
-    nombreComponente,
-    serialComponente,
-  });
-
   try {
-    const savedMovimientosC = await newMovimientosC.save();
-    res.status(201).json(savedMovimientosC);
+    const nuevoMovimiento = new MovimientosC(req.body);
+    await nuevoMovimiento.save();
+    res.status(201).json(nuevoMovimiento);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Error al añadir el movimiento' });
+  }
+};
+
+export const deleteMovimiento = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await MovimientosC.findByIdAndDelete(id);
+    res.status(200).json({ message: "Transaccion eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar el Transaccion:", error); // Log de error
+    res.status(500).json({ message: "Error al eliminar la Transaccion" });
   }
 };

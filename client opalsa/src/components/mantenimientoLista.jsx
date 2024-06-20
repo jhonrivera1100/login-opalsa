@@ -13,7 +13,7 @@ const MantenimientosList = () => {
           response.data.map(async (mantenimiento) => {
             if (mantenimiento.nroSerieMaquina) {
               try {
-                const machineResponse = await axios.get(`http://localhost:4000/api/maquina/${mantenimiento.nroSerieMaquina}`);
+                const machineResponse = await axios.get(`/maquina/${mantenimiento.nroSerieMaquina}`);
                 return {
                   ...mantenimiento,
                   nombreMaquina: machineResponse.data.nombreMaquina,

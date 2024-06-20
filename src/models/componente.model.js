@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-// Definir el esquema para los componentes
-const componenteSchema = mongoose.Schema({
+const componenteSchema = new mongoose.Schema({
     serialComponente: {
         type: String,
         required: true,
@@ -23,8 +22,8 @@ const componenteSchema = mongoose.Schema({
         trim: true
     },
     maquina: {
-        type: mongoose.Schema.Types.ObjectId, // Esto establece la relación con la máquina
-        ref: 'Maquina' // Referencia al modelo de datos de las máquinas
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Maquinas' // Asegúrate de que la referencia coincide con el nombre del modelo Maquinas
     }
 });
 

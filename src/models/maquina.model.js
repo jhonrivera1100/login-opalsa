@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const maquinaSchema = mongoose.Schema(
+const maquinaSchema = new mongoose.Schema(
   {
     nroSerieMaquina: {
       type: String,
@@ -66,7 +66,7 @@ const maquinaSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    componentes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Componente" }], // Referencia a los componentes relacionados
+    componentes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Componente" }],
   },
   {
     timestamps: true,

@@ -12,7 +12,7 @@ function Historial() {
       <div className="flex items-center justify-end">
           <MantenimientosList />
         </div>
-        <div>
+        <div className="flex items-center justify-end">
         <HistorialComponentes/>
         </div>
     </div>
