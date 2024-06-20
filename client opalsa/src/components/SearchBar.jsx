@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import AgregarIcon from "../assets/agregar_icon.svg";
 import { useMaquinas } from "../context/MaquinasContext";
+import { getCasinosRequest } from "../api/casinos";
 
 function SearchBar() {
   const { register, handleSubmit } = useForm();
   const { createMaquina } = useMaquinas();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("maquina");
+  const [casinos, setCasinos] = useState([]);
   const [formData, setFormData] = useState({
     maquina: {
       imgMaquina: null,
@@ -35,7 +37,18 @@ function SearchBar() {
       direccionCasino: "",
     },
   });
-  
+
+  useEffect(() => {
+    const fetchCasinos = async () => {
+      try {
+        const response = await getCasinosRequest();
+        setCasinos(response.data);
+      } catch (error) {
+        console.error("Error fetching casinos:", error);
+      }
+    };
+    fetchCasinos();
+  }, []);
 
   const openModal = () => {
     setModalOpen(true);
@@ -43,30 +56,9 @@ function SearchBar() {
 
   const onSubmit = handleSubmit(() => {
     const formDataToSend = new FormData();
-    formDataToSend.append("imgMaquina", formData.maquina.imgMaquina);
-    formDataToSend.append("nroSerieMaquina", formData.maquina.nroSerieMaquina);
-    formDataToSend.append("nombreMaquina", formData.maquina.nombreMaquina);
-    formDataToSend.append("modeloMaquina", formData.maquina.modeloMaquina);
-    formDataToSend.append("marcaMaquina", formData.maquina.marcaMaquina);
-    formDataToSend.append("softwareMaquina", formData.maquina.softwareMaquina);
-    formDataToSend.append("juegoMaquina", formData.maquina.juegoMaquina);
-    formDataToSend.append("estadoMaquina", formData.maquina.estadoMaquina);
-    formDataToSend.append(
-      "descripcionMaquina",
-      formData.maquina.descripcionMaquina
-    );
-    formDataToSend.append(
-      "ubicacionMaquina",
-      formData.maquina.ubicacionMaquina
-    );
-    formDataToSend.append(
-      "fechaInstalacionMaquina",
-      formData.maquina.fechaInstalacionMaquina
-    );
-    formDataToSend.append(
-      "proveedorMaquina",
-      formData.maquina.proveedorMaquina
-    );
+    Object.keys(formData.maquina).forEach(key => {
+      formDataToSend.append(key, formData.maquina[key]);
+    });
     createMaquina(formDataToSend);
   });
 
@@ -322,16 +314,19 @@ function SearchBar() {
                     >
                       Ubicación de la Máquina:
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="ubicacionMaquina"
                       value={formData.maquina.ubicacionMaquina}
-                      {...register("ubicacionMaquina")}
-                      autoFocus
-                      placeholder="Ubicación de la Máquina"
                       onChange={handleInputChange}
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                    />
+                    >
+                      <option value="">Seleccionar Casino</option>
+                      {casinos.map((casino) => (
+                        <option key={casino._id} value={casino.nombreCasino}>
+                          {casino.nombreCasino}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label
@@ -356,7 +351,7 @@ function SearchBar() {
                       htmlFor="proveedorMaquina"
                       className="text-black font-bold block mb-1"
                     >
-                      Proveedor de la Máquina:
+                      Proveedor:
                     </label>
                     <input
                       type="text"
@@ -364,7 +359,7 @@ function SearchBar() {
                       value={formData.maquina.proveedorMaquina}
                       {...register("proveedorMaquina")}
                       autoFocus
-                      placeholder="Proveedor de la Máquina"
+                      placeholder="Proveedor"
                       onChange={handleInputChange}
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                     />
@@ -401,21 +396,13 @@ function SearchBar() {
                   type="text"
                   name="direccionEmpresa"
                   value={formData.empresa.direccionEmpresa}
-                  placeholder="Direccion de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-
-                <input
-                  type="text"
-                  name="imgEmpresa"
-                  value={formData.empresa.imgEmpresa}
-                  placeholder="Imagen de la Empresa"
+                  placeholder="Dirección de la Empresa"
                   onChange={handleInputChange}
                   className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
                 />
               </div>
             )}
+
             {selectedOption === "casino" && (
               <div>
                 <input
@@ -438,12 +425,19 @@ function SearchBar() {
                   type="text"
                   name="direccionCasino"
                   value={formData.casino.direccionCasino}
-                  placeholder="Direccion del Casino"
+                  placeholder="Dirección del Casino"
                   onChange={handleInputChange}
                   className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
                 />
               </div>
             )}
+
+            <button
+              onClick={() => setModalOpen(false)}
+              className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import UserHeader from "../components/UserHeader";
 import MantenimientosList from "../components/mantenimientoLista";
-import HistorialComponentes from "../components/MovimientosLista";
+import HistorialComponentes from "../components/movimientosLista";
 
 function Historial() {
   return (
