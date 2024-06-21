@@ -35,19 +35,19 @@ function MaquinaCard({ maquina }) {
         </div>
         <div className="px-4 py-2">
           <div className="flex text-sm">
-            <strong className="text-sky-300 mr-1">Nombre: </strong>{" "}
+            <strong className="text-blue-200 mr-1">Nombre: </strong>{" "}
             <span className="text-white truncate">{maquina.nombreMaquina}</span>
           </div>
           <div className="flex text-sm">
-            <strong className="text-sky-300 mr-1">Estado: </strong>{" "}
+            <strong className="text-blue-200  mr-1">Estado: </strong>{" "}
             <span className="text-white truncate">{maquina.estadoMaquina}</span>
           </div>
           <div className="flex text-sm">
-            <strong className="text-sky-300 mr-1">Ubicacion: </strong>{" "}
+            <strong className="text-blue-200  mr-1">Ubicacion: </strong>{" "}
             <span className="text-white truncate">{maquina.ubicacionMaquina}</span>
           </div>
           <div className="flex text-sm">
-            <strong className="text-sky-300 mr-1">Fecha de Instalación: </strong>{" "}
+            <strong className="text-blue-200  mr-1">Fecha de Instalación: </strong>{" "}
             <span className="text-white truncate">{maquina.fechaInstalacionMaquina}</span>
           </div>
         </div>

@@ -24,7 +24,7 @@ function ModalMaquina({ maquina, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="bg-sky-50 shadow-xl w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6 relative text-sm">
+      <div className="bg-sky-50 shadow-xl w-full max-w-4xl max-h-[80vh]  overflow-y-auto p-6 relative text-sm">
         <button
           onClick={onClose}
           className="fixed top-4 right-4 text-blue-200 hover:text-white focus:outline-none"
@@ -70,52 +70,52 @@ function ModalMaquina({ maquina, onClose }) {
               </div>
             </div>
             <div className="w-2/3 pl-4 overflow-auto text-white">
-              <h2 className="text-xl font-semibold mb-2">Datos de la maquina</h2>
+              <h2 className="text-xl font-semibold mb-2">DATOS DE LA MAQUINA</h2>
               <div className="space-y-0.5">
                 <p>
-                  <strong className="text-sky-300">Nombre:</strong>{" "}
+                  <strong className="text-sky-200">Nombre:</strong>{" "}
                   {maquina.nombreMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Modelo:</strong>{" "}
+                  <strong className="text-sky-200">Modelo:</strong>{" "}
                   {maquina.modeloMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Software:</strong>{" "}
+                  <strong className="text-sky-200">Software:</strong>{" "}
                   {maquina.softwareMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Juego:</strong>{" "}
+                  <strong className="text-sky-200">Juego:</strong>{" "}
                   {maquina.juegoMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Estado:</strong>{" "}
+                  <strong className="text-sky-200">Estado:</strong>{" "}
                   {maquina.estadoMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Descripción:</strong>{" "}
+                  <strong className="text-sky-200">Descripción:</strong>{" "}
                   {maquina.descripcionMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Ubicación:</strong>{" "}
+                  <strong className="text-sky-200">Ubicación:</strong>{" "}
                   {maquina.ubicacionMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">
+                  <strong className="text-sky-200">
                     Fecha de Instalación:
                   </strong>{" "}
                   {maquina.fechaInstalacionMaquina}
                 </p>
                 <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
                 <p>
-                  <strong className="text-sky-300">Proveedor:</strong>{" "}
+                  <strong className="text-sky-200">Proveedor:</strong>{" "}
                   {maquina.proveedorMaquina}
                 </p>
               </div>
@@ -148,40 +148,48 @@ function ModalMaquina({ maquina, onClose }) {
             </div>
             {showComponentes && (
               <>
-                <ul className="list-none pl-0">
-                  <li className="font-semibold text-white bg-gray-900 mb-2 grid grid-cols-4 gap-4 p-2">
-                    <span>NOMBRE</span>
-                    <span>SERIAL</span>
-                    <span>MARCA</span>
-                    <span>DOCUMENTO</span>
-                  </li>
-                  {sortedComponentes.map((componente) => (
-                    <li
-                      className="text-gray-500 mb-1 grid grid-cols-4 gap-4 font-medium p-2 border-b border-gray-300"
-                      key={componente._id}
-                    >
-                      <span>{componente.nombreComponente}</span>
-                      <span>{componente.serialComponente}</span>
-                      <span>{componente.marcaComponente}</span>
-                      <span>{componente.documentoComponente}</span>
-                    </li>
-                  ))}
-                </ul>{" "}
-                {/* Botones en la parte inferior */}
-                <div className="flex justify-end space-x-4 mt-4">
-                  <button
-                    onClick={() => setShowAgregarModal(true)}
-                    className="bg-blue-500 text-white px-2 py-2 rounded"
-                  >
-                    Agregar Componente
-                  </button>
-                  <button
-                    onClick={() => setShowTransferirModal(true)}
-                    className="bg-green-500 text-white px-2 py-2 rounded"
-                  >
-                    Transferir Componente
-                  </button>
-                </div>
+                {sortedComponentes.length === 0 ? (
+                  <p className="text-gray-500 text-center mt-4">
+                    Esta máquina aún no tiene componentes.
+                  </p>
+                ) : (
+                  <>
+                    <ul className="list-none pl-0">
+                      <li className="font-semibold text-white bg-gray-900 mb-2 grid grid-cols-4 gap-4 p-2">
+                        <span>NOMBRE</span>
+                        <span>SERIAL</span>
+                        <span>MARCA</span>
+                        <span>DOCUMENTO</span>
+                      </li>
+                      {sortedComponentes.map((componente) => (
+                        <li
+                          className="text-gray-500 mb-1 grid grid-cols-4 gap-4 font-medium p-2 border-b border-gray-300"
+                          key={componente._id}
+                        >
+                          <span>{componente.nombreComponente}</span>
+                          <span>{componente.serialComponente}</span>
+                          <span>{componente.marcaComponente}</span>
+                          <span>{componente.documentoComponente}</span>
+                        </li>
+                      ))}
+                    </ul>{" "}
+                    {/* Botones en la parte inferior */}
+                    <div className="flex justify-end space-x-4 mt-4">
+                      <button
+                        onClick={() => setShowAgregarModal(true)}
+                        className="bg-blue-500 text-white px-2 py-2 rounded"
+                      >
+                        Agregar Componente
+                      </button>
+                      <button
+                        onClick={() => setShowTransferirModal(true)}
+                        className="bg-green-500 text-white px-2 py-2 rounded"
+                      >
+                        Transferir Componente
+                      </button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -199,11 +207,13 @@ function ModalMaquina({ maquina, onClose }) {
             maquina={maquina}
             componentes={componentes}
             onClose={() => setShowTransferirModal(false)}
-          />
-        )}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  );
-}
-
-export default ModalMaquina;
+    );
+  }
+  
+  export default ModalMaquina;
+  
+              
