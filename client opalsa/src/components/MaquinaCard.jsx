@@ -9,7 +9,7 @@ function MaquinaCard({ maquina }) {
   };
 
   return (
-    <div>  
+    <div className="wrappeantialiased text-gray-900">
       {showModal && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-70"
@@ -17,38 +17,40 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className={`max-w-[18rem] overflow-hidden shadow-lg mx-1 my-1 rounded-lg transition duration-300 transform hover:-translate-y-2 bg-gray-700 text-white cursor-pointer`}
+        className="max-w-sm rounded-lg overflow-hidden transition-shadow duration-300 cursor-pointer mx-2"
         onClick={toggleModal}
       >
-        <div className="bg-gray-900 text-white py-1 px-4 text-center font-semibold truncate">
-          Serial: {maquina.nroSerieMaquina}
-        </div>
-        <div className="relative">
-          <img
-            src={maquina.imgMaquina.url}
-            alt={maquina.nombreMaquina}
-            className="w-full h-96 object-cover"
-          />
-          <div className="absolute bottom-0 left-0 w-full bg-gray-900 text-white px-4 font-semibold text-lg text-center truncate">
-            {maquina.marcaMaquina}
-          </div>
-        </div>
-        <div className="px-4 py-2">
-          <div className="flex text-sm">
-            <strong className="text-blue-200 mr-1">Nombre: </strong>{" "}
-            <span className="text-white truncate">{maquina.nombreMaquina}</span>
-          </div>
-          <div className="flex text-sm">
-            <strong className="text-blue-200  mr-1">Estado: </strong>{" "}
-            <span className="text-white truncate">{maquina.estadoMaquina}</span>
-          </div>
-          <div className="flex text-sm">
-            <strong className="text-blue-200  mr-1">Ubicacion: </strong>{" "}
-            <span className="text-white truncate">{maquina.ubicacionMaquina}</span>
-          </div>
-          <div className="flex text-sm">
-            <strong className="text-blue-200  mr-1">Fecha de Instalación: </strong>{" "}
-            <span className="text-white truncate">{maquina.fechaInstalacionMaquina}</span>
+        <img
+          src={maquina.imgMaquina.url}
+          alt={maquina.nombreMaquina}
+          className="w-full h-[500px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
+        />
+        <div className="relative px-4 -mt-16">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="flex items-baseline">
+              <span className="bg-teal-200 text-teal-800 text-xs px-2 inline-block rounded-full uppercase font-semibold tracking-wide">
+                {maquina.estadoMaquina === "New" ? "New" : maquina.estadoMaquina}
+              </span>
+              <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                Serial: {maquina.nroSerieMaquina}
+              </div>
+            </div>
+
+            <h4 className="mt-1 text-xl font-semibold uppercase leading-tight truncate">
+              {maquina.nombreMaquina}
+            </h4>
+
+            <div className="mt-1">
+              <span className="text-gray-600 text-sm">{maquina.ubicacionMaquina}</span>
+            </div>
+            <div className="mt-4">
+              <span className="text-teal-600 text-md font-semibold">
+                 Instalación:
+              </span>{" "}
+              <span className="text-sm text-gray-600">
+                {maquina.fechaInstalacionMaquina}
+              </span>
+            </div>
           </div>
         </div>
       </div>

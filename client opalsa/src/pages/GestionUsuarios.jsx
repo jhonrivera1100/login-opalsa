@@ -108,6 +108,7 @@ function GestionUsuarios() {
             </div>
           </div>
         </div>
+        <div className=''>
         <div className='overflow-x-auto pt-14'>
           <div className='min-w-full'>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 text-left pl-5'>
@@ -149,6 +150,7 @@ function GestionUsuarios() {
               ))}
             </div>
           </div>
+        </div>
         </div>
       </div>
       {showModal && (

@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 
 const movimientosCSchema = new mongoose.Schema({
   componenteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Componente', required: true },
-  oldMaquinaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquina', required: true },
+  oldMaquinaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquinas', required: true },
   oldMaquinaSerial: { type: String, required: true },
-  newMaquinaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquina', required: true },
+  newMaquinaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquinas', required: true },
   newMaquinaSerial: { type: String, required: true },
   nombreComponente: { type: String, required: true },
   serialComponente: { type: String, required: true },

@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import UserHeader from "../components/UserHeader";
 import MantenimientosList from "../components/mantenimientoLista";
-import HistorialComponentes from "../components/movimientosLista";
+import MovimientosLista from "../components/MovimientosLista";
 
 function Historial() {
   return (
@@ -12,8 +12,8 @@ function Historial() {
       <div className="flex items-center justify-end">
           <MantenimientosList />
         </div>
-        <div>
-        <HistorialComponentes/>
+        <div className="flex items-center justify-end">
+        <MovimientosLista/>
         </div>
     </div>
   );
