@@ -23,6 +23,10 @@ const CrearMantenimiento = () => {
       const response = await axios.post("/recordatorios", recordatorioData); // Cambiar a la ruta correcta "/api/recordatorios"
       console.log("Recordatorio creado:", response.data);
       setError(null);
+      // Limpiar campos del formulario después del envío exitoso
+      setTitulo("");
+      setDescripcion("");
+      setFechaMantenimiento("");
     } catch (error) {
       console.error("Error al crear recordatorio:", error);
       setError("Error al crear el recordatorio. Por favor, inténtalo de nuevo.");
@@ -30,24 +34,54 @@ const CrearMantenimiento = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Crear Recordatorio</h2>
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Título</label>
-          <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+    <div className="container mx-auto my-4 px-4 lg:px-20">
+      <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
+        <div className="flex justify-center">
+          <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">Notificar Al Administrador</h2>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
-          <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32" required></textarea>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Fecha de Recordatorio</label>
-          <input type="date" value={fechaMantenimiento} onChange={(e) => setFechaMantenimiento(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
-        </div>
-        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Crear</button>
-      </form>
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-5 mt-5">
+            <div className="col-span-1">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Título</label>
+              <input
+                type="text"
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+              <textarea
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline h-32"
+                required
+              ></textarea>
+            </div>
+            <div className="col-span-1">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Fecha de Recordatorio</label>
+              <input
+                type="date"
+                value={fechaMantenimiento}
+                onChange={(e) => setFechaMantenimiento(e.target.value)}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <button
+              type="submit"
+              className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-gray-100 p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
+            >
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

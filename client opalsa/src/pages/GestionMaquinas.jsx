@@ -12,9 +12,6 @@ function GestionMaquinas() {
       <SearchBar /> {/* Componente SearchBar */}
       <SeccionesHome />
       {/* Aquí puedes agregar el contenido específico para la gestión de máquinas */}
-      <div>
-        <h1> Aquí va toda la gestión de máquinas </h1>
-      </div>
     </div>
   );
 }

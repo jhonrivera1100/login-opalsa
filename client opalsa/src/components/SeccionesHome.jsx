@@ -51,6 +51,7 @@ function SeccionesHome() {
       );
 
       return (
+        
         <div className="mx-auto border border-zinc-300 w-9/12 h-144 overflow-auto bg-stone-100 p-4">
           <div className="relative flex flex-col items-center">
             <button

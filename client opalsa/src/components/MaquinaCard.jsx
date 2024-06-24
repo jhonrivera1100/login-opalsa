@@ -26,7 +26,7 @@ function MaquinaCard({ maquina }) {
           className="w-full h-[500px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
         />
         <div className="relative px-4 -mt-16">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-xl">
             <div className="flex items-baseline">
               <span className="bg-teal-200 text-teal-800 text-xs px-2 inline-block rounded-full uppercase font-semibold tracking-wide">
                 {maquina.estadoMaquina === "New" ? "New" : maquina.estadoMaquina}
