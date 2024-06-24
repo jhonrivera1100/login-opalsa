@@ -9,7 +9,7 @@ function MaquinaCard({ maquina }) {
   };
 
   return (
-    <div className="wrappeantialiased text-gray-900">
+    <div className="wrapper antialiased text-gray-900">
       {showModal && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-70"
@@ -17,13 +17,13 @@ function MaquinaCard({ maquina }) {
         ></div>
       )}
       <div
-        className="max-w-sm rounded-lg overflow-hidden transition-shadow duration-300 cursor-pointer mx-2"
+        className="max-w-sm rounded-lg py-2 overflow-hidden transition-transform duration-300 cursor-pointer mx-2 transform hover:-translate-y-2"
         onClick={toggleModal}
       >
         <img
           src={maquina.imgMaquina.url}
           alt={maquina.nombreMaquina}
-          className="w-full h-[500px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
+          className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
         />
         <div className="relative px-4 -mt-16">
           <div className="bg-white p-6 rounded-lg shadow-lg">

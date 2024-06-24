@@ -4,7 +4,7 @@ import AgregarIcon from "../assets/agregar_icon.svg";
 import { useMaquinas } from "../context/MaquinasContext";
 import { getCasinosRequest } from "../api/casinos";
 
-function SearchBar() {
+function BotonAgregar() {
   const { register, handleSubmit } = useForm();
   const { createMaquina } = useMaquinas();
   const [modalOpen, setModalOpen] = useState(false);
@@ -89,7 +89,7 @@ function SearchBar() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-gray-100 mb-3 pl-12">
       <div className="max-w-xl mx-auto flex items-center justify-center">
         <div className="flex items-center">
           <img
@@ -98,7 +98,6 @@ function SearchBar() {
             className="h-8 w-8 cursor-pointer transition-transform transform hover:scale-110 ml-4"
             onClick={openModal}
           />
-          <h2 className="font-semibold p-6">Agregar</h2>
         </div>
       </div>
       {modalOpen && (
@@ -445,4 +444,4 @@ function SearchBar() {
   );
 }
 
-export default SearchBar;
+export default BotonAgregar;

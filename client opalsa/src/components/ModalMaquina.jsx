@@ -47,7 +47,7 @@ function ModalMaquina({ maquina, onClose }) {
 
         <div className="flex flex-col h-full">
         <h2 className="text-xl text-center py-2 text-gray-600 font-bold mb-2">
-                DATOS DE LA MAQUINA
+                Datos de la maquina
               </h2>
           {/* Parte superior: Imagen y datos de la máquina con fondo común */}
           <div className="flex mb-6 h-1/2 shadow-lg  bg-slate-300 p-4 rounded-lg relative">
