@@ -102,8 +102,8 @@ function BotonAgregar() {
       </div>
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-4 rounded-md max-h-screen overflow-auto w-120">
-            <h2 className="text-lg font-semibold mb-4">Modal de Agregar</h2>
+          <div className="bg-white p-4 rounded-md w-120 max-w-4xl max-h-[80vh] overflow-auto">
+            <h2 className="text-lg text-center font-semibold mb-4">Agrega un nuevo elemento.</h2>
             <div className="flex flex-col">
               <label className="mb-2">Selecciona una opción:</label>
               <div>

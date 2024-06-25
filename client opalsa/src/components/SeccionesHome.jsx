@@ -14,6 +14,7 @@ function SeccionesHome() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
+  const [cityFilter, setCityFilter] = useState(""); // Nuevo estado para el filtro de ciudad
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -39,6 +40,16 @@ function SeccionesHome() {
   const handleFilterChange = (e) => {
     setSelectedBrand(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handleCityFilterChange = (e) => {
+    setCityFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const changeSection = (newSection) => {
+    setSection(newSection);
+    setSelectedCasino(null); // Restablece el casino seleccionado al cambiar de sección
   };
 
   const renderSectionContent = () => {
@@ -105,57 +116,55 @@ function SeccionesHome() {
                 <option value="OTRO">OTRO</option>
               </select>
             </div>
-            <div className="w-full mt-4">
-              <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
-                <thead className="bg-gray-900 text-white dark:bg-gray-800">
-                  <tr>
-                    <th className="px-4 py-2 text-left"></th>
-                    <th className="px-4 py-2 text-left">Número de Serie</th>
-                    <th className="px-4 py-2 text-left">Marca</th>
-                    <th className="px-4 py-2 text-left">Nombre</th>
-                    <th className="px-4 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMaquinas.map((maquina) => (
-                    <tr
-                      key={maquina._id}
-                      className="border-t border-gray-200 dark:border-gray-700"
-                    >
-                      <td className="px-4 py-2">
-                        <div className="flex items-center">
-                          <div className="w-16 h-16 mr-2">
-                            <img
-                              src={maquina.imgMaquina.url}
-                              alt="Logo Maquina"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2">{maquina.nroSerieMaquina}</td>
-                      <td className="px-4 py-2">{maquina.marcaMaquina}</td>
-                      <td className="px-4 py-2">{maquina.nombreMaquina}</td>
-                      <td className="px-4 py-2">
-                        <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs">
-                          Ver más
-                        </button>
-                        <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs ml-2">
-                          Registros
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredMaquinas.length === 0 && (
-                    <tr>
-                      <td className="px-4 py-2" colSpan="4">
-                        No se encontraron máquinas para este casino.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="w-full mt-5">
+  <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
+    <thead className="bg-gray-900 text-white dark:bg-gray-800">
+      <tr>
+        <th className="px-4 py-2 text-left"></th>
+        <th className="px-4 py-2 font-semibold text-center">Número de Serie</th>
+        <th className="px-4 py-2 font-semibold text-center">Marca</th>
+        <th className="px-4 py-2 font-semibold text-center">Nombre</th>
+        <th className="px-4 py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {filteredMaquinas.map((maquina) => (
+        <tr key={maquina._id} className="border-t border-gray-200 dark:border-gray-700">
+          <td className="px-4 py-2">
+            <div className="flex items-center justify-center">
+              <div className="w-16 h-16 mr-2">
+                <img
+                  src={maquina.imgMaquina.url}
+                  alt="Logo Maquina"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
             </div>
+          </td>
+          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.nroSerieMaquina}</td>
+          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.marcaMaquina}</td>
+          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.nombreMaquina}</td>
+          <td className="px-4 py-2 text-center">
+            <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs">
+              Ver más
+            </button>
+            <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs ml-2">
+              Registros
+            </button>
+          </td>
+        </tr>
+      ))}
+      {filteredMaquinas.length === 0 && (
+        <tr>
+          <td className="px-4 py-2 text-center" colSpan="5">
+            No se encontraron máquinas para este casino.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
           </div>
         </div>
       );
@@ -178,9 +187,13 @@ function SeccionesHome() {
         )
         .slice(startIndex, endIndex);
     } else if (section === "Casinos") {
-      sectionData = casinos;
+      sectionData = casinos.filter(
+        (casino) =>
+          casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          (cityFilter === "" || casino.ciudadCasino === cityFilter)
+      );
     } else {
-      return <p>Empresas placeholder content</p>;
+      return <p></p>;
     }
 
     const handlePreviousPage = () => {
@@ -213,6 +226,28 @@ function SeccionesHome() {
               <option value="IGT">IGT</option>
               <option value="MAQ">MAQ</option>
               <option value="OTRO">OTRO</option>
+            </select>
+          </div>
+        )}
+        {section === "Casinos" && (
+          <div className="flex mb-4 w-full justify-center items-center">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Buscar por nombre del casino"
+              className="px-4 py-2 border rounded-md w-1/2 mx-2"
+            />
+            <select
+              value={cityFilter}
+              onChange={handleCityFilterChange}
+              className="px-4 py-2 border rounded-md"
+            >
+              <option value="">Todas las ciudades</option>
+              <option value="Cali">Cali</option>
+              <option value="Popayan">Popayan</option>
+              <option value="Pasto">Pasto</option>
+              <option value="Tulua">Tulua</option>
             </select>
           </div>
         )}
@@ -263,7 +298,7 @@ function SeccionesHome() {
                   ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
                   : "text-blue-500 font-bold py-2 px-4 mx-2"
               }
-              onClick={() => setSection("Empresas")}
+              onClick={() => changeSection("Empresas")}
             >
               Empresas
             </button>
@@ -273,7 +308,7 @@ function SeccionesHome() {
                   ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
                   : "text-blue-500 font-bold py-2 px-4 mx-2"
               }
-              onClick={() => setSection("Casinos")}
+              onClick={() => changeSection("Casinos")}
             >
               Casinos
             </button>
@@ -283,7 +318,7 @@ function SeccionesHome() {
                   ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
                   : "text-blue-500 font-bold py-2 px-4 mx-2"
               }
-              onClick={() => setSection("Maquinas")}
+              onClick={() => changeSection("Maquinas")}
             >
               Máquinas
             </button>
