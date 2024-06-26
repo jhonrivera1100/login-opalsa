@@ -4,7 +4,8 @@ const componenteSchema = new mongoose.Schema({
     serialComponente: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     nombreComponente: {
         type: String,

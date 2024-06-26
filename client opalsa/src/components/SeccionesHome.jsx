@@ -117,54 +117,116 @@ function SeccionesHome() {
               </select>
             </div>
             <div className="w-full mt-5">
-  <table className="w-full border-collapse border border-gray-200 dark:border-gray-700">
-    <thead className="bg-gray-900 text-white dark:bg-gray-800">
-      <tr>
-        <th className="px-4 py-2 text-left"></th>
-        <th className="px-4 py-2 font-semibold text-center">Número de Serie</th>
-        <th className="px-4 py-2 font-semibold text-center">Marca</th>
-        <th className="px-4 py-2 font-semibold text-center">Nombre</th>
-        <th className="px-4 py-2"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {filteredMaquinas.map((maquina) => (
-        <tr key={maquina._id} className="border-t border-gray-200 dark:border-gray-700">
-          <td className="px-4 py-2">
-            <div className="flex items-center justify-center">
-              <div className="w-16 h-16 mr-2">
-                <img
-                  src={maquina.imgMaquina.url}
-                  alt="Logo Maquina"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
+            <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+  <thead className="bg-white">
+    <tr>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      ></th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      >
+        Nombre
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      >
+        Serial
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      >
+        Marca
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      >
+        Documento
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
+      ></th>
+      <th scope="col" className="relative px-6 py-3">
+        <span className="sr-only">Acciones</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-gray-200">
+    {filteredMaquinas.map((maquina) => (
+      <tr
+        key={maquina._id}
+        className="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50"
+      >
+        <td className="px-4 py-2 whitespace-nowrap">
+          <div className="flex items-center justify-center">
+            <div className="w-16 h-16 mr-2">
+              <img
+                src={maquina.imgMaquina.url}
+                alt="Logo Maquina"
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
-          </td>
-          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.nroSerieMaquina}</td>
-          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.marcaMaquina}</td>
-          <td className="px-4 py-2 text-gray-700 font-semibold text-center">{maquina.nombreMaquina}</td>
-          <td className="px-4 py-2 text-center">
+          </div>
+        </td>
+        <td className="px-4 py-2 whitespace-nowrap text-gray-700 font-semibold text-left">
+          {maquina.nombreMaquina}
+        </td>
+        <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+          {maquina.nroSerieMaquina}
+        </td>
+        <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+          {maquina.marcaMaquina}
+        </td>
+        <td className="px-12 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+          <div className="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="h-6 w-6 mr-2 text-gray-500 transition-colors duration-300 ease-in-out hover:text-gray-900"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+              />
+            </svg>
+            {maquina.documentoMaquina}
+          </div>
+        </td>
+        <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+          <div className="flex justify-end gap-4">
             <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs">
               Ver más
             </button>
             <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs ml-2">
               Registros
             </button>
-          </td>
-        </tr>
-      ))}
-      {filteredMaquinas.length === 0 && (
-        <tr>
-          <td className="px-4 py-2 text-center" colSpan="5">
-            No se encontraron máquinas para este casino.
-          </td>
-        </tr>
-      )}
-    </tbody>
-  </table>
-</div>
+          </div>
+        </td>
+        <td className="px-4 py-2 whitespace-nowrap"></td>
+      </tr>
+    ))}
+    {filteredMaquinas.length === 0 && (
+      <tr>
+        <td className="px-4 py-2 text-center" colSpan="6">
+          No se encontraron máquinas para este casino.
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
 
+
+            </div>
           </div>
         </div>
       );
@@ -189,7 +251,9 @@ function SeccionesHome() {
     } else if (section === "Casinos") {
       sectionData = casinos.filter(
         (casino) =>
-          casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          casino.nombreCasino
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) &&
           (cityFilter === "" || casino.ciudadCasino === cityFilter)
       );
     } else {
@@ -292,16 +356,6 @@ function SeccionesHome() {
       <div className="flex items-center justify-center py-3 bg-gray-100 mt-4">
         <div className="flex justify-center w-full">
           <div className="flex items-center ml-32">
-            <button
-              className={
-                section === "Empresas"
-                  ? "bg-blue-500 text-white font-bold py-2 px-4 mx-2 rounded"
-                  : "text-blue-500 font-bold py-2 px-4 mx-2"
-              }
-              onClick={() => changeSection("Empresas")}
-            >
-              Empresas
-            </button>
             <button
               className={
                 section === "Casinos"

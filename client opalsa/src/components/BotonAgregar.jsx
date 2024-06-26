@@ -25,12 +25,6 @@ function BotonAgregar() {
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
     },
-    empresa: {
-      nombreEmpresa: "",
-      ciudadEmpresa: "",
-      direccionEmpresa: "",
-      imgEmpresa: "",
-    },
     casino: {
       nombreCasino: "",
       ciudadCasino: "",
@@ -107,18 +101,6 @@ function BotonAgregar() {
             <div className="flex flex-col">
               <label className="mb-2">Selecciona una opción:</label>
               <div>
-                <input
-                  type="radio"
-                  id="empresa"
-                  name="option"
-                  value="empresa"
-                  checked={selectedOption === "empresa"}
-                  onChange={() => handleOptionChange("empresa")}
-                />
-                <label htmlFor="empresa" className="text-black ml-2 mr-4">
-                  Empresa
-                </label>
-
                 <input
                   type="radio"
                   id="casino"
@@ -370,35 +352,6 @@ function BotonAgregar() {
                     Guardar
                   </button>
                 </form>
-              </div>
-            )}
-
-            {selectedOption === "empresa" && (
-              <div>
-                <input
-                  type="text"
-                  name="nombreEmpresa"
-                  value={formData.empresa.nombreEmpresa}
-                  placeholder="Nombre de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-                <input
-                  type="text"
-                  name="ciudadEmpresa"
-                  value={formData.empresa.ciudadEmpresa}
-                  placeholder="Ciudad de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-                <input
-                  type="text"
-                  name="direccionEmpresa"
-                  value={formData.empresa.direccionEmpresa}
-                  placeholder="Dirección de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
               </div>
             )}
 

@@ -37,7 +37,7 @@ function MaquinaCard({ maquina }) {
             </div>
 
             <h4 className="mt-1 text-xl font-semibold uppercase leading-tight truncate">
-              {maquina.nombreMaquina}
+              {maquina.marcaMaquina}
             </h4>
 
             <div className="mt-1">
