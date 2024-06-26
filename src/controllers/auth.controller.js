@@ -6,7 +6,7 @@ import { TOKEN_SECRET } from '../config.js';
 
 
 export const register = async (req, res) => {
-  const { email, password, username, cedula, cargo } = req.body;
+  const { email, password, username, cedula, cargo, ciudad } = req.body;
   try {
     const emailFound = await User.findOne({ email });
     const usernameFound = await User.findOne({ username });
@@ -27,6 +27,7 @@ export const register = async (req, res) => {
       password: passwordHash,
       cedula,
       cargo,
+      ciudad,
     });
     const userSaved = await newUser.save();
     const token = await createAccessToken({ id: userSaved._id });
@@ -38,6 +39,7 @@ export const register = async (req, res) => {
       email: userSaved.email,
       cedula: userSaved.cedula,
       cargo: userSaved.cargo,
+      ciudad: userSaved.ciudad,
       createdAt: userSaved.createdAt,
       updatedAt: userSaved.updatedAt,
     });
@@ -83,6 +85,9 @@ export const profile = async (req, res) =>{
         id: userFound._id,
         username: userFound.username,
         email: userFound.email,
+        cedula: userFound.cedula,
+        cargo: userFound.cargo,
+        ciudad: userFound.ciudad,
         createdAt: userFound.createdAt,
         updateAt: userFound.updatedAt,
  })
@@ -110,6 +115,11 @@ return res.json({
   id: userFound._id,
   username: userFound.username,
   email: userFound.email,
+  cedula: userFound.cedula,
+  cargo: userFound.cargo,
+  ciudad: userFound.ciudad,
+  createdAt: userFound.createdAt,
+  updateAt: userFound.updatedAt,
 });
 });
 }

@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import HeaderNotificaciones from "../components/HeaderNotificaciones";
 import axios from "../api/axios";
-import { FaTrashAlt } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import Modal from "../components/ModalNotificaciones";
+import { FaRegUser } from "react-icons/fa";
+import { GoDiscussionClosed } from "react-icons/go";
 
 const NotificacionesAdmin = () => {
   const { user, isAuthenticated } = useAuth();
@@ -67,7 +68,7 @@ const NotificacionesAdmin = () => {
               <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                className="bg-gray-200 outline-none py-2 pl-10 pr-4 rounded-xl w-full md:w-auto"
+                className="bg-gray-100 outline-none py-2 pl-10 pr-4 rounded-xl w-full md:w-auto"
                 placeholder="Buscar Recordatorios"
                 value={searchTerm}
                 onChange={handleSearchChange}
@@ -77,44 +78,41 @@ const NotificacionesAdmin = () => {
         </div>
         <div className="w-full pt-6">
           <div className="h-[700px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredRecordatorios.map(recordatorio => (
-                <div key={recordatorio._id} className="border border-gray-200 rounded-lg shadow-lg hover:shadow-md transition-shadow duration-300">
-                  <div className="bg-blue-500 text-white py-2 px-2 text-center font-bold rounded-t-lg">
-                    <h3 className="text-lg font-bold">Recordatorios</h3>
+                <div key={recordatorio._id} className="relative bg-white py-6 px-6 rounded-3xl w-[300px] my-4 shadow-xl">
+                  <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-yellow-500 left-4 -top-4">
+                    <GoDiscussionClosed className="w-8 h-8"/>
                   </div>
-                  <div className="p-6 bg-gray-50">
-                    <div className="space-y-2">
-                    <div>
-                        <strong>Titulo:</strong>
-                        <p>{recordatorio.titulo}</p>
-                      </div>
-                      <div>
-                        <strong>Descripción:</strong>
-                        <p
-                          className="cursor-pointer text-gray-500"
-                          onClick={() => handleDescriptionClick(recordatorio)}
+                  <div className="mt-8">
+                    <p className="text-xl font-semibold my-2">Recordatorio</p>
+                    <div className="flex space-x-2 text-gray-400 text-sm">
+                      <FaRegUser className="h-5 w-5"/>
+                      <p> {recordatorio.usuario ? recordatorio.usuario.username : "Desconocido"}</p>
+                    </div>
+                    <div className="flex space-x-2 text-gray-400 text-sm my-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p> {new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
+                    </div>
+                    <div className="border-t-2"></div>
+                    <div className="mt-4">
+                      <p className="text-gray-600 mb-2">
+                        <strong>Título:</strong> {recordatorio.titulo}
+                      </p>
+                      <p className="text-gray-600 mb-2 cursor-pointer" onClick={() => handleDescriptionClick(recordatorio)}>
+                        <strong>Descripción:</strong> {recordatorio.descripcion.length > 100 ? `${recordatorio.descripcion.substring(0, 100)}...` : recordatorio.descripcion}
+                      </p>
+                      <div className="flex justify-center">
+                        <button
+                          className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+                          onClick={() => handleDelete(recordatorio._id)}
                         >
-                          {recordatorio.descripcion.length > 30
-                            ? `${recordatorio.descripcion.substring(0, 100)}...`
-                            : recordatorio.descripcion}
-                        </p>
-                      </div>
-                      <div>
-                        <strong>Fecha:</strong>
-                        <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <strong>Usuario:</strong>
-                        <p>{recordatorio.usuario ? recordatorio.usuario.username : "Desconocido"}</p>
+                          Eliminar
+                        </button>
                       </div>
                     </div>
-                    <button
-                      className="mt-4 bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
-                      onClick={() => handleDelete(recordatorio._id)}
-                    >
-                      Eliminar
-                    </button>
                   </div>
                 </div>
               ))}

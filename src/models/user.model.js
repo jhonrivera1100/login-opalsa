@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     cargo:{
         type: String,
         required: true
+    },
+    ciudad:{
+        type: String,
+        required: true,
     }
 },{
     timestamps:true

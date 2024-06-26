@@ -1,3 +1,5 @@
+// src/components/Navbar.jsx
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -54,7 +56,7 @@ function Navbar() {
     <nav
       className={`fixed top-0 left-0 h-full transition-all duration-300 ${
         isHovered ? "w-55" : "w-20"
-      } bg-slate-200 font-semibold text-zinc-900`}
+      } bg-slate-200 font-semibold text-zinc-900 z-50`} // Asegúrate de que `z-50` esté presente
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -82,7 +84,6 @@ function Navbar() {
             </div>
             {isHovered && <span className="ml-2">Inicio</span>}
           </Link>
-          {/* Otros enlaces con estructura similar */}
           <Link to="/GestionMaquinas" className={getLinkClass("/GestionMaquinas")}>
             <div className={getLineClass("/GestionMaquinas")}></div>
             <div className={getIconBgClass("/GestionMaquinas")}>
@@ -90,7 +91,6 @@ function Navbar() {
             </div>
             {isHovered && <span className="ml-2">Gestión</span>}
           </Link>
-          {/* Otros enlaces con estructura similar */}
           <Link to="/Historial" className={getLinkClass("/Historial")}>
             <div className={getLineClass("/Historial")}></div>
             <div className={getIconBgClass("/Historial")}>
@@ -98,7 +98,6 @@ function Navbar() {
             </div>
             {isHovered && <span className="ml-2">Historial</span>}
           </Link>
-          {/* Otros enlaces con estructura similar */}
           <Link to="/RegistroMantenimiento" className={getLinkClass("/RegistroMantenimiento")}>
             <div className={getLineClass("/RegistroMantenimiento")}></div>
             <div className={getIconBgClass("/RegistroMantenimiento")}>
@@ -106,7 +105,6 @@ function Navbar() {
             </div>
             {isHovered && <span className="ml-2">Reportes</span>}
           </Link>
-          {/* Otros enlaces con estructura similar */}
           <Link to="/profile" className={getLinkClass("/profile")}>
             <div className={getLineClass("/profile")}></div>
             <div className={getIconBgClass("/profile")}>
@@ -114,9 +112,7 @@ function Navbar() {
             </div>
             {isHovered && <span className="ml-2">Perfil</span>}
           </Link>
-          {/* Elemento de separación */}
           <div className="flex-grow"></div>
-          {/* Elementos de menú responsive */}
           <div className={`flex flex-col ${menuOpen ? "block" : "hidden"} md:hidden`}>
             <Link
               to="/login"
@@ -130,7 +126,6 @@ function Navbar() {
               {isHovered && <span className="ml-2">Cerrar Sesión</span>}
             </Link>
           </div>
-          {/* Otros enlaces de menú responsive */}
           <div className={`hidden md:flex flex-col space-y-2 ${menuOpen ? "block" : "hidden"}`}>
             <Link to="/admin" className={getLinkClass("/admin")}>
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -139,7 +134,6 @@ function Navbar() {
               </div>
               {isHovered && <span className="ml-2">Administrador</span>}
             </Link>
-            {/* Elemento de cierre de sesión */}
             <div
               onClick={logout}
               className="group flex items-center text-base transition duration-300 ease-in-out transform hover:bg-white hover:text-blue-500 p-2 rounded-tr-3xl rounded-br-3xl relative cursor-pointer"
