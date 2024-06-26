@@ -54,7 +54,7 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 h-full transition-all duration-300 ${
+      className={`fixed top-0 left-0 h-full z-50 transition-all duration-300 ${
         isHovered ? "w-55" : "w-20"
       } bg-slate-200 font-semibold text-zinc-900 z-50`} // Asegúrate de que `z-50` esté presente
       onMouseEnter={() => setIsHovered(true)}

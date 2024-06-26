@@ -4,7 +4,7 @@ import AgregarIcon from "../assets/agregar_icon.svg";
 import { useMaquinas } from "../context/MaquinasContext";
 import { getCasinosRequest } from "../api/casinos";
 
-function SearchBar() {
+function BotonAgregar() {
   const { register, handleSubmit } = useForm();
   const { createMaquina } = useMaquinas();
   const [modalOpen, setModalOpen] = useState(false);
@@ -24,12 +24,6 @@ function SearchBar() {
       ubicacionMaquina: "",
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
-    },
-    empresa: {
-      nombreEmpresa: "",
-      ciudadEmpresa: "",
-      direccionEmpresa: "",
-      imgEmpresa: "",
     },
     casino: {
       nombreCasino: "",
@@ -89,7 +83,7 @@ function SearchBar() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-gray-100 mb-3 pl-12">
       <div className="max-w-xl mx-auto flex items-center justify-center">
         <div className="flex items-center">
           <img
@@ -98,28 +92,15 @@ function SearchBar() {
             className="h-8 w-8 cursor-pointer transition-transform transform hover:scale-110 ml-4"
             onClick={openModal}
           />
-          <h2 className="font-semibold p-6">Agregar</h2>
         </div>
       </div>
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-4 rounded-md max-h-screen overflow-auto w-120">
-            <h2 className="text-lg font-semibold mb-4">Modal de Agregar</h2>
+          <div className="bg-white p-4 rounded-md w-120 max-w-4xl max-h-[80vh] overflow-auto">
+            <h2 className="text-lg text-center font-semibold mb-4">Agrega un nuevo elemento.</h2>
             <div className="flex flex-col">
               <label className="mb-2">Selecciona una opción:</label>
               <div>
-                <input
-                  type="radio"
-                  id="empresa"
-                  name="option"
-                  value="empresa"
-                  checked={selectedOption === "empresa"}
-                  onChange={() => handleOptionChange("empresa")}
-                />
-                <label htmlFor="empresa" className="text-black ml-2 mr-4">
-                  Empresa
-                </label>
-
                 <input
                   type="radio"
                   id="casino"
@@ -374,35 +355,6 @@ function SearchBar() {
               </div>
             )}
 
-            {selectedOption === "empresa" && (
-              <div>
-                <input
-                  type="text"
-                  name="nombreEmpresa"
-                  value={formData.empresa.nombreEmpresa}
-                  placeholder="Nombre de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-                <input
-                  type="text"
-                  name="ciudadEmpresa"
-                  value={formData.empresa.ciudadEmpresa}
-                  placeholder="Ciudad de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-                <input
-                  type="text"
-                  name="direccionEmpresa"
-                  value={formData.empresa.direccionEmpresa}
-                  placeholder="Dirección de la Empresa"
-                  onChange={handleInputChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 mt-2 mb-2 focus:outline-none focus:border-blue-300 w-full text-black"
-                />
-              </div>
-            )}
-
             {selectedOption === "casino" && (
               <div>
                 <input
@@ -445,4 +397,4 @@ function SearchBar() {
   );
 }
 
-export default SearchBar;
+export default BotonAgregar;

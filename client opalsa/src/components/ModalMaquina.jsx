@@ -8,7 +8,7 @@ function ModalMaquina({ maquina, onClose }) {
 
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
-  const [showComponentes, setShowComponentes] = useState(false); // Estado para manejar la visibilidad de los componentes
+  const [showComponentes, setShowComponentes] = useState(false);
 
   useEffect(() => {
     getComponentes();
@@ -24,196 +24,280 @@ function ModalMaquina({ maquina, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="bg-sky-50 shadow-xl w-full max-w-4xl max-h-[80vh]  overflow-y-auto p-6 relative text-sm">
-        <button
-          onClick={onClose}
-          className="fixed top-4 right-4 text-blue-200 hover:text-white focus:outline-none"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
+      <div className="bg-gray-100 shadow-xl w-full max-w-7xl max-h-screen overflow-y-auto p-6 relative text-sm flex">
+        <div className="w-4/12 max-h-[90vh] pr-4">
+          <div className="max-w-sm rounded-lg py-2 overflow-hidden transition-transform duration-300 cursor-pointer mx-2 transform hover:-translate-y-1">
+            <img
+              src={maquina.imgMaquina.url}
+              alt={maquina.nombreMaquina}
+              className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
             />
-          </svg>
-        </button>
-
-        <div className="flex flex-col h-full">
-          {/* Parte superior: Imagen y datos de la máquina con fondo común */}
-          <div className="flex mb-6 h-1/2 border-gray-900 border-4 bg-slate-600 p-4 rounded-lg relative">
-            {" "}
-            {/* Fondo común y padding */}
-            <div className="w-1/3 pr-4 flex flex-col items-center justify-center relative">
-              <div className="absolute top-0 left-[16%] w-[62%] bg-gray-900 text-white text-center py-1 rounded-t-lg">
-                {" "}
-                {/* Anchura ajustada */}
-                <strong>Serial: {maquina.nroSerieMaquina}</strong>{" "}
-                {/* Franja Número de Serie */}
-              </div>
-              <img
-                src={maquina.imgMaquina.url}
-                alt={maquina.nombreMaquina}
-                className="w-40 h-60 object-cover mb-4 bg-white mt-7" // Fondo de la imagen
-              />
-              <div className="absolute bottom-0 left-[16%] w-[62%] bg-gray-900 text-white text-center py-1 rounded-b-lg mx-auto">
-                {" "}
-                {/* Anchura ajustada */}
-                <strong>Marca: {maquina.marcaMaquina}</strong>{" "}
-                {/* Franja Marca */}
-              </div>
-            </div>
-            <div className="w-2/3 pl-4 overflow-auto text-white">
-              <h2 className="text-xl font-semibold mb-2">DATOS DE LA MAQUINA</h2>
-              <div className="space-y-0.5">
-                <p>
-                  <strong className="text-sky-200">Nombre:</strong>{" "}
-                  {maquina.nombreMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Modelo:</strong>{" "}
-                  {maquina.modeloMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Software:</strong>{" "}
-                  {maquina.softwareMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Juego:</strong>{" "}
-                  {maquina.juegoMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Estado:</strong>{" "}
-                  {maquina.estadoMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Descripción:</strong>{" "}
-                  {maquina.descripcionMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Ubicación:</strong>{" "}
-                  {maquina.ubicacionMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">
-                    Fecha de Instalación:
-                  </strong>{" "}
-                  {maquina.fechaInstalacionMaquina}
-                </p>
-                <div className="w-1/2 border-t border-white my-2"></div> {/* Línea divisoria */}
-                <p>
-                  <strong className="text-sky-200">Proveedor:</strong>{" "}
-                  {maquina.proveedorMaquina}
-                </p>
+            <div className="relative px-4 -mt-16">
+              <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-xl">
+                <div className="flex items-baseline">
+                  <span className="bg-teal-200 text-teal-800 text-xs px-2 inline-block rounded-full uppercase font-semibold tracking-wide">
+                    {maquina.estadoMaquina === "New"
+                      ? "New"
+                      : maquina.estadoMaquina}
+                  </span>
+                  <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+                    Serial: {maquina.nroSerieMaquina}
+                  </div>
+                </div>
+                <h4 className="mt-1 text-xl font-semibold uppercase leading-tight truncate">
+                  {maquina.marcaMaquina}
+                </h4>
+                <div className="mt-1">
+                  <span className="text-gray-600 text-sm">
+                    {maquina.ubicacionMaquina}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Instalación:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.fechaInstalacionMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Nombre:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.nombreMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Modelo:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.modeloMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Software:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.softwareMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Juego:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.juegoMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Estado:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.estadoMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Proveedor:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.proveedorMaquina}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-teal-600 text-md font-semibold">
+                    Descripción:
+                  </span>{" "}
+                  <span className="text-sm text-gray-600">
+                    {maquina.descripcionMaquina}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Parte inferior: Lista de componentes */}
-          <div className="flex-1 overflow-auto">
-            <div
-              className="flex items-center justify-center space-x-2 text-lg text-center rounded-lg font-bold text-gray-600 p-4 cursor-pointer hover:bg-gray-300" // Flex para alineación
-              onClick={toggleComponentes}
+        <div className="w-full flex flex-col pl-4 max-h-[90vh] overflow-y-auto">
+          <h1 className="text-xl text-black text-center py-3 font-bold mb-4">
+            Componentes de la máquina
+          </h1>
+          {sortedComponentes.length === 0 ? (
+            <div className="flex flex-col items-center mt-4 space-y-4">
+              <span className="text-gray-500 text-center">
+                Esta máquina aún no tiene componentes.
+              </span>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowAgregarModal(true)}
+                  className="bg-blue-500 text-white px-2 py-2 rounded"
+                >
+                  Agregar Componente
+                </button>
+                <button
+                  onClick={() => setShowTransferirModal(true)}
+                  className="bg-green-500 text-white px-2 py-2 rounded"
+                >
+                  Transferir Componente
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+ <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+  <thead className="bg-white">
+    <tr>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+      >
+        Nombre
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+      >
+        Serial
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+      >
+        Marca
+      </th>
+      <th
+        scope="col"
+        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+      >
+        Documento
+      </th>
+      <th scope="col" className="relative px-6 py-3">
+        <span className="sr-only">Acciones</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-gray-200">
+    {sortedComponentes.map((componente) => (
+      <tr key={componente._id} className="hover:bg-gray-50">
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm font-medium text-gray-900">
+            {componente.nombreComponente}
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-500">
+            {componente.serialComponente}
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-500">
+            {componente.marcaComponente}
+          </div>
+        </td>
+        <td className="px-12 py-4 whitespace-nowrap">
+          <div className="text-gray-500 hover:text-gray-900 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="h-6 w-6"
             >
-              <span>Componentes de la máquina</span>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+              />
+            </svg>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div className="flex justify-end gap-4">
+            <a
+              href="#"
+              className="text-gray-600 hover:text-gray-900"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={`h-6 w-6 transform transition-transform ${
-                  showComponentes ? "rotate-180" : ""
-                }`} // Rotación
                 fill="none"
                 viewBox="0 0 24 24"
+                strokeWidth="1.5"
                 stroke="currentColor"
+                className="h-6 w-6"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
                 />
               </svg>
-            </div>
-            {showComponentes && (
-              <>
-                {sortedComponentes.length === 0 ? (
-                  <p className="text-gray-500 text-center mt-4">
-                    Esta máquina aún no tiene componentes.
-                  </p>
-                ) : (
-                  <>
-                    <ul className="list-none pl-0">
-                      <li className="font-semibold text-white bg-gray-900 mb-2 grid grid-cols-4 gap-4 p-2">
-                        <span>NOMBRE</span>
-                        <span>SERIAL</span>
-                        <span>MARCA</span>
-                        <span>DOCUMENTO</span>
-                      </li>
-                      {sortedComponentes.map((componente) => (
-                        <li
-                          className="text-gray-500 mb-1 grid grid-cols-4 gap-4 font-medium p-2 border-b border-gray-300"
-                          key={componente._id}
-                        >
-                          <span>{componente.nombreComponente}</span>
-                          <span>{componente.serialComponente}</span>
-                          <span>{componente.marcaComponente}</span>
-                          <span>{componente.documentoComponente}</span>
-                        </li>
-                      ))}
-                    </ul>{" "}
-                    {/* Botones en la parte inferior */}
-                    <div className="flex justify-end space-x-4 mt-4">
-                      <button
-                        onClick={() => setShowAgregarModal(true)}
-                        className="bg-blue-500 text-white px-2 py-2 rounded"
-                      >
-                        Agregar Componente
-                      </button>
-                      <button
-                        onClick={() => setShowTransferirModal(true)}
-                        className="bg-green-500 text-white px-2 py-2 rounded"
-                      >
-                        Transferir Componente
-                      </button>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
+            </a>
+            <a
+              href="#"
+              className="text-red-600 hover:text-red-900"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+            </a>
           </div>
-        </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
-        {showAgregarModal && (
-          <AgregarComponenteModal
-            maquinaId={maquina._id}
-            onClose={() => setShowAgregarModal(false)}
-          />
-        )}
 
-        {showTransferirModal && (
-          <TransferirComponenteModal
-            maquina={maquina}
-            componentes={componentes}
-            onClose={() => setShowTransferirModal(false)}
-            />
+              <div className="flex justify-center space-x-4 mt-4">
+                <button
+                  onClick={() => setShowAgregarModal(true)}
+                  className="bg-blue-500 text-white px-2 py-2 rounded"
+                >
+                  Agregar Componente
+                </button>
+                <button
+                  onClick={() => setShowTransferirModal(true)}
+                  className="bg-green-500 text-white px-2 py-2 rounded"
+                >
+                  Transferir Componente
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
-    );
-  }
-  
-  export default ModalMaquina;
-  
-              
+
+      {showAgregarModal && (
+        <AgregarComponenteModal
+          maquinaId={maquina._id}
+          onClose={() => setShowAgregarModal(false)}
+        />
+      )}
+
+      {showTransferirModal && (
+        <TransferirComponenteModal
+          maquina={maquina}
+          componentes={componentes}
+          onClose={() => setShowTransferirModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+export default ModalMaquina;
