@@ -2,7 +2,7 @@ import axios from "../api/axios";
 import React, { useState, useEffect } from "react";
 import { getMaquinasRequest } from "../api/maquinas";
 
-function TransferirComponenteModal({ maquina, componentes, onClose }) {
+function TransferirComponenteModal({ maquina, componentes, onClose, onComponentTransferred }) {
   const [numerosDeSerie, setNumerosDeSerie] = useState([]);
   const [maquinas, setMaquinas] = useState([]);
   const [formData, setFormData] = useState({
@@ -46,34 +46,31 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
       const componenteAActualizar = componentes.find(
         (componente) => componente.serialComponente === formData.serialComponente
       );
-  
+
       await axios.put(`/componentes/${componenteAActualizar._id}`, {
         maquina: formData.nuevaMaquinaSerial
       });
-  
+
       console.log("Componente transferido exitosamente:", formData.serialComponente);
       console.log("Nueva máquina:", formData.nuevaMaquinaSerial);
-  
-      // Obtener los datos de las máquinas involucradas
-      const oldMaquina = maquinas.find(m => m._id === maquina._id);
-      const newMaquina = maquinas.find(m => m._id === formData.nuevaMaquinaSerial);
-  
+
       // Registro en el historial
-      const response = await axios.post('/movimientos', {
+      await axios.post('/movimientos', {
         componenteId: componenteAActualizar._id,
-        oldMaquinaId: oldMaquina._id,
-        oldMaquinaSerial: oldMaquina.nroSerieMaquina,
-        newMaquinaId: newMaquina._id,
-        newMaquinaSerial: newMaquina.nroSerieMaquina,
+        oldMaquinaId: maquina._id,
+        newMaquinaId: formData.nuevaMaquinaSerial,
         nombreComponente: componenteAActualizar.nombreComponente,
         serialComponente: componenteAActualizar.serialComponente,
       });
-  
-      console.log("Historial de movimientos guardado:", response.data);
-  
+
+      console.log("Historial de movimientos guardado");
+
+      // Llama al callback para notificar que la transferencia fue exitosa
+      onComponentTransferred();
     } catch (error) {
       console.error("Error al transferir el componente:", error);
     }
+
     onClose();
   };
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
-import UserHeader from '../components/UserHeader';
 import CrearRecordatorio from "../components/NotificacionesRegistro";
 import MantenimientoRegistro from '../components/MantenimientosRegistro';
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +14,6 @@ const RegistroMantenimiento = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-      <UserHeader />
       <div>
           <MantenimientoRegistro />
         </div>

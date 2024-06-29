@@ -50,7 +50,7 @@ function BotonAgregar() {
 
   const onSubmit = handleSubmit(() => {
     const formDataToSend = new FormData();
-    Object.keys(formData.maquina).forEach(key => {
+    Object.keys(formData.maquina).forEach((key) => {
       formDataToSend.append(key, formData.maquina[key]);
     });
     createMaquina(formDataToSend);
@@ -97,7 +97,9 @@ function BotonAgregar() {
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="bg-white p-4 rounded-md w-120 max-w-4xl max-h-[80vh] overflow-auto">
-            <h2 className="text-lg text-center font-semibold mb-4">Agrega un nuevo elemento.</h2>
+            <h2 className="text-lg text-center font-semibold mb-4">
+              Agrega un nuevo elemento.
+            </h2>
             <div className="flex flex-col">
               <label className="mb-2">Selecciona una opción:</label>
               <div>
@@ -259,16 +261,15 @@ function BotonAgregar() {
                     >
                       Estado de la Máquina:
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="estadoMaquina"
                       value={formData.maquina.estadoMaquina}
-                      {...register("estadoMaquina")}
-                      autoFocus
-                      placeholder="Estado de la Máquina"
                       onChange={handleInputChange}
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                    />
+                    >
+                      <option value="activo">Activo</option>
+                      <option value="inactivo">Inactivo</option>
+                    </select>
                   </div>
                   <div>
                     <label

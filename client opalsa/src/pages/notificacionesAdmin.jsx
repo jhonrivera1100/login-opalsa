@@ -85,7 +85,7 @@ const NotificacionesAdmin = () => {
                     <GoDiscussionClosed className="w-8 h-8"/>
                   </div>
                   <div className="mt-8">
-                    <p className="text-xl font-semibold my-2">Recordatorio</p>
+                    <p className="text-xl font-semibold my-2">Notificacion</p>
                     <div className="flex space-x-2 text-gray-400 text-sm">
                       <FaRegUser className="h-5 w-5"/>
                       <p> {recordatorio.usuario ? recordatorio.usuario.username : "Desconocido"}</p>
