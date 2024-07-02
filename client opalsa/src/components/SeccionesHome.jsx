@@ -3,18 +3,19 @@ import { getMaquinasRequest } from "../api/maquinas";
 import { getCasinosRequest } from "../api/casinos";
 import CasinoCard from "../components/casinoCard";
 import BotonAgregar from "../components/BotonAgregar";
-import MaquinaCard from "../components/MaquinaCard"; // Importa el componente MaquinaCard
+import MaquinaCard from "../components/MaquinaCard";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
   const [maquinas, setMaquinas] = useState([]);
   const [casinos, setCasinos] = useState([]);
   const [selectedCasino, setSelectedCasino] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPageMaquinas, setCurrentPageMaquinas] = useState(1);
+  const [currentPageCasinos, setCurrentPageCasinos] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
-  const [cityFilter, setCityFilter] = useState(""); // Nuevo estado para el filtro de ciudad
-  const itemsPerPage = 12;
+  const [cityFilter, setCityFilter] = useState("");
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,22 +34,39 @@ function SeccionesHome() {
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1);
+    setCurrentPageMaquinas(1);
+    setCurrentPageCasinos(1);
   };
 
   const handleFilterChange = (e) => {
     setSelectedBrand(e.target.value);
-    setCurrentPage(1);
+    setCurrentPageMaquinas(1);
   };
 
   const handleCityFilterChange = (e) => {
     setCityFilter(e.target.value);
-    setCurrentPage(1);
+    setCurrentPageCasinos(1);
   };
 
   const changeSection = (newSection) => {
     setSection(newSection);
-    setSelectedCasino(null); // Restablece el casino seleccionado al cambiar de sección
+    setSelectedCasino(null);
+  };
+
+  const handlePreviousPageMaquinas = () => {
+    setCurrentPageMaquinas((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const handleNextPageMaquinas = () => {
+    setCurrentPageMaquinas((prevPage) => prevPage + 1);
+  };
+
+  const handlePreviousPageCasinos = () => {
+    setCurrentPageCasinos((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const handleNextPageCasinos = () => {
+    setCurrentPageCasinos((prevPage) => prevPage + 1);
   };
 
   const renderSectionContent = () => {
@@ -82,19 +100,13 @@ function SeccionesHome() {
             <h2 className="text-2xl font-bold text-gray-900 mt-4">
               {selectedCasino.nombreCasino}
             </h2>
-            <p className="text-lg text-gray-500">
-              {selectedCasino.ciudadCasino}
-            </p>
-            <p className="text-lg text-gray-500">
-              {selectedCasino.direccionCasino}
-            </p>
+            <p className="text-lg text-gray-500">{selectedCasino.ciudadCasino}</p>
+            <p className="text-lg text-gray-500">{selectedCasino.direccionCasino}</p>
             <div className="w-full text-center mt-8 mb-4">
               <h3 className="text-xl font-bold text-gray-900 mt-6 mb-2">
-                MAQUINAS EN EL CASINO
+                MÁQUINAS EN EL CASINO
               </h3>
-              <p className="text-lg text-gray-500">
-                Total: {filteredMaquinas.length}
-              </p>
+              <p className="text-lg text-gray-500">Total: {filteredMaquinas.length}</p>
             </div>
             <div className="flex mb-4 w-full justify-center items-center">
               <input
@@ -184,13 +196,13 @@ function SeccionesHome() {
                       </td>
                       <td className="px-12 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
                         <div className="flex items-center">
-                          <svg
+                        <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth="1.5"
                             stroke="currentColor"
-                            className="h-6 w-6 mr-2 text-gray-500 transition-colors duration-300 ease-in-out hover:text-gray-900"
+                            className="h-6 w-6 hover:text-gray-900"
                           >
                             <path
                               strokeLinecap="round"
@@ -198,7 +210,6 @@ function SeccionesHome() {
                               d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                             />
                           </svg>
-                          {maquina.documentoMaquina}
                         </div>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
@@ -229,46 +240,35 @@ function SeccionesHome() {
       );
     }
 
-    let sectionData = [];
-    if (section === "Maquinas") {
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      sectionData = maquinas
-        .filter(
-          (maquina) =>
-            (maquina.nombreMaquina
+    const startIndexMaquinas = (currentPageMaquinas - 1) * itemsPerPage;
+    const endIndexMaquinas = startIndexMaquinas + itemsPerPage;
+    const paginatedMaquinas = maquinas
+      .filter(
+        (maquina) =>
+          (maquina.nombreMaquina
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+            maquina.nroSerieMaquina
               .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-              maquina.nroSerieMaquina
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())) &&
-            (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-        )
-        .slice(startIndex, endIndex);
-    } else if (section === "Casinos") {
-      sectionData = casinos.filter(
+              .includes(searchQuery.toLowerCase())) &&
+          (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
+      )
+      .slice(startIndexMaquinas, endIndexMaquinas);
+
+    const startIndexCasinos = (currentPageCasinos - 1) * itemsPerPage;
+    const endIndexCasinos = startIndexCasinos + itemsPerPage;
+    const paginatedCasinos = casinos
+      .filter(
         (casino) =>
           casino.nombreCasino
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) &&
           (cityFilter === "" || casino.ciudadCasino === cityFilter)
-      );
-    } else {
-      return <p></p>;
-    }
-
-    const handlePreviousPage = () => {
-      setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-    };
-
-    const handleNextPage = () => {
-      setCurrentPage((prevPage) =>
-        prevPage * itemsPerPage < maquinas.length ? prevPage + 1 : prevPage
-      );
-    };
+      )
+      .slice(startIndexCasinos, endIndexCasinos);
 
     return (
-      <div className="mx-auto bg-gray-100 w-10/12 h-144 overflow-auto  p-4">
+      <div className="mx-auto bg-gray-100 w-10/12 h-144 overflow-auto p-4">
         {section === "Maquinas" && (
           <div className="flex mb-4 w-full justify-center items-center">
             <input
@@ -281,7 +281,7 @@ function SeccionesHome() {
             <select
               value={selectedBrand}
               onChange={handleFilterChange}
-              className="px-6 py-2 border rounded-md"
+              className="px-4 py-2 border rounded-md"
             >
               <option value="">Todas las marcas</option>
               <option value="IGT">IGT</option>
@@ -302,7 +302,7 @@ function SeccionesHome() {
             <select
               value={cityFilter}
               onChange={handleCityFilterChange}
-              className="px-6 py-2 border rounded-md"
+              className="px-4 py-2 border rounded-md"
             >
               <option value="">Todas las ciudades</option>
               <option value="Cali">Cali</option>
@@ -314,11 +314,11 @@ function SeccionesHome() {
         )}
         <div className="grid grid-cols-4 gap-1">
           {section === "Maquinas" &&
-            sectionData.map((maquina) => (
-              <MaquinaCard key={maquina._id} maquina={maquina} /> // Usa el componente MaquinaCard
+            paginatedMaquinas.map((maquina) => (
+              <MaquinaCard key={maquina._id} maquina={maquina} />
             ))}
           {section === "Casinos" &&
-            sectionData.map((casino) => (
+            paginatedCasinos.map((casino) => (
               <CasinoCard
                 key={casino._id}
                 casino={casino}
@@ -329,15 +329,37 @@ function SeccionesHome() {
         {section === "Maquinas" && (
           <div className="flex justify-between mt-4">
             <button
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
+              onClick={handlePreviousPageMaquinas}
+              disabled={currentPageMaquinas === 1}
               className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
             >
               Anterior
             </button>
             <button
-              onClick={handleNextPage}
-              disabled={currentPage * itemsPerPage >= maquinas.length}
+              onClick={handleNextPageMaquinas}
+              disabled={
+                currentPageMaquinas * itemsPerPage >= maquinas.length
+              }
+              className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
+        {section === "Casinos" && (
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={handlePreviousPageCasinos}
+              disabled={currentPageCasinos === 1}
+              className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              Anterior
+            </button>
+            <button
+              onClick={handleNextPageCasinos}
+              disabled={
+                currentPageCasinos * itemsPerPage >= casinos.length
+              }
               className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
             >
               Siguiente

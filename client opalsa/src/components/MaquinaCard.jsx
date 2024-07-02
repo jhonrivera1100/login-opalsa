@@ -58,7 +58,7 @@ function MaquinaCard({ maquina }) {
                   : maquina.estadoMaquina}
               </span>
               <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
-                Serial: {maquina.nroSerieMaquina}
+                {maquina.nroSerieMaquina}
               </div>
             </div>
 
