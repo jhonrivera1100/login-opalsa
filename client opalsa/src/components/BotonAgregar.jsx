@@ -24,6 +24,7 @@ function BotonAgregar() {
       ubicacionMaquina: "",
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
+      documentoMaquina: null,
     },
     casino: {
       nombreCasino: "",
@@ -48,6 +49,17 @@ function BotonAgregar() {
 
   const openModal = () => {
     setModalOpen(true);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setFormData({
+      ...formData,
+      maquina: {
+        ...formData.maquina,
+        documentoMaquina: file,
+      },
+    });
   };
 
   const onSubmit = handleSubmit(() => {
@@ -350,18 +362,20 @@ function BotonAgregar() {
                   </div>
                   <div>
                     <label
-                      htmlFor="documentacionMaquina"
+                      htmlFor="documentoMaquina"
                       className="text-black font-bold block mb-1"
                     >
-                      Documentacion de la maquina:
+                      Documentación de la máquina:
                     </label>
                     <input
                       type="file"
-                      name="documentacionMaquina"
+                      name="documentoMaquina"
+                      onChange={handleFileChange} // Maneja el cambio de archivo
                       autoFocus
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                     />
                   </div>
+
                   <button
                     type="submit"
                     className="col-span-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md"
