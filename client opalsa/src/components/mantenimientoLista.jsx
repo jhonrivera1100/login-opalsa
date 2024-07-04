@@ -58,10 +58,10 @@ const MantenimientosList = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-2 p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div className="max-w-7xl mx-auto mt-5 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {mantenimientos.map((mantenimiento) => (
-          <div key={mantenimiento._id} className="relative bg-white py-4 px-4 rounded-3xl w-[250px] h-[435px] shadow-xl">
+          <div key={mantenimiento._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] h-[435px]  m-4 shadow-xl">
             <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-green-500 left-4 -top-6">
               {/* svg */}
               <FaTools className="h-8 w-8"/>
@@ -82,7 +82,7 @@ const MantenimientosList = () => {
               </div>
               <div className="border-t-2"></div>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Descripción</p>
+                <p className="font-semibold text-base mb-1">Descripción</p>
                 <p
                   className="text-sm text-gray-500 cursor-pointer hover:text-gray-800 transition"
                   onClick={() => handleOpenModal(mantenimiento)}
@@ -94,23 +94,23 @@ const MantenimientosList = () => {
               </div>
               {mantenimiento.nombreMaquina && (
                 <div className="my-1">
-                  <p className="font-semibold text-base mb-2">Nombre de la Máquina</p>
+                  <p className="font-semibold text-base mb-1">Nombre de la Máquina</p>
                   <p className="text-sm text-gray-500">{mantenimiento.nombreMaquina}</p>
                 </div>
               )}
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Número de Serie</p>
+                <p className="font-semibold text-base mb-1">Número de Serie</p>
                 <p className="text-sm text-gray-500">{mantenimiento.nroSerieMaquina}</p>
               </div>
               {mantenimiento.ubicacionMaquina && (
                 <div className="my-1">
-                  <p className="font-semibold text-base mb-2">Ubicación</p>
+                  <p className="font-semibold text-base mb-1">Ubicación</p>
                   <p className="text-sm text-gray-500">{mantenimiento.ubicacionMaquina}</p>
                 </div>
               )}
               {mantenimiento.archivo && (
                 <div className="my-1">
-                  <p className="font-semibold text-base mb-2">Documento</p>
+                  <p className="font-semibold text-base mb-1">Documento</p>
                   <a href={`http://localhost:4000/upload/${mantenimiento.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm">
                     {mantenimiento.archivo}
                   </a>
