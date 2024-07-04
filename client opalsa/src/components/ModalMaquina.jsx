@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
-import { deleteComponentesRequest } from "../api/componentes"; 
-import { deleteMaquinasRequest } from "../api/maquinas";// Importar la función de eliminación desde tu archivo de peticiones
+import { deleteComponentesRequest } from "../api/componentes";
+import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas"; // Importar la función de eliminación desde tu archivo de peticiones
 
 function ModalMaquina({ maquina, onClose }) {
   const { componentes, getComponentes } = useComponentes();
@@ -39,8 +39,27 @@ function ModalMaquina({ maquina, onClose }) {
     }
   };
 
+  const toggleEstadoMaquina = async () => {
+    const nuevoEstado =
+      maquina.estadoMaquina === "activo" ? "inactivo" : "activo";
+
+    try {
+      // Actualiza el estado en el backend
+      await updateMaquinasRequest({ ...maquina, estadoMaquina: nuevoEstado });
+
+      // Actualiza el estado localmente
+      maquina.estadoMaquina = nuevoEstado;
+      // Puedes actualizar otros componentes relacionados si es necesario
+    } catch (error) {
+      console.error("Error al cambiar el estado de la máquina:", error);
+      // Manejo de errores, como mostrar un mensaje al usuario
+    }
+  };
+
   const handleEliminarMaquina = async () => {
-    const confirmDelete = window.confirm("¿Seguro que deseas eliminar esta máquina?");
+    const confirmDelete = window.confirm(
+      "¿Seguro que deseas eliminar esta máquina?"
+    );
     if (confirmDelete) {
       try {
         // Lógica para eliminar la máquina
@@ -86,19 +105,23 @@ function ModalMaquina({ maquina, onClose }) {
             <div className="relative px-4 -mt-16">
               <div className="bg-white p-6 rounded-lg shadow-xl hover:shadow-xl">
                 <div className="flex items-baseline">
-                  <span
-                    className={`text-xs px-2 inline-block rounded-full uppercase font-semibold tracking-wide ${
+                  <button
+                    onClick={toggleEstadoMaquina}
+                    className={`text-xs px-2 inline-block rounded-full uppercase hover:scale-105 font-semibold tracking-wide ${
                       maquina.estadoMaquina === "inactivo"
                         ? "bg-red-200 text-red-800"
                         : "bg-teal-200 text-teal-800"
                     }`}
                   >
-                    {maquina.estadoMaquina === "New" ? "New" : maquina.estadoMaquina}
-                  </span>
+                    {maquina.estadoMaquina === "inactivo"
+                      ? "Inactivo"
+                      : "Activo"}
+                  </button>
                   <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
                     Serial: {maquina.nroSerieMaquina}
                   </div>
                 </div>
+
                 <h4 className="mt-1 text-xl font-semibold uppercase leading-tight truncate">
                   {maquina.marcaMaquina}
                 </h4>
@@ -145,14 +168,6 @@ function ModalMaquina({ maquina, onClose }) {
                   </span>{" "}
                   <span className="text-sm text-gray-600">
                     {maquina.juegoMaquina}
-                  </span>
-                </div>
-                <div className="mt-1">
-                  <span className="text-teal-600 text-md font-semibold">
-                    Estado:
-                  </span>{" "}
-                  <span className="text-sm text-gray-600">
-                    {maquina.estadoMaquina}
                   </span>
                 </div>
                 <div className="mt-1">
@@ -296,7 +311,9 @@ function ModalMaquina({ maquina, onClose }) {
                             </svg>
                           </a>
                           <button
-                            onClick={() => handleDeleteComponente(componente._id)}
+                            onClick={() =>
+                              handleDeleteComponente(componente._id)
+                            }
                             className="text-red-600 hover:text-red-900"
                           >
                             <svg

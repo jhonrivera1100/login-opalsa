@@ -27,8 +27,10 @@ function BotonAgregar() {
     },
     casino: {
       nombreCasino: "",
+      imgCasino: null,
       ciudadCasino: "",
       direccionCasino: "",
+      documentacionCasino: null,
     },
   });
 

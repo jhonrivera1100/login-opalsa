@@ -8,5 +8,8 @@ export const createCasinoSchema = z.object({
   }).optional(),
   ciudadCasino: z.string().min(1, { message: "La ciudad del casino es obligatoria" }),
   direccionCasino: z.string().min(1, { message: "La direccion es obligatoria" }),
-  documentacionCasino: z.string().min(1, { message: "La documentacion es obligatoria" })
+  documentacionCasino: z.object({
+    url: z.string(),
+    public_id: z.string()
+  }).optional()
 });
