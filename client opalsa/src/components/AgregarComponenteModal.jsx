@@ -8,25 +8,39 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
     serialComponente: "",
     nombreComponente: "",
     marcaComponente: "",
-    documentoComponente: "",
+    documentoComponente: null, // Inicialmente null para el archivo
     maquina: maquinaId,
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    if (e.target.name === "documentoComponente") {
+      setFormData({
+        ...formData,
+        documentoComponente: e.target.files[0], // Guardar el archivo seleccionado
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createComponente(formData);
+    const formDataToSend = new FormData();
+    formDataToSend.append("serialComponente", formData.serialComponente);
+    formDataToSend.append("nombreComponente", formData.nombreComponente);
+    formDataToSend.append("marcaComponente", formData.marcaComponente);
+    formDataToSend.append("maquina", formData.maquina);
+    formDataToSend.append("documentoComponente", formData.documentoComponente); // Agregar el archivo al FormData
+
+    await createComponente(formDataToSend);
     setFormData({
       serialComponente: "",
       nombreComponente: "",
       marcaComponente: "",
-      documentoComponente: "",
+      documentoComponente: null, // Reiniciar el archivo después de enviar
       maquina: maquinaId,
     });
     onClose();
@@ -51,7 +65,7 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="documentoComponente">Documento del Componente</label>
-            <input type="text" name="documentoComponente" id="documentoComponente" value={formData.documentoComponente} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+            <input type="file" name="documentoComponente" id="documentoComponente" onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
           </div>
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="bg-red-500 text-white px-4 py-2 rounded mr-2">Cancelar</button>
