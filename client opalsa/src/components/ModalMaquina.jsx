@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
+import { deleteComponentesRequest } from "../api/componentes"; 
+import { deleteMaquinasRequest } from "../api/maquinas";// Importar la función de eliminación desde tu archivo de peticiones
 
 function ModalMaquina({ maquina, onClose }) {
   const { componentes, getComponentes } = useComponentes();
@@ -23,10 +25,32 @@ function ModalMaquina({ maquina, onClose }) {
   };
 
   const handleTransferComplete = () => {
-    // Aquí puedes realizar alguna acción adicional si es necesario después de la transferencia
-    // Por ejemplo, actualizar la lista de componentes
     getComponentes();
-    setShowTransferirModal(false); // Cerrar el modal de transferencia después de completar la transferencia
+    setShowTransferirModal(false);
+  };
+
+  const handleDeleteComponente = async (componenteId) => {
+    try {
+      await deleteComponentesRequest(componenteId);
+      getComponentes(); // Actualizar la lista de componentes después de eliminar
+    } catch (error) {
+      console.error("Error al eliminar el componente:", error);
+      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+    }
+  };
+
+  const handleEliminarMaquina = async () => {
+    const confirmDelete = window.confirm("¿Seguro que deseas eliminar esta máquina?");
+    if (confirmDelete) {
+      try {
+        // Lógica para eliminar la máquina
+        await deleteMaquinasRequest(maquina._id); // Debes implementar esta función
+        onClose(); // Cerrar el modal después de eliminar
+      } catch (error) {
+        console.error("Error al eliminar la máquina:", error);
+        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+      }
+    }
   };
 
   return (
@@ -147,6 +171,16 @@ function ModalMaquina({ maquina, onClose }) {
                     {maquina.descripcionMaquina}
                   </span>
                 </div>
+
+                {/* Botón para eliminar la máquina */}
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={handleEliminarMaquina}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    Eliminar Máquina
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -222,7 +256,7 @@ function ModalMaquina({ maquina, onClose }) {
                           {componente.marcaComponente}
                         </div>
                       </td>
-                      <td className="px-12 py-                        4 whitespace-nowrap">
+                      <td className="px-12 py-4 whitespace-nowrap">
                         <div className="text-gray-500 hover:text-gray-900 flex items-center">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -261,8 +295,8 @@ function ModalMaquina({ maquina, onClose }) {
                               />
                             </svg>
                           </a>
-                          <a
-                            href="#"
+                          <button
+                            onClick={() => handleDeleteComponente(componente._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             <svg
@@ -279,7 +313,7 @@ function ModalMaquina({ maquina, onClose }) {
                                 d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                               />
                             </svg>
-                          </a>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -325,4 +359,3 @@ function ModalMaquina({ maquina, onClose }) {
 }
 
 export default ModalMaquina;
-

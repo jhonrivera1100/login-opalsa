@@ -346,6 +346,20 @@ function BotonAgregar() {
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                     />
                   </div>
+                  <div>
+                    <label
+                      htmlFor="documentacionMaquina"
+                      className="text-black font-bold block mb-1"
+                    >
+                      Documentacion de la maquina:
+                    </label>
+                    <input
+                      type="file"
+                      name="documentacionMaquina"
+                      autoFocus
+                      className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                    />
+                  </div>
                   <button
                     type="submit"
                     className="col-span-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md"

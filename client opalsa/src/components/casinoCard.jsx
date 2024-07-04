@@ -2,12 +2,12 @@ import React from 'react';
 
 function CasinoCard({ casino, onVerMas }) {
   return (
-    <div className="w-72 max-w-sm bg-white border border-gray-200 my-1 rounded-lg shadow-lg transition-transform duration-300 hover:-translate-y-2">
+    <div className="w-full sm:w-72 max-w-sm bg-white border border-gray-200 my-1 rounded-lg shadow-lg transition-transform duration-300 hover:-translate-y-2">
       <div className="relative">
         <img 
           src={casino.imgCasino.url} 
           alt={casino.nombreCasino} 
-          className="w-full h-48 object-cover rounded-t-lg" 
+          className="w-full h-48 object-cover rounded-t-lg"
         />
       </div>
       <div className="flex flex-col items-center p-4">
