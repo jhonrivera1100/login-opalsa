@@ -27,21 +27,21 @@ function Sidebar() {
 
       {/* MENU */}
       <div className='pt-8'>
-      <div className='bg-sidebar-300/60 p-5 pt-[10px] rounded-tr-[100px] h-[90vh] flex flex-col justify-between gap-6'>
+      <div className='bg-slate-200 font-semibold text-zinc-900 p-5 pt-[10px] rounded-tr-[100px] h-[90vh] flex flex-col justify-between gap-6'>
         <nav className='flex flex-col gap-12   pt-14'>
-          <Link to="/admin" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/admin" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <RiHome4Line /> Home
           </Link>
-          <Link to="/Usuarios" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/Usuarios" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <LuUsers /> Gestion Usuarios
           </Link>
-          <Link to="/notifi" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/notifi" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <IoNotificationsOutline /> Notificaciones
           </Link>
-          <Link to="/" className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <CgEreader /> Aplicacion
           </Link>
-          <Link to="/login" onClick={logout} className='flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/login" onClick={logout} className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <FiLogOut /> Logout
           </Link>
         </nav>

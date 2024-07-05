@@ -2,9 +2,10 @@ import axios from "../api/axios";
 import React, { useState, useEffect } from "react";
 import { getMaquinasRequest } from "../api/maquinas";
 
-function TransferirComponenteModal({ maquina, componentes, onClose }) {
+function TransferirComponenteModal({ maquina, componentes, onClose, onComponentTransferred }) {
   const [numerosDeSerie, setNumerosDeSerie] = useState([]);
   const [maquinas, setMaquinas] = useState([]);
+  const [nombreComponente, setNombreComponente] = useState("");
   const [formData, setFormData] = useState({
     serialComponente: "",
     nuevaMaquinaSerial: "",
@@ -13,6 +14,7 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
   useEffect(() => {
     if (!maquina) return;
 
+    // Filtra números de serie para componentes de la máquina actual
     const numerosDeSerieFiltrados = componentes
       .filter((componente) => componente.maquina === maquina._id)
       .map((componente) => componente.serialComponente);
@@ -24,19 +26,32 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
     const fetchMaquinas = async () => {
       try {
         const response = await getMaquinasRequest();
-        setMaquinas(response.data);
+        // Excluir la máquina actual del listado de máquinas
+        const maquinasFiltradas = response.data.filter(
+          (m) => m._id !== maquina._id
+        );
+        setMaquinas(maquinasFiltradas);
       } catch (error) {
         console.error("Error al obtener las máquinas:", error);
       }
     };
 
     fetchMaquinas();
-  }, []);
+  }, [maquina]);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "serialComponente") {
+      const selectedComponent = componentes.find(
+        (componente) => componente.serialComponente === value
+      );
+      setNombreComponente(selectedComponent ? selectedComponent.nombreComponente : "");
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -46,43 +61,38 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
       const componenteAActualizar = componentes.find(
         (componente) => componente.serialComponente === formData.serialComponente
       );
-  
+
       await axios.put(`/componentes/${componenteAActualizar._id}`, {
-        maquina: formData.nuevaMaquinaSerial
+        maquina: formData.nuevaMaquinaSerial,
       });
-  
+
       console.log("Componente transferido exitosamente:", formData.serialComponente);
       console.log("Nueva máquina:", formData.nuevaMaquinaSerial);
-  
-      // Obtener los datos de las máquinas involucradas
-      const oldMaquina = maquinas.find(m => m._id === maquina._id);
-      const newMaquina = maquinas.find(m => m._id === formData.nuevaMaquinaSerial);
-  
+
       // Registro en el historial
-      const response = await axios.post('/movimientos', {
+      await axios.post("/movimientos", {
         componenteId: componenteAActualizar._id,
-        oldMaquinaId: oldMaquina._id,
-        oldMaquinaSerial: oldMaquina.nroSerieMaquina,
-        newMaquinaId: newMaquina._id,
-        newMaquinaSerial: newMaquina.nroSerieMaquina,
+        oldMaquinaId: maquina._id,
+        newMaquinaId: formData.nuevaMaquinaSerial,
         nombreComponente: componenteAActualizar.nombreComponente,
         serialComponente: componenteAActualizar.serialComponente,
       });
-  
-      console.log("Historial de movimientos guardado:", response.data);
-  
+
+      console.log("Historial de movimientos guardado");
+
+      // Llama al callback para notificar que la transferencia fue exitosa
+      onComponentTransferred();
     } catch (error) {
       console.error("Error al transferir el componente:", error);
     }
+
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 overflow-auto">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-md w-full p-6">
-        <h3 className="text-xl font-bold mb-4 text-black">
-          Transferir Componente
-        </h3>
+        <h3 className="text-xl font-bold mb-4 text-black">Transferir Componente</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -106,6 +116,17 @@ function TransferirComponenteModal({ maquina, componentes, onClose }) {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Nombre del Componente
+            </label>
+            <input
+              type="text"
+              value={nombreComponente}
+              readOnly
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
           </div>
           <div className="mb-4">
             <label

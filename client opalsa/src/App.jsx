@@ -14,11 +14,13 @@ import NotificacionesAdmin from "./pages/notificacionesAdmin";
 import GestionUsuarios from "./pages/GestionUsuarios";
 import { MaquinasProvider } from "./context/MaquinasContext";
 import { ComponentesProvider } from "./context/ComponentesContext";
-import { NotificacionesProvider } from "./context/NotificacionesContext"; // Importa el NotificacionesProvider
+import { NotificacionesProvider } from "./context/NotificacionesContext";
+import { CasinosProvider } from "./context/CasinosContext"; // Importa el NotificacionesProvider
 
 function App() {
   return (
     <AuthProvider>
+      <CasinosProvider>
       <MaquinasProvider>
         <ComponentesProvider>
           <NotificacionesProvider> {/* Envolver con NotificacionesProvider */}
@@ -41,6 +43,7 @@ function App() {
           </NotificacionesProvider>
         </ComponentesProvider>
       </MaquinasProvider>
+      </CasinosProvider>
     </AuthProvider>
   );
 }
