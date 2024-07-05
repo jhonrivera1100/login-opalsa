@@ -11,6 +11,7 @@ function ModalMaquina({ maquina, onClose }) {
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
   const [showComponentes, setShowComponentes] = useState(false);
+  const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
 
   useEffect(() => {
     getComponentes();
@@ -40,16 +41,14 @@ function ModalMaquina({ maquina, onClose }) {
   };
 
   const toggleEstadoMaquina = async () => {
-    const nuevoEstado =
-      maquina.estadoMaquina === "activo" ? "inactivo" : "activo";
+    const nuevoEstado = estadoMaquina === "activo" ? "inactivo" : "activo";
 
     try {
       // Actualiza el estado en el backend
       await updateMaquinasRequest({ ...maquina, estadoMaquina: nuevoEstado });
 
-      // Actualiza el estado localmente
-      maquina.estadoMaquina = nuevoEstado;
-      // Puedes actualizar otros componentes relacionados si es necesario
+      // Actualiza el estado localmente de manera inmutable
+      setEstadoMaquina(nuevoEstado);
     } catch (error) {
       console.error("Error al cambiar el estado de la máquina:", error);
       // Manejo de errores, como mostrar un mensaje al usuario
@@ -112,14 +111,12 @@ function ModalMaquina({ maquina, onClose }) {
                   <button
                     onClick={toggleEstadoMaquina}
                     className={`text-xs px-2 inline-block rounded-full uppercase hover:scale-105 font-semibold tracking-wide ${
-                      maquina.estadoMaquina === "inactivo"
+                      estadoMaquina === "inactivo"
                         ? "bg-red-200 text-red-800"
                         : "bg-teal-200 text-teal-800"
                     }`}
                   >
-                    {maquina.estadoMaquina === "inactivo"
-                      ? "Inactivo"
-                      : "Activo"}
+                    {estadoMaquina === "inactivo" ? "Inactivo" : "Activo"}
                   </button>
                   <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
                     Serial: {maquina.nroSerieMaquina}
@@ -334,7 +331,7 @@ function ModalMaquina({ maquina, onClose }) {
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m-1.022-.166a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                               />
                             </svg>
                           </button>
