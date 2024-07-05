@@ -3,7 +3,7 @@ import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
 import { deleteComponentesRequest } from "../api/componentes";
-import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas"; // Importar la función de eliminación desde tu archivo de peticiones
+import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas";
 
 function ModalMaquina({ maquina, onClose }) {
   const { componentes, getComponentes } = useComponentes();
@@ -70,6 +70,10 @@ function ModalMaquina({ maquina, onClose }) {
         // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
       }
     }
+  };
+
+  const abrirDocumento = (url) => {
+    window.open(url, "_blank");
   };
 
   return (
@@ -272,7 +276,10 @@ function ModalMaquina({ maquina, onClose }) {
                         </div>
                       </td>
                       <td className="px-12 py-4 whitespace-nowrap">
-                        <div className="text-gray-500 hover:text-gray-900 flex items-center">
+                        <div
+                          className="text-gray-500 hover:text-gray-900 flex items-center cursor-pointer"
+                          onClick={() => abrirDocumento(componente.documentoComponente.url)}
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
