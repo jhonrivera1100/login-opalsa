@@ -28,7 +28,7 @@ const MovimientosLista = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto mt-10 p-6">
+    <div className="max-w-7xl mx-auto mt-2 p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
         {movimientos.map(movimiento => (
           <div key={movimiento._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] shadow-xl m-4">
@@ -41,23 +41,23 @@ const MovimientosLista = () => {
             <div className="mt-8">
               <p className="text-xl font-semibold my-2">Movimiento de Componente</p>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Nombre Componente</p>
+                <p className="font-semibold text-base mb-1">Nombre Componente</p>
                 <p className="text-sm text-gray-500">{movimiento.nombreComponente}</p>
               </div>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Serial Componente</p>
+                <p className="font-semibold text-base mb-1">Serial Componente</p>
                 <p className="text-sm text-gray-500">{movimiento.serialComponente}</p>
               </div>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Serial Maquina Inicial</p>
+                <p className="font-semibold text-base mb-1">Serial Maquina Inicial</p>
                 <p className="text-sm text-gray-500">{movimiento.oldMaquinaSerial}</p>
               </div>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Serial Maquina Final</p>
+                <p className="font-semibold text-base mb-1">Serial Maquina Final</p>
                 <p className="text-sm text-gray-500">{movimiento.newMaquinaSerial}</p>
               </div>
               <div className="my-1">
-                <p className="font-semibold text-base mb-2">Fecha de Transferencia</p>
+                <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
                 <p className="text-sm text-gray-500">{new Date(movimiento.fechaTransferencia).toLocaleDateString()}</p>
               </div>
               <div className=' flex justify-center'>

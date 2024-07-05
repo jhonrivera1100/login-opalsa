@@ -77,10 +77,10 @@ const NotificacionesAdmin = () => {
           </div>
         </div>
         <div className="w-full pt-6">
-          <div className="h-[700px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredRecordatorios.map(recordatorio => (
-                <div key={recordatorio._id} className="relative bg-white py-6 px-6 rounded-3xl w-[300px] my-4 shadow-xl">
+                <div key={recordatorio._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl">
                   <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-yellow-500 left-4 -top-4">
                     <GoDiscussionClosed className="w-8 h-8"/>
                   </div>

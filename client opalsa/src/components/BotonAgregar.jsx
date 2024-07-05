@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import AgregarIcon from "../assets/agregar_icon.svg";
 import { useMaquinas } from "../context/MaquinasContext";
@@ -21,9 +21,9 @@ function BotonAgregar() {
       marcaMaquina: "",
       softwareMaquina: "",
       juegoMaquina: "",
-      estadoMaquina: "",
+      estadoMaquina: "activo", // Valor por defecto
       descripcionMaquina: "",
-      ubicacionMaquina: "",
+      ubicacionMaquina: "", // Asegúrate de manejar la ubicación correctamente
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
       documentoMaquina: null,
@@ -65,7 +65,7 @@ function BotonAgregar() {
         marcaMaquina: "",
         softwareMaquina: "",
         juegoMaquina: "",
-        estadoMaquina: "",
+        estadoMaquina: "activo",
         descripcionMaquina: "",
         ubicacionMaquina: "",
         fechaInstalacionMaquina: "",
@@ -94,23 +94,31 @@ function BotonAgregar() {
     });
   };
 
-  const onSubmitMaquina = handleSubmit(() => {
-    const formDataToSend = new FormData();
-    Object.keys(formData.maquina).forEach((key) => {
-      formDataToSend.append(key, formData.maquina[key]);
-    });
-    createMaquina(formDataToSend);
-    closeModal();
-  });
+  const onSubmitMaquina = async () => {
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData.maquina).forEach((key) => {
+        formDataToSend.append(key, formData.maquina[key]);
+      });
+      await createMaquina(formDataToSend);
+      closeModal();
+    } catch (error) {
+      console.error("Error creating machine:", error);
+    }
+  };
 
-  const onSubmitCasino = handleSubmit(() => {
-    const formDataToSend = new FormData();
-    Object.keys(formData.casino).forEach((key) => {
-      formDataToSend.append(key, formData.casino[key]);
-    });
-    createCasino(formDataToSend);
-    closeModal();
-  });
+  const onSubmitCasino = async () => {
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData.casino).forEach((key) => {
+        formDataToSend.append(key, formData.casino[key]);
+      });
+      await createCasino(formDataToSend);
+      closeModal();
+    } catch (error) {
+      console.error("Error creating casino:", error);
+    }
+  };
 
   const handleInputChange = (event, isFile = false) => {
     const { name, value } = event.target;
@@ -186,7 +194,10 @@ function BotonAgregar() {
             </div>
 
             {selectedOption === "maquina" && (
-              <form onSubmit={onSubmitMaquina} className="grid grid-cols-2 gap-6">
+              <form
+                onSubmit={handleSubmit(onSubmitMaquina)}
+                className="grid grid-cols-2 gap-6"
+              >
                 <div>
                   <label
                     htmlFor="imgMaquina"
@@ -273,244 +284,249 @@ function BotonAgregar() {
                 <div>
                   <label
                     htmlFor="softwareMaquina"
-                    className="text-black fontbold block mb-1">
-Software de la Máquina:
-</label>
-<input
-type="text"
-name="softwareMaquina"
-value={formData.maquina.softwareMaquina}
-{...register("softwareMaquina")}
-placeholder="Software de la Máquina"
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-/>
-</div>
-<div>
-<label
-                 htmlFor="juegoMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Juego de la Máquina:
-</label>
-<input
-type="text"
-name="juegoMaquina"
-value={formData.maquina.juegoMaquina}
-{...register("juegoMaquina")}
-placeholder="Juego de la Máquina"
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-/>
-</div>
-<div>
-<label
-                 htmlFor="estadoMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Estado de la Máquina:
-</label>
-<select
-name="estadoMaquina"
-value={formData.maquina.estadoMaquina}
-{...register("estadoMaquina")}
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
->
-<option value="activo">Activo</option>
-<option value="inactivo">Inactivo</option>
-</select>
-</div>
-<div>
-<label
-                 htmlFor="descripcionMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Descripción de la Máquina:
-</label>
-<textarea
-name="descripcionMaquina"
-value={formData.maquina.descripcionMaquina}
-{...register("descripcionMaquina")}
-placeholder="Descripción de la Máquina"
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-></textarea>
-</div>
-<div>
-<label
-                 htmlFor="ubicacionMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Ubicación de la Máquina:
-</label>
-<select
-name="ubicacionMaquina"
-value={formData.maquina.ubicacionMaquina}
-{...register("ubicacionMaquina")}
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
->
-{casinos.map((casino) => (
-<option key={casino._id} value={casino.nombreCasino}>
-{casino.nombreCasino}
-</option>
-))}
-</select>
-</div>
-<div>
-<label
-                 htmlFor="fechaInstalacionMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Fecha de Instalación de la Máquina:
-</label>
-<input
-type="date"
-name="fechaInstalacionMaquina"
-value={formData.maquina.fechaInstalacionMaquina}
-{...register("fechaInstalacionMaquina")}
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-/>
-</div>
-<div>
-<label
-                 htmlFor="proveedorMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Proveedor de la Máquina:
-</label>
-<input
-type="text"
-name="proveedorMaquina"
-value={formData.maquina.proveedorMaquina}
-{...register("proveedorMaquina")}
-placeholder="Proveedor de la Máquina"
-onChange={handleInputChange}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-/>
-</div>
-<div>
-<label
-                 htmlFor="documentoMaquina"
-                 className="text-black font-bold block mb-1"
-               >
-Documentación de la Máquina:
-</label>
-<input
-type="file"
-name="documentoMaquina"
-onChange={(e) => handleFileChange(e)}
-className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-/>
-</div>
-<div className="col-span-2 flex justify-end">
-<button
-                 type="submit"
-                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
-               >
-Guardar
-</button>
-</div>
-</form>
-)}
-        {selectedOption === "casino" && (
-          <form onSubmit={onSubmitCasino} className="grid grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="imgCasino"
-                className="text-black font-bold block mb-1"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Software de la Máquina:
+                  </label>
+                  <input
+                    type="text"
+                    name="softwareMaquina"
+                    value={formData.maquina.softwareMaquina}
+                    {...register("softwareMaquina")}
+                    placeholder="Software de la Máquina"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="juegoMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Juego de la Máquina:
+                  </label>
+                  <input
+                    type="text"
+                    name="juegoMaquina"
+                    value={formData.maquina.juegoMaquina}
+                    {...register("juegoMaquina")}
+                    placeholder="Juego de la Máquina"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="estadoMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Estado de la Máquina:
+                  </label>
+                  <select
+                    name="estadoMaquina"
+                    value={formData.maquina.estadoMaquina}
+                    {...register("estadoMaquina")}
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  >
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="descripcionMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Descripción de la Máquina:
+                  </label>
+                  <textarea
+                    name="descripcionMaquina"
+                    value={formData.maquina.descripcionMaquina}
+                    {...register("descripcionMaquina")}
+                    placeholder="Descripción de la Máquina"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  ></textarea>
+                </div>
+                <div>
+                  <label
+                    htmlFor="ubicacionMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Ubicación de la Máquina:
+                  </label>
+                  <select
+                    name="ubicacionMaquina"
+                    value={formData.maquina.ubicacionMaquina}
+                    {...register("ubicacionMaquina", { required: true })}
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  >
+                    <option value="">Seleccione una ubicación</option>
+                    {casinos.map((casino) => (
+                      <option key={casino._id} value={casino.nombreCasino}>
+                        {casino.nombreCasino}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="fechaInstalacionMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Fecha de Instalación de la Máquina:
+                  </label>
+                  <input
+                    type="date"
+                    name="fechaInstalacionMaquina"
+                    value={formData.maquina.fechaInstalacionMaquina}
+                    {...register("fechaInstalacionMaquina")}
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="proveedorMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Proveedor de la Máquina:
+                  </label>
+                  <input
+                    type="text"
+                    name="proveedorMaquina"
+                    value={formData.maquina.proveedorMaquina}
+                    {...register("proveedorMaquina")}
+                    placeholder="Proveedor de la Máquina"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="documentoMaquina"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Documentación de la Máquina:
+                  </label>
+                  <input
+                    type="file"
+                    name="documentoMaquina"
+                    onChange={(e) => handleFileChange(e)}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div className="col-span-2 flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </form>
+            )}
+            {selectedOption === "casino" && (
+              <form
+                onSubmit={handleSubmit(onSubmitCasino)}
+                className="grid grid-cols-2 gap-6"
               >
-                Imagen del Casino:
-              </label>
-              <input
-                type="file"
-                name="imgCasino"
-                onChange={(e) => handleInputChange(e, true)}
-                className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="nombreCasino"
-                className="text-black font-bold block mb-1"
-              >
-                Nombre del Casino:
-              </label>
-              <input
-                type="text"
-                name="nombreCasino"
-                value={formData.casino.nombreCasino}
-                {...register("nombreCasino")}
-                placeholder="Nombre del Casino"
-                onChange={handleInputChange}
-                className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="ciudadCasino"
-                className="text-black font-bold block mb-1"
-              >
-                Ciudad del Casino:
-              </label>
-              <input
-                type="text"
-                name="ciudadCasino"
-                value={formData.casino.ciudadCasino}
-                {...register("ciudadCasino")}
-                placeholder="Ciudad del Casino"
-                onChange={handleInputChange}
-                className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="direccionCasino"
-                className="text-black font-bold block mb-1"
-              >
-                Dirección del Casino:
-              </label>
-              <input
-                type="text"
-                name="direccionCasino"
-                value={formData.casino.direccionCasino}
-                {...register("direccionCasino")}
-                placeholder="Dirección del Casino"
-                onChange={handleInputChange}
-                className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="documentacionCasino"
-                className="text-black font-bold block mb-1"
-              >
-                Documentación del Casino:
-              </label>
-              <input
-                type="file"
-                name="documentacionCasino"
-                onChange={(e) => handleFileChange(e)}
-                className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-              />
-            </div>
-            <div className="col-span-2 flex justify-end">
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
+                <div>
+                  <label
+                    htmlFor="imgCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Imagen del Casino:
+                  </label>
+                  <input
+                    type="file"
+                    name="imgCasino"
+                    onChange={(e) => handleInputChange(e, true)}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="nombreCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Nombre del Casino:
+                  </label>
+                  <input
+                    type="text"
+                    name="nombreCasino"
+                    value={formData.casino.nombreCasino}
+                    {...register("nombreCasino")}
+                    placeholder="Nombre del Casino"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="ciudadCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Ciudad del Casino:
+                  </label>
+                  <input
+                    type="text"
+                    name="ciudadCasino"
+                    value={formData.casino.ciudadCasino}
+                    {...register("ciudadCasino")}
+                    placeholder="Ciudad del Casino"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="direccionCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Dirección del Casino:
+                  </label>
+                  <input
+                    type="text"
+                    name="direccionCasino"
+                    value={formData.casino.direccionCasino}
+                    {...register("direccionCasino")}
+                    placeholder="Dirección del Casino"
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="documentacionCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Documentación del Casino:
+                  </label>
+                  <input
+                    type="file"
+                    name="documentacionCasino"
+                    onChange={(e) => handleFileChange(e)}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div className="col-span-2 flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
-  )}
-</div>
-);
+  );
 }
 
 export default BotonAgregar;
