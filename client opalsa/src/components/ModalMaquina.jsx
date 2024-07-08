@@ -3,7 +3,7 @@ import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
 import { deleteComponentesRequest } from "../api/componentes";
-import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas"; // Importar la función de eliminación desde tu archivo de peticiones
+import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas";
 
 function ModalMaquina({ maquina, onClose }) {
   const { componentes, getComponentes } = useComponentes();
@@ -11,6 +11,7 @@ function ModalMaquina({ maquina, onClose }) {
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
   const [showComponentes, setShowComponentes] = useState(false);
+  const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
 
   useEffect(() => {
     getComponentes();
@@ -40,16 +41,14 @@ function ModalMaquina({ maquina, onClose }) {
   };
 
   const toggleEstadoMaquina = async () => {
-    const nuevoEstado =
-      maquina.estadoMaquina === "activo" ? "inactivo" : "activo";
+    const nuevoEstado = estadoMaquina === "activo" ? "inactivo" : "activo";
 
     try {
       // Actualiza el estado en el backend
       await updateMaquinasRequest({ ...maquina, estadoMaquina: nuevoEstado });
 
-      // Actualiza el estado localmente
-      maquina.estadoMaquina = nuevoEstado;
-      // Puedes actualizar otros componentes relacionados si es necesario
+      // Actualiza el estado localmente de manera inmutable
+      setEstadoMaquina(nuevoEstado);
     } catch (error) {
       console.error("Error al cambiar el estado de la máquina:", error);
       // Manejo de errores, como mostrar un mensaje al usuario
@@ -70,6 +69,10 @@ function ModalMaquina({ maquina, onClose }) {
         // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
       }
     }
+  };
+
+  const abrirDocumento = (url) => {
+    window.open(url, "_blank");
   };
 
   return (
@@ -99,7 +102,6 @@ function ModalMaquina({ maquina, onClose }) {
           <div className="max-w-sm rounded-lg py-2 overflow-hidden transition-transform duration-300 cursor-pointer mx-2 transform hover:-translate-y-1">
             <img
               src={maquina.imgMaquina.url}
-              alt={maquina.nombreMaquina}
               className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
             />
             <div className="relative px-4 -mt-16">
@@ -108,14 +110,12 @@ function ModalMaquina({ maquina, onClose }) {
                   <button
                     onClick={toggleEstadoMaquina}
                     className={`text-xs px-2 inline-block rounded-full uppercase hover:scale-105 font-semibold tracking-wide ${
-                      maquina.estadoMaquina === "inactivo"
+                      estadoMaquina === "inactivo"
                         ? "bg-red-200 text-red-800"
                         : "bg-teal-200 text-teal-800"
                     }`}
                   >
-                    {maquina.estadoMaquina === "inactivo"
-                      ? "Inactivo"
-                      : "Activo"}
+                    {estadoMaquina === "inactivo" ? "Inactivo" : "Activo"}
                   </button>
                   <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
                     Serial: {maquina.nroSerieMaquina}
@@ -136,14 +136,6 @@ function ModalMaquina({ maquina, onClose }) {
                   </span>{" "}
                   <span className="text-sm text-gray-600">
                     {maquina.fechaInstalacionMaquina}
-                  </span>
-                </div>
-                <div className="mt-1">
-                  <span className="text-teal-600 text-md font-semibold">
-                    Nombre:
-                  </span>{" "}
-                  <span className="text-sm text-gray-600">
-                    {maquina.nombreMaquina}
                   </span>
                 </div>
                 <div className="mt-1">
@@ -272,7 +264,10 @@ function ModalMaquina({ maquina, onClose }) {
                         </div>
                       </td>
                       <td className="px-12 py-4 whitespace-nowrap">
-                        <div className="text-gray-500 hover:text-gray-900 flex items-center">
+                        <div
+                          className="text-gray-500 hover:text-gray-900 flex items-center cursor-pointer"
+                          onClick={() => abrirDocumento(componente.documentoComponente.url)}
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -327,7 +322,7 @@ function ModalMaquina({ maquina, onClose }) {
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m-1.022-.166a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                               />
                             </svg>
                           </button>

@@ -23,7 +23,6 @@ export const traerMaquina = async (req, res) => {
 export const crearMaquina = async (req, res) => {
   const {
     nroSerieMaquina,
-    nombreMaquina,
     modeloMaquina,
     marcaMaquina,
     softwareMaquina,
@@ -59,7 +58,6 @@ export const crearMaquina = async (req, res) => {
 
   const newMaquina = new Maquinas({
     nroSerieMaquina,
-    nombreMaquina,
     modeloMaquina,
     marcaMaquina,
     softwareMaquina,
@@ -88,7 +86,6 @@ export const crearMaquina = async (req, res) => {
 export const actualizarMaquina = async (req, res) => {
   const {
     nroSerieMaquina,
-    nombreMaquina,
     modeloMaquina,
     marcaMaquina,
     softwareMaquina,
@@ -102,7 +99,6 @@ export const actualizarMaquina = async (req, res) => {
 
   let updatedFields = {
     nroSerieMaquina,
-    nombreMaquina,
     modeloMaquina,
     marcaMaquina,
     softwareMaquina,

@@ -2,7 +2,7 @@ import axios from "../api/axios";
 import React, { useState, useEffect } from "react";
 import { getMaquinasRequest } from "../api/maquinas";
 
-function TransferirComponenteModal({ maquina, componentes, onClose, onComponentTransferred }) {
+function TransferirComponenteModal({ maquina, componentes, onClose, onComponentTransferred = () => {} }) {
   const [numerosDeSerie, setNumerosDeSerie] = useState([]);
   const [maquinas, setMaquinas] = useState([]);
   const [nombreComponente, setNombreComponente] = useState("");
@@ -73,7 +73,9 @@ function TransferirComponenteModal({ maquina, componentes, onClose, onComponentT
       await axios.post("/movimientos", {
         componenteId: componenteAActualizar._id,
         oldMaquinaId: maquina._id,
+        oldMaquinaSerial: maquina.nroSerieMaquina, // Asegúrate de tener el número de serie de la máquina anterior
         newMaquinaId: formData.nuevaMaquinaSerial,
+        newMaquinaSerial: maquinas.find(m => m._id === formData.nuevaMaquinaSerial).nroSerieMaquina, // Obtener el número de serie de la nueva máquina
         nombreComponente: componenteAActualizar.nombreComponente,
         serialComponente: componenteAActualizar.serialComponente,
       });

@@ -111,17 +111,18 @@ function GestionUsuarios() {
         <div className=''>
         <div className='overflow-x-auto pt-14'>
           <div className='min-w-full'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 text-left pl-5'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 text-left pl-5'>
               <div className='font-semibold'>Nombre</div>
               <div className='font-semibold'>Cédula</div>
+              <div className='font-semibold'>Ciudad</div>
               <div className='font-semibold'>Correo Electronico</div>
-              <div className='font-semibold'>Cargo</div>
+              <div className='font-semibold pl-8'>Cargo</div>
               <div className='font-semibold'>Permisos</div>
               <div className='font-semibold'>Eliminar</div>
             </div>
             <div className='overflow-y-auto max-h-[700px]'>
               {filteredUsers.map(user => (
-                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
+                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
                   </div>
@@ -129,19 +130,22 @@ function GestionUsuarios() {
                     <p className="text-gray-600">{user.cedula}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
+                    <p className="text-gray-600">{user.ciudad}</p>
                   </div>
                   <div>
+                    <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
+                  </div>
+                  <div className='pl-8'>
                     <p className="text-gray-600">{user.cargo}</p>
                   </div>
                   <div>
                     <button
                       onClick={() => handleShowPermissions(user)}
-                      className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
+                      className='px-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
                       Ver Permisos
                     </button>
                   </div>
-                  <div className='flex justify-center lg:justify-start'>
+                  <div className='flex justify-center lg:justify-start px-8'>
                     <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
                       <FaTrashAlt />
                     </button>

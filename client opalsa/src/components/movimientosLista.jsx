@@ -33,7 +33,6 @@ const MovimientosLista = () => {
         {movimientos.map(movimiento => (
           <div key={movimiento._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] shadow-xl m-4">
             <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-blue-500 left-4 -top-6">
-              {/* svg */}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -60,13 +59,13 @@ const MovimientosLista = () => {
                 <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
                 <p className="text-sm text-gray-500">{new Date(movimiento.fechaTransferencia).toLocaleDateString()}</p>
               </div>
-              <div className=' flex justify-center'>
-              <button
-                className="mt-4 bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
-                onClick={() => handleDelete(movimiento._id)}
-              >
-                Eliminar
-              </button>
+              <div className='flex justify-center'>
+                <button
+                  className="mt-4 bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+                  onClick={() => handleDelete(movimiento._id)}
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           </div>

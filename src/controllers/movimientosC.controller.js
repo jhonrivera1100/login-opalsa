@@ -18,11 +18,30 @@ export const getMovimientosC = async (req, res) => {
 
 export const addMovimientosC = async (req, res) => {
   try {
-    const nuevoMovimiento = new MovimientosC(req.body);
+    console.log("Datos recibidos:", req.body); // Log de los datos recibidos
+
+    const { componenteId, oldMaquinaId, oldMaquinaSerial, newMaquinaId, newMaquinaSerial, nombreComponente, serialComponente } = req.body;
+
+    // Validar que todos los campos requeridos están presentes
+    if (!componenteId || !oldMaquinaId || !oldMaquinaSerial || !newMaquinaId || !newMaquinaSerial || !nombreComponente || !serialComponente) {
+      return res.status(400).json({ message: 'Todos los campos son requeridos' });
+    }
+
+    const nuevoMovimiento = new MovimientosC({
+      componenteId,
+      oldMaquinaId,
+      oldMaquinaSerial,
+      newMaquinaId,
+      newMaquinaSerial,
+      nombreComponente,
+      serialComponente,
+      fechaTransferencia: new Date()
+    });
+
     await nuevoMovimiento.save();
     res.status(201).json(nuevoMovimiento);
   } catch (error) {
-    console.error(error);
+    console.error("Error al añadir el movimiento:", error);
     res.status(500).json({ message: 'Error al añadir el movimiento' });
   }
 };

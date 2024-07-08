@@ -102,7 +102,7 @@ const NotificacionesAdmin = () => {
                         <strong>Título:</strong> {recordatorio.titulo}
                       </p>
                       <p className="text-gray-600 mb-2 cursor-pointer" onClick={() => handleDescriptionClick(recordatorio)}>
-                        <strong>Descripción:</strong> {recordatorio.descripcion.length > 100 ? `${recordatorio.descripcion.substring(0, 100)}...` : recordatorio.descripcion}
+                        <strong>Descripción:</strong> {recordatorio.descripcion.length > 20 ? `${recordatorio.descripcion.substring(0, 10)}...` : recordatorio.descripcion}
                       </p>
                       <div className="flex justify-center">
                         <button

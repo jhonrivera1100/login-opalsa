@@ -40,7 +40,6 @@ function MaquinaCard({ maquina }) {
         <div className="relative">
           <img
             src={maquina.imgMaquina.url}
-            alt={maquina.nombreMaquina}
             className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg"
           />
           {hovered && (

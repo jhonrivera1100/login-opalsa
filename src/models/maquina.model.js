@@ -7,11 +7,6 @@ const maquinaSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    nombreMaquina: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     modeloMaquina: {
       type: String,
       required: true,
@@ -47,7 +42,6 @@ const maquinaSchema = new mongoose.Schema(
     },
     descripcionMaquina: {
       type: String,
-      required: true,
       trim: true,
     },
     ubicacionMaquina: {

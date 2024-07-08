@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const createMaquinaSchema = z.object({
   nroSerieMaquina: z.string().min(1, { message: "El número de serie es obligatorio" }),
-  nombreMaquina: z.string().min(1, { message: "El nombre de la máquina es obligatorio" }),
   modeloMaquina: z.string().min(1, { message: "El modelo de la máquina es obligatorio" }),
   marcaMaquina: z.string().min(1, { message: "La marca de la máquina es obligatoria" }),
   softwareMaquina: z.string().min(1, { message: "El software de la máquina es obligatorio" }),

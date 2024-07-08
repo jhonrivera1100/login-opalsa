@@ -14,6 +14,11 @@ const RegistroMantenimiento = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
+      <header className="flex items-center justify-center py-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-center">
+        REPORTES PARA<span className="text-sidebar-100 drop-shadow-xl"> ADMINISTRADOR</span>
+        </h1>
+      </header>
       <div>
           <MantenimientoRegistro />
         </div>
