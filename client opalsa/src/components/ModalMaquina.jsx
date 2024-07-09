@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
+import TransferirMaquinaModal from "./TransferirMaquinaModal";
 import { deleteComponentesRequest } from "../api/componentes";
 import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas";
 
@@ -11,6 +12,7 @@ function ModalMaquina({ maquina, onClose }) {
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
   const [showComponentes, setShowComponentes] = useState(false);
+  const [showTransferirMaquinaModal, setShowTransferirMaquinaModal] = useState(false);
   const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
 
   useEffect(() => {
@@ -33,10 +35,9 @@ function ModalMaquina({ maquina, onClose }) {
   const handleDeleteComponente = async (componenteId) => {
     try {
       await deleteComponentesRequest(componenteId);
-      getComponentes(); // Actualizar la lista de componentes después de eliminar
+      getComponentes();
     } catch (error) {
       console.error("Error al eliminar el componente:", error);
-      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
     }
   };
 
@@ -44,14 +45,10 @@ function ModalMaquina({ maquina, onClose }) {
     const nuevoEstado = estadoMaquina === "activo" ? "inactivo" : "activo";
 
     try {
-      // Actualiza el estado en el backend
       await updateMaquinasRequest({ ...maquina, estadoMaquina: nuevoEstado });
-
-      // Actualiza el estado localmente de manera inmutable
       setEstadoMaquina(nuevoEstado);
     } catch (error) {
       console.error("Error al cambiar el estado de la máquina:", error);
-      // Manejo de errores, como mostrar un mensaje al usuario
     }
   };
 
@@ -61,12 +58,10 @@ function ModalMaquina({ maquina, onClose }) {
     );
     if (confirmDelete) {
       try {
-        // Lógica para eliminar la máquina
-        await deleteMaquinasRequest(maquina._id); // Debes implementar esta función
-        onClose(); // Cerrar el modal después de eliminar
+        await deleteMaquinasRequest(maquina._id);
+        onClose();
       } catch (error) {
         console.error("Error al eliminar la máquina:", error);
-        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
       }
     }
   };
@@ -179,8 +174,13 @@ function ModalMaquina({ maquina, onClose }) {
                   </span>
                 </div>
 
-                {/* Botón para eliminar la máquina */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-between">
+                  <button
+                    onClick={() => setShowTransferirMaquinaModal(true)}
+                    className="bg-green-500 text-white px-4 py-2 rounded"
+                  >
+                    Transferir Máquina
+                  </button>
                   <button
                     onClick={handleEliminarMaquina}
                     className="text-red-600 hover:text-red-900"
@@ -266,7 +266,9 @@ function ModalMaquina({ maquina, onClose }) {
                       <td className="px-12 py-4 whitespace-nowrap">
                         <div
                           className="text-gray-500 hover:text-gray-900 flex items-center cursor-pointer"
-                          onClick={() => abrirDocumento(componente.documentoComponente.url)}
+                          onClick={() =>
+                            abrirDocumento(componente.documentoComponente.url)
+                          }
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -364,6 +366,14 @@ function ModalMaquina({ maquina, onClose }) {
           maquina={maquina}
           componentes={componentes}
           onClose={handleTransferComplete}
+        />
+      )}
+
+      {/* Renderizar el modal de transferencia de máquina si showTransferirMaquinaModal es true */}
+      {showTransferirMaquinaModal && (
+        <TransferirMaquinaModal
+          maquina={maquina}
+          onClose={() => setShowTransferirMaquinaModal(false)}
         />
       )}
     </div>
