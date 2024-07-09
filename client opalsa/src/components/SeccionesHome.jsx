@@ -4,12 +4,14 @@ import { getCasinosRequest } from "../api/casinos";
 import CasinoCard from "../components/casinoCard";
 import BotonAgregar from "../components/BotonAgregar";
 import MaquinaCard from "../components/MaquinaCard";
+import ModalMaquina from "../components/ModalMaquina"; // Asegúrate de importar o crear el componente ModalMaquina
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
   const [maquinas, setMaquinas] = useState([]);
   const [casinos, setCasinos] = useState([]);
   const [selectedCasino, setSelectedCasino] = useState(null);
+  const [selectedMaquina, setSelectedMaquina] = useState(null); // Estado para almacenar la máquina seleccionada
   const [currentPageMaquinas, setCurrentPageMaquinas] = useState(1);
   const [currentPageCasinos, setCurrentPageCasinos] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,10 +78,10 @@ function SeccionesHome() {
   const renderSectionContent = () => {
     if (selectedCasino) {
       const filteredMaquinas = maquinas.filter((maquina) => {
-        const maquinaUbicacion = maquina.ubicacionMaquina || ""; // Manejo de ubicación de máquina en caso de ser undefined
-        const maquinaNombre = maquina.nombreMaquina || ""; // Manejo de nombre de máquina en caso de ser undefined
-        const maquinaSerie = maquina.nroSerieMaquina || ""; // Manejo de número de serie de máquina en caso de ser undefined
-  
+        const maquinaUbicacion = maquina.ubicacionMaquina || "";
+        const maquinaNombre = maquina.nombreMaquina || "";
+        const maquinaSerie = maquina.nroSerieMaquina || "";
+
         return (
           maquinaUbicacion === selectedCasino.nombreCasino &&
           (maquinaNombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -211,7 +213,10 @@ function SeccionesHome() {
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end gap-4">
-                          <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs">
+                          <button
+                            className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs"
+                            onClick={() => setSelectedMaquina(maquina)} // Aquí se establece la máquina seleccionada
+                          >
                             Ver más
                           </button>
                           <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs ml-2">
@@ -400,6 +405,14 @@ function SeccionesHome() {
         </div>
       </div>
       <div className="bg-gray-100">{renderSectionContent()}</div>
+
+      {/* Modal para mostrar detalles de la máquina */}
+      {selectedMaquina && (
+        <ModalMaquina
+          maquina={selectedMaquina}
+          onClose={() => setSelectedMaquina(null)}
+        />
+      )}
     </div>
   );
 }
