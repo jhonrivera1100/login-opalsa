@@ -75,17 +75,18 @@ function SeccionesHome() {
 
   const renderSectionContent = () => {
     if (selectedCasino) {
-      const filteredMaquinas = maquinas.filter(
-        (maquina) =>
-          maquina.ubicacionMaquina === selectedCasino.nombreCasino &&
-          (maquina.nombreMaquina
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-            maquina.nroSerieMaquina
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())) &&
+      const filteredMaquinas = maquinas.filter((maquina) => {
+        const maquinaUbicacion = maquina.ubicacionMaquina || ""; // Manejo de ubicación de máquina en caso de ser undefined
+        const maquinaNombre = maquina.nombreMaquina || ""; // Manejo de nombre de máquina en caso de ser undefined
+        const maquinaSerie = maquina.nroSerieMaquina || ""; // Manejo de número de serie de máquina en caso de ser undefined
+  
+        return (
+          maquinaUbicacion === selectedCasino.nombreCasino &&
+          (maquinaNombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            maquinaSerie.toLowerCase().includes(searchQuery.toLowerCase())) &&
           (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-      );
+        );
+      });
 
       return (
         <div className="mx-auto w-10/12 h-144 overflow-auto p-4">
