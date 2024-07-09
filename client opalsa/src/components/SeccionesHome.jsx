@@ -144,12 +144,6 @@ function SeccionesHome() {
                       scope="col"
                       className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
                     >
-                      Nombre
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
-                    >
                       Serial
                     </th>
                     <th
