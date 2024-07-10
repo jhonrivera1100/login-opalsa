@@ -60,6 +60,7 @@ function ModalMaquina({ maquina, onClose }) {
       try {
         await deleteMaquinasRequest(maquina._id);
         onClose();
+        window.location.reload(); // Recargar la página
       } catch (error) {
         console.error("Error al eliminar la máquina:", error);
       }
@@ -229,155 +230,159 @@ function ModalMaquina({ maquina, onClose }) {
                       Serial
                     </th>
                     <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
-                    >
-                      Marca
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
-                    >
-                      Documento
-                    </th>
-                    <th scope="col" className="relative px-6 py-3">
-                      <span className="sr-only">Acciones</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {sortedComponentes.map((componente) => (
-                    <tr key={componente._id} className="group hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {componente.nombreComponente}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {componente.serialComponente}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {componente.marcaComponente}
-                        </div>
-                      </td>
-                      <td className="px-12 py-4 whitespace-nowrap">
-                        <div
-                          className="text-gray-500 hover:text-gray-900 flex items-center cursor-pointer"
-                          onClick={() =>
-                            abrirDocumento(componente.documentoComponente.url)
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="h-6 w-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                            />
-                          </svg>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end gap-4">
-                          <a
-                            href="#"
-                            className="text-gray-600 hover:text-gray-900"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                              />
-                            </svg>
-                          </a>
-                          <button
-                            onClick={() =>
-                              handleDeleteComponente(componente._id)
-                            }
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m-1.022-.166a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
+                        scope="col"
+                        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+                      >
+                        Marca
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4"
+                      >
+                        Documento
+                      </th>
+                      <th
+                        scope="col"
+                        className="relative px-6 py-3"
+                      >
+                        <span className="sr-only">Acciones</span>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedComponentes.map((componente) => (
+                      <tr key={componente._id} className="group hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {componente.nombreComponente}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {componente.serialComponente}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {componente.marcaComponente}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div
+                            className="text-gray-500 ml-8 hover:text-gray-900 flex items-center cursor-pointer"
+                            onClick={() =>
+                              abrirDocumento(componente.documentoComponente.url)
+                            }
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="h-6 w-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                              />
+                            </svg>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end gap-4">
+                            <a
+                              href="#"
+                              className="text-gray-600 hover:text-gray-900"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="h-6 w-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                                />
+                              </svg>
+                            </a>
+                            <button
+                              onClick={() =>
+                                handleDeleteComponente(componente._id)
+                              }
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="h-6 w-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m-1.022-.166a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-              <div className="flex justify-center space-x-4 mt-4">
-                <button
-                  onClick={() => setShowAgregarModal(true)}
-                  className="bg-blue-500 text-white px-2 py-2 rounded"
-                >
-                  Agregar Componente
-                </button>
-                <button
-                  onClick={() => setShowTransferirModal(true)}
-                  className="bg-green-500 text-white px-2 py-2 rounded"
-                >
-                  Transferir Componente
-                </button>
-              </div>
-            </>
-          )}
+                <div className="flex justify-center space-x-4 mt-4">
+                  <button
+                    onClick={() => setShowAgregarModal(true)}
+                    className="bg-blue-500 text-white px-2 py-2 rounded"
+                  >
+                    Agregar Componente
+                  </button>
+                  <button
+                    onClick={() => setShowTransferirModal(true)}
+                    className="bg-green-500 text-white px-2 py-2 rounded"
+                  >
+                    Transferir Componente
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
+
+        {showAgregarModal && (
+          <AgregarComponenteModal
+            maquinaId={maquina._id}
+            onClose={() => setShowAgregarModal(false)}
+          />
+        )}
+
+        {showTransferirModal && (
+          <TransferirComponenteModal
+            maquina={maquina}
+            componentes={componentes}
+            onClose={handleTransferComplete}
+          />
+        )}
+
+        {/* Renderizar el modal de transferencia de máquina si showTransferirMaquinaModal es true */}
+        {showTransferirMaquinaModal && (
+          <TransferirMaquinaModal
+            maquina={maquina}
+            onClose={() => setShowTransferirMaquinaModal(false)}
+          />
+        )}
       </div>
-
-      {showAgregarModal && (
-        <AgregarComponenteModal
-          maquinaId={maquina._id}
-          onClose={() => setShowAgregarModal(false)}
-        />
-      )}
-
-      {showTransferirModal && (
-        <TransferirComponenteModal
-          maquina={maquina}
-          componentes={componentes}
-          onClose={handleTransferComplete}
-        />
-      )}
-
-      {/* Renderizar el modal de transferencia de máquina si showTransferirMaquinaModal es true */}
-      {showTransferirMaquinaModal && (
-        <TransferirMaquinaModal
-          maquina={maquina}
-          onClose={() => setShowTransferirMaquinaModal(false)}
-        />
-      )}
-    </div>
   );
 }
 
 export default ModalMaquina;
+
