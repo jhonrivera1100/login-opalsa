@@ -23,12 +23,21 @@ const Historial = () => {
                   nombreMaquina: machineResponse.data.nombreMaquina,
                   ubicacionMaquina: machineResponse.data.ubicacionMaquina,
                   type: 'mantenimiento',
+                  fecha: new Date(mantenimiento.fechaMantenimiento),
                 };
               } catch (error) {
-                return { ...mantenimiento, type: 'mantenimiento' };
+                return {
+                  ...mantenimiento,
+                  type: 'mantenimiento',
+                  fecha: new Date(mantenimiento.fechaMantenimiento),
+                };
               }
             } else {
-              return { ...mantenimiento, type: 'mantenimiento' };
+              return {
+                ...mantenimiento,
+                type: 'mantenimiento',
+                fecha: new Date(mantenimiento.fechaMantenimiento),
+              };
             }
           })
         );
@@ -36,10 +45,13 @@ const Historial = () => {
         const movimientosWithDetails = movimientosResponse.data.map((movimiento) => ({
           ...movimiento,
           type: 'movimiento',
+          fecha: new Date(movimiento.fechaTransferencia),
         }));
 
         const combinedItems = [...mantenimientosWithDetails, ...movimientosWithDetails];
-        combinedItems.sort((a, b) => new Date(b.fechaMantenimiento || b.fechaTransferencia) - new Date(a.fechaMantenimiento || a.fechaTransferencia));
+
+        // Ordenar los elementos combinados por la fecha unificada
+        combinedItems.sort((a, b) => b.fecha - a.fecha);
 
         setItems(combinedItems);
       } catch (error) {
@@ -81,7 +93,7 @@ const Historial = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <p>{new Date(item.fechaMantenimiento).toLocaleDateString()}</p>
+                      <p>{item.fecha.toLocaleDateString()}</p>
                     </div>
                     <div className="border-t-2"></div>
                     <div className="my-1">
@@ -133,7 +145,7 @@ const Historial = () => {
                     </div>
                     <div className="my-1">
                       <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
-                      <p className="text-sm text-gray-500">{new Date(item.fechaTransferencia).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-500">{item.fecha.toLocaleDateString()}</p>
                     </div>
                   </>
                 )}
