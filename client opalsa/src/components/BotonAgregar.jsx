@@ -7,7 +7,7 @@ import { getCasinosRequest } from "../api/casinos";
 
 function BotonAgregar() {
   const { register, handleSubmit, reset } = useForm();
-  const { createMaquina } = useMaquinas();
+  const { createMaquina, getMaquinasRequest } = useMaquinas();
   const { createCasino } = useCasinos();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("maquina");
@@ -20,9 +20,9 @@ function BotonAgregar() {
       marcaMaquina: "",
       softwareMaquina: "",
       juegoMaquina: "",
-      estadoMaquina: "activo", // Valor por defecto
+      estadoMaquina: "activo",
       descripcionMaquina: "",
-      ubicacionMaquina: "", // Asegúrate de manejar la ubicación correctamente
+      ubicacionMaquina: "",
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
       documentoMaquina: null,
@@ -99,7 +99,7 @@ function BotonAgregar() {
         formDataToSend.append(key, formData.maquina[key]);
       });
       await createMaquina(formDataToSend);
-      closeModal();
+      window.location.reload(); // Recarga la página
     } catch (error) {
       console.error("Error creating machine:", error);
     }
@@ -112,7 +112,7 @@ function BotonAgregar() {
         formDataToSend.append(key, formData.casino[key]);
       });
       await createCasino(formDataToSend);
-      closeModal();
+      window.location.reload(); // Recarga la página
     } catch (error) {
       console.error("Error creating casino:", error);
     }
@@ -157,7 +157,7 @@ function BotonAgregar() {
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               onClick={closeModal}
             >
-              &#x2715; {/* HTML entity for "X" */}
+              &#x2715;
             </button>
             <h2 className="text-lg text-center font-semibold mb-4">
               Agrega un nuevo elemento.
@@ -176,7 +176,6 @@ function BotonAgregar() {
                 <label htmlFor="casino" className="text-black ml-2 mr-4">
                   Casino
                 </label>
-
                 <input
                   type="radio"
                   id="maquina"
@@ -210,7 +209,6 @@ function BotonAgregar() {
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                   />
                 </div>
-
                 <div>
                   <label
                     htmlFor="nroSerieMaquina"
@@ -328,7 +326,7 @@ function BotonAgregar() {
                     placeholder="Descripción de la Máquina"
                     onChange={handleInputChange}
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                  ></textarea>
+                  />
                 </div>
                 <div>
                   <label
@@ -340,13 +338,13 @@ function BotonAgregar() {
                   <select
                     name="ubicacionMaquina"
                     value={formData.maquina.ubicacionMaquina}
-                    {...register("ubicacionMaquina", { required: true })}
+                    {...register("ubicacionMaquina")}
                     onChange={handleInputChange}
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                   >
-                    <option value="">Seleccione una ubicación</option>
+                    <option value="">Selecciona una ubicación</option>
                     {casinos.map((casino) => (
-                      <option key={casino._id} value={casino.nombreCasino}>
+                      <option key={casino.id} value={casino.nombreCasino}>
                         {casino.nombreCasino}
                       </option>
                     ))}
@@ -357,7 +355,7 @@ function BotonAgregar() {
                     htmlFor="fechaInstalacionMaquina"
                     className="text-black font-bold block mb-1"
                   >
-                    Fecha de Instalación de la Máquina:
+                    Fecha de Instalación:
                   </label>
                   <input
                     type="date"
@@ -390,21 +388,21 @@ function BotonAgregar() {
                     htmlFor="documentoMaquina"
                     className="text-black font-bold block mb-1"
                   >
-                    Documentación de la Máquina:
+                    Documento de la Máquina:
                   </label>
                   <input
                     type="file"
                     name="documentoMaquina"
-                    onChange={(e) => handleFileChange(e)}
+                    onChange={(e) => handleInputChange(e, true)}
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                   />
                 </div>
-                <div className="col-span-2 flex justify-end">
+                <div className="col-span-2 flex justify-center">
                   <button
                     type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
+                    className="bg-green-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600"
                   >
-                    Guardar
+                    Agregar Máquina
                   </button>
                 </div>
               </form>
@@ -414,20 +412,6 @@ function BotonAgregar() {
                 onSubmit={handleSubmit(onSubmitCasino)}
                 className="grid grid-cols-2 gap-6"
               >
-                <div>
-                  <label
-                    htmlFor="imgCasino"
-                    className="text-black font-bold block mb-1"
-                  >
-                    Imagen del Casino:
-                  </label>
-                  <input
-                    type="file"
-                    name="imgCasino"
-                    onChange={(e) => handleInputChange(e, true)}
-                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                  />
-                </div>
                 <div>
                   <label
                     htmlFor="nombreCasino"
@@ -442,6 +426,20 @@ function BotonAgregar() {
                     {...register("nombreCasino")}
                     placeholder="Nombre del Casino"
                     onChange={handleInputChange}
+                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="imgCasino"
+                    className="text-black font-bold block mb-1"
+                  >
+                    Imagen del Casino:
+                  </label>
+                  <input
+                    type="file"
+                    name="imgCasino"
+                    onChange={(e) => handleInputChange(e, true)}
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                   />
                 </div>
@@ -489,16 +487,16 @@ function BotonAgregar() {
                   <input
                     type="file"
                     name="documentacionCasino"
-                    onChange={(e) => handleFileChange(e)}
+                    onChange={(e) => handleInputChange(e, true)}
                     className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
                   />
                 </div>
-                <div className="col-span-2 flex justify-end">
+                <div className="col-span-2 flex justify-center">
                   <button
                     type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4"
+                    className="bg-green-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-600"
                   >
-                    Guardar
+                    Agregar Casino
                   </button>
                 </div>
               </form>
