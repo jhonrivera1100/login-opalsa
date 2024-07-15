@@ -35,7 +35,7 @@ const MantenimientoRegistro = () => {
       setNroSerieMaquina(selectedSerie);
       const selectedMaquina = maquinas.find(maquina => maquina.nroSerieMaquina === selectedSerie);
       if (selectedMaquina) {
-        setNombreMaquina(selectedMaquina.nombreMaquina);
+        setNombreMaquina(selectedMaquina.marcaMaquina);
         setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
       } else {
         setNombreMaquina('');
@@ -106,7 +106,7 @@ const MantenimientoRegistro = () => {
               value={nombreMaquina}
               readOnly
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Nombre de la Máquina"
+              placeholder="Marca de la Máquina"
             />
             <input
               type="text"
