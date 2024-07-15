@@ -14,7 +14,11 @@ function TransferirMaquinaModal({ maquina, onClose }) {
   const fetchCasinos = async () => {
     try {
       const response = await getCasinosRequest();
-      setCasinos(response.data);
+      // Filtrar los casinos para excluir el casino actual de la máquina
+      const filteredCasinos = response.data.filter(
+        (casino) => casino.nombreCasino !== maquina.ubicacionMaquina
+      );
+      setCasinos(filteredCasinos);
     } catch (error) {
       console.error("Error fetching casinos:", error);
       // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
@@ -48,6 +52,7 @@ function TransferirMaquinaModal({ maquina, onClose }) {
       console.log("Historial de movimientos guardado");
   
       onClose(); // Cerrar el modal después de transferir
+      window.location.reload(); // Recargar la página
     } catch (error) {
       console.error("Error al transferir la máquina:", error);
       // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
@@ -56,7 +61,7 @@ function TransferirMaquinaModal({ maquina, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="bg-white shadow-xl rounded-lg p-6">
+      <div className="relative bg-white shadow-xl rounded-lg p-6">
         <button
           className="absolute top-0 right-0 m-4 text-gray-600 hover:text-gray-900"
           onClick={onClose}
