@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "../api/axios";
 import { getMaquinaRequest, updateMaquinasRequest } from "../api/maquinas";
 import { getCasinosRequest } from "../api/casinos";
 
@@ -30,6 +31,26 @@ function TransferirMaquinaModal({ maquina, onClose }) {
       const updatedMaquina = { ...maquina, ubicacionMaquina: selectedCasino };
       await updateMaquinasRequest(updatedMaquina);
       console.log("Máquina transferida a:", selectedCasino);
+  
+      // Datos del movimiento
+      const movimiento = {
+        maquinaId: maquina._id,
+        oldCasinoId: maquina.ubicacionMaquina,
+        oldCasinoNombre: maquina.ubicacionMaquina,
+        newCasinoId: selectedCasino,
+        newCasinoNombre: selectedCasino,
+        marcaMaquina: maquina.marcaMaquina,
+        serialMaquina: maquina.nroSerieMaquina,
+      };
+  
+      // Log del objeto del movimiento de máquina
+      console.log("Datos del movimiento de máquina:", movimiento);
+  
+      // Registro en el historial
+      await axios.post("/moviMaquinas", movimiento);
+  
+      console.log("Historial de movimientos guardado");
+  
       onClose(); // Cerrar el modal después de transferir
       window.location.reload(); // Recargar la página
     } catch (error) {

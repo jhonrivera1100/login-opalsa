@@ -3,6 +3,8 @@ import axios from 'axios';
 import Navbar from "../components/Navbar";
 import { FaTools } from "react-icons/fa";
 import { CgWebsite } from "react-icons/cg";
+import { MdAutoAwesomeMotion } from "react-icons/md";
+import { MdCasino } from "react-icons/md";
 
 const Historial = () => {
   const [items, setItems] = useState([]);
@@ -12,6 +14,7 @@ const Historial = () => {
       try {
         const mantenimientosResponse = await axios.get('http://localhost:4000/api/mantenimientos');
         const movimientosResponse = await axios.get('http://localhost:4000/api/movimientos');
+        const moviMaquinasResponse = await axios.get('http://localhost:4000/api/moviMaquinas');
 
         const mantenimientosWithDetails = await Promise.all(
           mantenimientosResponse.data.map(async (mantenimiento) => {
@@ -48,7 +51,13 @@ const Historial = () => {
           fecha: new Date(movimiento.fechaTransferencia),
         }));
 
-        const combinedItems = [...mantenimientosWithDetails, ...movimientosWithDetails];
+        const moviMaquinasWithDetails = moviMaquinasResponse.data.map((moviMaquina) => ({
+          ...moviMaquina,
+          type: 'moviMaquina',
+          fecha: new Date(moviMaquina.fechaTransferencia),
+        }));
+
+        const combinedItems = [...mantenimientosWithDetails, ...movimientosWithDetails, ...moviMaquinasWithDetails];
 
         // Ordenar los elementos combinados por la fecha unificada
         combinedItems.sort((a, b) => b.fecha - a.fecha);
@@ -62,6 +71,21 @@ const Historial = () => {
     fetchData();
   }, []);
 
+  const deleteItem = async (id, type) => {
+    try {
+      if (type === 'mantenimiento') {
+        await axios.delete(`http://localhost:4000/api/mantenimientos/${id}`);
+      } else if (type === 'movimiento') {
+        await axios.delete(`http://localhost:4000/api/movimientos/${id}`);
+      } else if (type === 'moviMaquina') {
+        await axios.delete(`http://localhost:4000/api/moviMaquinas/${id}`);
+      }
+      setItems(items.filter(item => item._id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+
   return (
     <div>
       <Navbar /> {/* Componente Navbar */}
@@ -70,19 +94,15 @@ const Historial = () => {
           MANTENIMIENTOS<span className="text-sidebar-100 drop-shadow-xl"> Y MOVIMIENTOS</span>
         </h1>
       </header>
-      <div className="max-w-7xl mx-auto mt-5 p-6">
+      <div className="max-w-7xl mx-auto mt-5 p-6 pl-[75px]">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {items.map((item) => (
             <div key={item._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] shadow-xl m-4">
-              <div className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${item.type === 'mantenimiento' ? 'bg-green-500' : 'bg-blue-500'} left-4 -top-6`}>
-                {item.type === 'mantenimiento' ? <FaTools className="h-8 w-8" /> : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                )}
+              <div className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${item.type === 'mantenimiento' ? 'bg-green-500' : item.type === 'movimiento' ? 'bg-blue-500' : 'bg-yellow-500'} left-4 -top-6`}>
+                {item.type === 'mantenimiento' ? <FaTools className="h-8 w-8" /> : item.type === 'movimiento' ? <MdAutoAwesomeMotion className="h-8 w-8" /> : <div className="h-8 w-8 bg-yellow-500 rounded-full "><MdCasino className="h-8 w-8" /></div>}
               </div>
               <div className="mt-8">
-                <p className="text-xl font-semibold my-2">{item.type === 'mantenimiento' ? 'Mantenimiento' : 'Movimiento de Componente'}</p>
+                <p className="text-xl font-semibold my-2">{item.type === 'mantenimiento' ? 'Mantenimiento' : item.type === 'movimiento' ? 'Movimiento de Componente' : 'Movimiento de Máquina'}</p>
                 {item.type === 'mantenimiento' ? (
                   <>
                     <div className="flex space-x-2 text-gray-400 text-sm">
@@ -125,7 +145,7 @@ const Historial = () => {
                       </div>
                     )}
                   </>
-                ) : (
+                ) : item.type === 'movimiento' ? (
                   <>
                     <div className="my-1">
                       <p className="font-semibold text-base mb-1">Nombre Componente</p>
@@ -136,11 +156,11 @@ const Historial = () => {
                       <p className="text-sm text-gray-500">{item.serialComponente}</p>
                     </div>
                     <div className="my-1">
-                      <p className="font-semibold text-base mb-1">Serial Maquina Inicial</p>
+                      <p className="font-semibold text-base mb-1">Serial Máquina Inicial</p>
                       <p className="text-sm text-gray-500">{item.oldMaquinaSerial}</p>
                     </div>
                     <div className="my-1">
-                      <p className="font-semibold text-base mb-1">Serial Maquina Final</p>
+                      <p className="font-semibold text-base mb-1">Serial Máquina Final</p>
                       <p className="text-sm text-gray-500">{item.newMaquinaSerial}</p>
                     </div>
                     <div className="my-1">
@@ -148,7 +168,36 @@ const Historial = () => {
                       <p className="text-sm text-gray-500">{item.fecha.toLocaleDateString()}</p>
                     </div>
                   </>
+                ) : (
+                  <>
+                    <div className="my-1">
+                      <p className="font-semibold text-base mb-1">Serial Máquina</p>
+                      <p className="text-sm text-gray-500">{item.serialMaquina}</p>
+                    </div>
+                    <div className="my-1">
+                      <p className="font-semibold text-base mb-1">Marca Máquina</p>
+                      <p className="text-sm text-gray-500">{item.marcaMaquina}</p>
+                    </div>
+                    <div className="my-1">
+                      <p className="font-semibold text-base mb-1">Casino Inicial</p>
+                      <p className="text-sm text-gray-500">{item.oldCasinoNombre}</p>
+                    </div>
+                    <div className="my-1">
+                      <p className="font-semibold text-base mb-1">Casino Final</p>
+                      <p className="text-sm text-gray-500">{item.newCasinoNombre}</p>
+                    </div>
+                    <div className="my-1">
+                      <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
+                      <p className="text-sm text-gray-500">{item.fecha.toLocaleDateString()}</p>
+                    </div>
+                  </>
                 )}
+                <button
+                  className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                  onClick={() => deleteItem(item._id, item.type)}
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}

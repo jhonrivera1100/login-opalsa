@@ -7,3 +7,6 @@ body{
   background: #EEEEEE;
   color: rgb(0, 0, 0);
 }
+.custom-shadow {
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
+}
