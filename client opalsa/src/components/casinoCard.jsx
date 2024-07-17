@@ -1,6 +1,10 @@
 import React from 'react';
 
-function CasinoCard({ casino, onVerMas }) {
+function CasinoCard({ casino, onVerMas, onVerDocumentos }) {
+  const handleVerDocumentos = () => {
+    onVerDocumentos(casino.documentacionCasino);
+  };
+
   return (
     <div className="w-full sm:w-72 max-w-sm bg-white border border-gray-200 my-1 rounded-lg shadow-lg transition-transform duration-300 hover:-translate-y-2">
       <div className="relative">
@@ -21,12 +25,12 @@ function CasinoCard({ casino, onVerMas }) {
           >
             Ver más
           </button>
-          <a 
-            href="#" 
+          <button
             className="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+            onClick={handleVerDocumentos}
           >
-            Contactar
-          </a>
+            Documentacion
+          </button>
         </div>
       </div>
     </div>

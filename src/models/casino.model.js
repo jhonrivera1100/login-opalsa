@@ -21,10 +21,12 @@ const casinoSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    documentacionCasino: {
-      url: String,
-      public_id: String,
-    },
+    documentacionCasino: [
+      {
+        url: String,
+        public_id: String,
+      }
+    ],
     maquinas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Maquinas" }],
   },
   {
