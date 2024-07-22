@@ -55,3 +55,27 @@ export const deleteRecordatorio = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar el recordatorio" });
   }
 };
+
+// Controlador para actualizar el estado "visto"
+export const updateVisto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { visto } = req.body;
+
+    // Verificar si el recordatorio existe
+    const recordatorio = await Recordatorio.findById(id);
+    if (!recordatorio) {
+      return res.status(404).json({ message: "Recordatorio no encontrado." });
+    }
+
+    // Actualizar el campo "visto"
+    recordatorio.visto = visto;
+    await recordatorio.save();
+
+    // Enviar respuesta con el recordatorio actualizado
+    res.status(200).json(recordatorio);
+  } catch (error) {
+    console.error("Error al actualizar el estado de visto:", error);
+    res.status(500).json({ message: "Error al actualizar el estado de visto." });
+  }
+};

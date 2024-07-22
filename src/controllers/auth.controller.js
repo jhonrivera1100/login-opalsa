@@ -6,20 +6,25 @@ import { TOKEN_SECRET } from '../config.js';
 
 
 export const register = async (req, res) => {
-  const { email, password, username, cedula, cargo, ciudad } = req.body;
+  const { email, password, username, cedula, cargo, ciudad, role = 'user' } = req.body;
   try {
+    console.log('Datos recibidos:', { email, password, username, cedula, cargo, ciudad, role });
+
     const emailFound = await User.findOne({ email });
     const usernameFound = await User.findOne({ username });
 
     if (emailFound) {
+      console.log('El email ya está en uso');
       return res.status(400).json(["El email ya está en uso"]);
     }
 
     if (usernameFound) {
+      console.log('El nombre de usuario ya está en uso');
       return res.status(400).json(["El nombre de usuario ya está en uso"]);
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    console.log('Password hash generado:', passwordHash);
 
     const newUser = new User({
       username,
@@ -28,9 +33,15 @@ export const register = async (req, res) => {
       cedula,
       cargo,
       ciudad,
+      role,
     });
+
     const userSaved = await newUser.save();
+    console.log('Usuario guardado:', userSaved);
+
     const token = await createAccessToken({ id: userSaved._id });
+    console.log('Token creado:', token);
+
     res.cookie("token", token);
 
     res.json({
@@ -40,10 +51,12 @@ export const register = async (req, res) => {
       cedula: userSaved.cedula,
       cargo: userSaved.cargo,
       ciudad: userSaved.ciudad,
+      role: userSaved.role,
       createdAt: userSaved.createdAt,
       updatedAt: userSaved.updatedAt,
     });
   } catch (error) {
+    console.error('Error en el registro:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -118,6 +131,7 @@ return res.json({
   cedula: userFound.cedula,
   cargo: userFound.cargo,
   ciudad: userFound.ciudad,
+  role: userFound.role,
   createdAt: userFound.createdAt,
   updateAt: userFound.updatedAt,
 });

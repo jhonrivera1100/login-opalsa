@@ -4,24 +4,12 @@ import Sidebar from '../components/Sidebar';
 import { FaTrashAlt } from 'react-icons/fa';
 import HeaderUsuarios from '../components/HeaderUsuarios';
 import { FiSearch } from 'react-icons/fi';
-import { Tooltip } from 'react-tooltip'; 
 
 function GestionUsuarios() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [showFullEmail, setShowFullEmail] = useState(false);
   const [tooltipId, setTooltipId] = useState(null);
-
-  const permissionsList = [
-    'Permiso 1',
-    'Permiso 2',
-    'Permiso 3',
-    'Permiso 4',
-    'Permiso 5'
-  ];
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -54,34 +42,13 @@ function GestionUsuarios() {
     setSearchTerm(e.target.value);
   };
 
-  const handleShowPermissions = (user) => {
-    setSelectedUser(user);
-    setSelectedPermissions(user.permissions || []);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedUser(null);
-  };
-
-  const handlePermissionChange = (permission) => {
-    setSelectedPermissions(prevState => {
-      if (prevState.includes(permission)) {
-        return prevState.filter(p => p !== permission);
-      } else {
-        return [...prevState, permission];
-      }
-    });
-  };
-
-  const handleSavePermissions = async () => {
+  const handleRoleChange = async (userId, currentRole) => {
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
     try {
-      await axios.put(`http://localhost:4000/api/users/${selectedUser._id}/permissions`, { permissions: selectedPermissions });
-      setUsers(users.map(user => user._id === selectedUser._id ? { ...user, permissions: selectedPermissions } : user));
-      handleCloseModal();
+      const response = await axios.put(`http://localhost:4000/api/users/${userId}/role`, { role: newRole });
+      setUsers(users.map(user => user._id === userId ? { ...user, role: response.data.role } : user));
     } catch (error) {
-      console.error('Error al guardar permisos:', error);
+      console.error('Error al actualizar el rol:', error);
     }
   };
 
@@ -109,90 +76,54 @@ function GestionUsuarios() {
           </div>
         </div>
         <div className=''>
-        <div className='overflow-x-auto pt-14'>
-          <div className='min-w-full'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 text-left pl-5'>
-              <div className='font-semibold'>Nombre</div>
-              <div className='font-semibold'>Cédula</div>
-              <div className='font-semibold'>Ciudad</div>
-              <div className='font-semibold'>Correo Electronico</div>
-              <div className='font-semibold pl-8'>Cargo</div>
-              <div className='font-semibold'>Permisos</div>
-              <div className='font-semibold'>Eliminar</div>
-            </div>
-            <div className='overflow-y-auto max-h-[700px]'>
-              {filteredUsers.map(user => (
-                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
+          <div className='overflow-x-auto pt-14'>
+            <div className='min-w-full'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 text-left pl-5'>
+                <div className='font-semibold'>Nombre</div>
+                <div className='font-semibold'>Cédula</div>
+                <div className='font-semibold'>Ciudad</div>
+                <div className='font-semibold'>Correo Electronico</div>
+                <div className='font-semibold pl-8'>Cargo</div>
+                <div className='font-semibold'>Rol</div>
+                <div className='font-semibold'>Eliminar</div>
+              </div>
+              <div className='overflow-y-auto max-h-[650px]'>
+                {filteredUsers.map(user => (
+                  <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">{user.cedula}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">{user.ciudad}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
+                    </div>
+                    <div className='pl-8'>
+                      <p className="text-gray-600">{user.cargo}</p>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => handleRoleChange(user._id, user.role)}
+                        className=' w-[105px] py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
+                        {user.role}
+                      </button>
+                    </div>
+                    <div className='flex justify-center lg:justify-start px-8'>
+                      <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
+                        <FaTrashAlt />
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600">{user.cedula}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">{user.ciudad}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
-                  </div>
-                  <div className='pl-8'>
-                    <p className="text-gray-600">{user.cargo}</p>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => handleShowPermissions(user)}
-                      className='px-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
-                      Ver Permisos
-                    </button>
-                  </div>
-                  <div className='flex justify-center lg:justify-start px-8'>
-                    <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mx-4">
-            <h2 className="text-2xl font-bold mb-4">Permisos de {selectedUser.username}</h2>
-            <p><strong>Cargo:</strong> {selectedUser.cargo}</p>
-            <p><strong>Email:</strong> {selectedUser.email}</p>
-            <div className="mt-4">
-              {permissionsList.map(permission => (
-                <div key={permission}>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
-                      checked={selectedPermissions.includes(permission)}
-                      onChange={() => handlePermissionChange(permission)}
-                    />
-                    <span className="ml-2">{permission}</span>
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={handleSavePermissions}
-                className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-lg transition duration-300">
-                Guardar
-              </button>
-              <button
-                onClick={handleCloseModal}
-                className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-lg transition duration-300">
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

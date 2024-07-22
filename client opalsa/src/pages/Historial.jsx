@@ -8,6 +8,9 @@ import { MdCasino } from "react-icons/md";
 
 const Historial = () => {
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [filter, setFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,10 +62,10 @@ const Historial = () => {
 
         const combinedItems = [...mantenimientosWithDetails, ...movimientosWithDetails, ...moviMaquinasWithDetails];
 
-        // Ordenar los elementos combinados por la fecha unificada
         combinedItems.sort((a, b) => b.fecha - a.fecha);
 
         setItems(combinedItems);
+        setFilteredItems(combinedItems);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -81,10 +84,52 @@ const Historial = () => {
         await axios.delete(`http://localhost:4000/api/moviMaquinas/${id}`);
       }
       setItems(items.filter(item => item._id !== id));
+      setFilteredItems(filteredItems.filter(item => item._id !== id));
     } catch (error) {
       console.error('Error deleting item:', error);
     }
   };
+
+  const handleSearch = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    let filtered = items;
+
+    if (filter !== 'all') {
+      filtered = items.filter(item => item.type === filter);
+    }
+
+    if (filter === 'mantenimiento') {
+      filtered = filtered.filter(item => item.nroSerieMaquina.toLowerCase().includes(query));
+    } else if (filter === 'movimiento') {
+      filtered = filtered.filter(item => item.serialComponente.toLowerCase().includes(query));
+    } else if (filter === 'moviMaquina') {
+      filtered = filtered.filter(item => item.serialMaquina.toLowerCase().includes(query));
+    }
+
+    setFilteredItems(filtered);
+  };
+
+  useEffect(() => {
+    let filtered = items;
+
+    if (filter !== 'all') {
+      filtered = items.filter(item => item.type === filter);
+    }
+
+    if (searchQuery) {
+      if (filter === 'mantenimiento') {
+        filtered = filtered.filter(item => item.nroSerieMaquina.toLowerCase().includes(searchQuery));
+      } else if (filter === 'movimiento') {
+        filtered = filtered.filter(item => item.serialComponente.toLowerCase().includes(searchQuery));
+      } else if (filter === 'moviMaquina') {
+        filtered = filtered.filter(item => item.serialMaquina.toLowerCase().includes(searchQuery));
+      }
+    }
+
+    setFilteredItems(filtered);
+  }, [filter, items, searchQuery]);
 
   return (
     <div>
@@ -95,8 +140,43 @@ const Historial = () => {
         </h1>
       </header>
       <div className="max-w-7xl mx-auto mt-5 p-6 pl-[75px]">
+        <div className="flex justify-center mb-4">
+          <button
+            className={`mx-2 px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setFilter('all')}
+          >
+            Todos
+          </button>
+          <button
+            className={`mx-2 px-4 py-2 rounded ${filter === 'mantenimiento' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setFilter('mantenimiento')}
+          >
+            Mantenimientos
+          </button>
+          <button
+            className={`mx-2 px-4 py-2 rounded ${filter === 'movimiento' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setFilter('movimiento')}
+          >
+            Movimientos de Componentes
+          </button>
+          <button
+            className={`mx-2 px-4 py-2 rounded ${filter === 'moviMaquina' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setFilter('moviMaquina')}
+          >
+            Movimientos de Máquinas
+          </button>
+        </div>
+        <div className="flex justify-center mb-9 pt-7 ">
+          <input 
+            type="text" 
+            className="px-4 py-2 border rounded w-[500px]"
+            placeholder="Buscar Numero de Serie"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <div key={item._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] shadow-xl m-4">
               <div className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${item.type === 'mantenimiento' ? 'bg-green-500' : item.type === 'movimiento' ? 'bg-blue-500' : 'bg-yellow-500'} left-4 -top-6`}>
                 {item.type === 'mantenimiento' ? <FaTools className="h-8 w-8" /> : item.type === 'movimiento' ? <MdAutoAwesomeMotion className="h-8 w-8" /> : <div className="h-8 w-8 bg-yellow-500 rounded-full "><MdCasino className="h-8 w-8" /></div>}
@@ -115,21 +195,16 @@ const Historial = () => {
                       </svg>
                       <p>{item.fecha.toLocaleDateString()}</p>
                     </div>
-                    <div className="border-t-2"></div>
-                    <div className="my-1">
-                      <p className="font-semibold text-base mb-1">Descripción</p>
-                      <p className="text-sm text-gray-500">{item.descripcion}</p>
-                    </div>
-                    {item.nombreMaquina && (
-                      <div className="my-1">
-                        <p className="font-semibold text-base mb-1">Nombre de la Máquina</p>
-                        <p className="text-sm text-gray-500">{item.nombreMaquina}</p>
-                      </div>
-                    )}
                     <div className="my-1">
                       <p className="font-semibold text-base mb-1">Número de Serie</p>
                       <p className="text-sm text-gray-500">{item.nroSerieMaquina}</p>
                     </div>
+                    {item.nombreMaquina && (
+                      <div className="my-1">
+                        <p className="font-semibold text-base mb-1">Nombre Máquina</p>
+                        <p className="text-sm text-gray-500">{item.nombreMaquina}</p>
+                      </div>
+                    )}
                     {item.ubicacionMaquina && (
                       <div className="my-1">
                         <p className="font-semibold text-base mb-1">Ubicación</p>

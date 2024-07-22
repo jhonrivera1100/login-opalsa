@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FaCog,
@@ -8,16 +8,23 @@ import {
   FaUserShield,
   FaSignOutAlt,
   FaHome,
-  FaBars,  // Icono del menú
-  FaTimes, // Icono de cerrar
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [isHovered, setIsHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { logout } = useAuth();
+  const [role, setRole] = useState(null);
+  const { user, logout } = useAuth();
   const location = useLocation();
+
+  useEffect(() => {
+    if (user) {
+      setRole(user.role);
+    }
+  }, [user]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -59,6 +66,39 @@ function Navbar() {
     }`;
   };
 
+  const renderLink = (to, icon, label) => (
+    <Link to={to} className={getLinkClass(to)}>
+      <div className={getLineClass(to)}></div>
+      <div className={getIconBgClass(to)}>
+        {icon}
+      </div>
+      {isHovered && (
+        <span className="ml-2 text-gray-700 group-hover:text-blue-800">
+          {label}
+        </span>
+      )}
+    </Link>
+  );
+
+  const adminLinks = (
+    <>
+      {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
+      {renderLink("/GestionMaquinas", <FaCog className={getIconClass("/GestionMaquinas")} />, "Gestión")}
+      {renderLink("/Historial", <FaHistory className={getIconClass("/Historial")} />, "Historial")}
+      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
+      {renderLink("/admin", <FaUserShield className={getIconClass("/admin")} />, "Administrador")}
+    </>
+  );
+
+  const userLinks = (
+    <>
+      {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
+      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
+    </>
+  );
+
   return (
     <>
       <button
@@ -75,7 +115,6 @@ function Navbar() {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex flex-col h-full">
-          {/* Parte superior con texto OPALSA */}
           <div className="bg-blue-950 text-white py-12 px-4 flex flex-col justify-center items-center">
             {isHovered ? (
               <span className="text-base font-bold mb-2">OPALSA</span>
@@ -89,90 +128,22 @@ function Navbar() {
               </span>
             )}
           </div>
-          {/* Links del menú */}
           <div className="flex flex-col flex-grow p-4 space-y-2">
-            <Link to="/" className={getLinkClass("/")}>
-              <div className={getLineClass("/")}></div>
-              <div className={getIconBgClass("/")}>
-                <FaHome className={getIconClass("/")} />
-              </div>
-              {isHovered && (
-                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                  Inicio
-                </span>
-              )}
-            </Link>
-            <Link to="/GestionMaquinas" className={getLinkClass("/GestionMaquinas")}>
-              <div className={getLineClass("/GestionMaquinas")}></div>
-              <div className={getIconBgClass("/GestionMaquinas")}>
-                <FaCog className={getIconClass("/GestionMaquinas")} />
-              </div>
-              {isHovered && (
-                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                  Gestión
-                </span>
-              )}
-            </Link>
-            <Link to="/Historial" className={getLinkClass("/Historial")}>
-              <div className={getLineClass("/Historial")}></div>
-              <div className={getIconBgClass("/Historial")}>
-                <FaHistory className={getIconClass("/Historial")} />
-              </div>
-              {isHovered && (
-                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                  Historial
-                </span>
-              )}
-            </Link>
-            <Link to="/RegistroMantenimiento" className={getLinkClass("/RegistroMantenimiento")}>
-              <div className={getLineClass("/RegistroMantenimiento")}></div>
-              <div className={getIconBgClass("/RegistroMantenimiento")}>
-                <FaTools className={getIconClass("/RegistroMantenimiento")} />
-              </div>
-              {isHovered && (
-                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                  Reportes
-                </span>
-              )}
-            </Link>
-            <Link to="/profile" className={getLinkClass("/profile")}>
-              <div className={getLineClass("/profile")}></div>
-              <div className={getIconBgClass("/profile")}>
-                <FaUser className={getIconClass("/profile")} />
-              </div>
-              {isHovered && (
-                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                  Perfil
-                </span>
-              )}
-            </Link>
+            {role === "admin" ? adminLinks : userLinks}
             <div className="flex-grow"></div>
-            <div className="flex flex-col space-y-2">
-              <Link to="/admin" className={getLinkClass("/admin")}>
-                <div className={getLineClass("/admin")}></div>
-                <div className={getIconBgClass("/admin")}>
-                  <FaUserShield className={getIconClass("/admin")} />
-                </div>
-                {isHovered && (
-                  <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                    Administrador
-                  </span>
-                )}
-              </Link>
-              <div
-                onClick={logout}
-                className="group flex items-center text-base transition duration-300 ease-in-out transform hover:bg-white hover:text-blue-800 p-2 rounded-tr-3xl rounded-br-3xl relative cursor-pointer"
-              >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="bg-white group-hover:bg-slate-200 rounded-full p-2 transition duration-300">
-                  <FaSignOutAlt className={getIconClass("/logout")} />
-                </div>
-                {isHovered && (
-                  <span className="ml-2 text-gray-700 group-hover:text-blue-800">
-                    Cerrar Sesión
-                  </span>
-                )}
+            <div
+              onClick={logout}
+              className="group flex items-center text-base transition duration-300 ease-in-out transform hover:bg-white hover:text-blue-800 p-2 rounded-tr-3xl rounded-br-3xl relative cursor-pointer"
+            >
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="bg-white group-hover:bg-slate-200 rounded-full p-2 transition duration-300">
+                <FaSignOutAlt className={getIconClass("/logout")} />
               </div>
+              {isHovered && (
+                <span className="ml-2 text-gray-700 group-hover:text-blue-800">
+                  Cerrar Sesión
+                </span>
+              )}
             </div>
           </div>
         </div>

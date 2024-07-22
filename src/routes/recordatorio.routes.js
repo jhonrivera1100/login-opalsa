@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createRecordatorio, getRecordatorios, deleteRecordatorio } from "../controllers/recordatorio.controller.js";
+import { createRecordatorio, getRecordatorios, deleteRecordatorio, updateVisto } from "../controllers/recordatorio.controller.js";
 
 const router = Router();
 
@@ -11,5 +11,8 @@ router.get("/recordatorios", getRecordatorios);
 
 // Ruta para eliminar un recordatorio por ID
 router.delete("/recordatorios/:id", deleteRecordatorio);
+
+// Ruta para marcar un recordatorio como visto
+router.patch('/recordatorios/:id/visto', updateVisto);
 
 export default router;
