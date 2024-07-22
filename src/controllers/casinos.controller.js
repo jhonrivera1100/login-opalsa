@@ -1,5 +1,5 @@
 import Casino from '../models/casino.model.js';
-import { uploadImage, uploadFile, deleteImage } from '../libs/cloudinary.js'; // Asumiendo que tienes estas funciones implementadas
+import { uploadImage, uploadFile, deleteImage } from '../libs/cloudinary.js';
 import fs from 'fs-extra';
 
 // Obtener todos los casinos
@@ -36,7 +36,7 @@ export const createCasino = async (req, res) => {
   } = req.body;
 
   let imgCasino = {};
-  let documentacionCasino = {};
+  let documentacionCasino = [];
 
   // Manejo de la imagen de casino
   if (req.files && req.files.imgCasino) {
@@ -48,14 +48,25 @@ export const createCasino = async (req, res) => {
     };
   }
 
-  // Manejo del documento de casino
+  // Manejo de los documentos de casino
   if (req.files && req.files.documentacionCasino) {
-    const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
-    await fs.remove(req.files.documentacionCasino.tempFilePath);
-    documentacionCasino = {
-      url: result.secure_url,
-      public_id: result.public_id,
-    };
+    if (Array.isArray(req.files.documentacionCasino)) {
+      for (let file of req.files.documentacionCasino) {
+        const result = await uploadFile(file.tempFilePath, 'Documentos');
+        await fs.remove(file.tempFilePath);
+        documentacionCasino.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+    } else {
+      const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
+      await fs.remove(req.files.documentacionCasino.tempFilePath);
+      documentacionCasino.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
+    }
   }
 
   const newCasino = new Casino({
@@ -109,19 +120,37 @@ export const updateCasino = async (req, res) => {
     };
   }
 
-  // Manejo del documento de casino
+  // Manejo de los documentos de casino
   if (req.files && req.files.documentacionCasino) {
     const casino = await Casino.findById(req.params.id);
-    if (casino.documentacionCasino && casino.documentacionCasino.public_id) {
-      await deleteImage(casino.documentacionCasino.public_id);
+
+    // Borra los documentos anteriores si es necesario
+    if (casino.documentacionCasino && casino.documentacionCasino.length) {
+      for (let doc of casino.documentacionCasino) {
+        if (doc.public_id) {
+          await deleteImage(doc.public_id);
+        }
+      }
     }
 
-    const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
-    await fs.remove(req.files.documentacionCasino.tempFilePath);
-    updatedFields.documentacionCasino = {
-      url: result.secure_url,
-      public_id: result.public_id,
-    };
+    updatedFields.documentacionCasino = [];
+    if (Array.isArray(req.files.documentacionCasino)) {
+      for (let file of req.files.documentacionCasino) {
+        const result = await uploadFile(file.tempFilePath, 'Documentos');
+        await fs.remove(file.tempFilePath);
+        updatedFields.documentacionCasino.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+    } else {
+      const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
+      await fs.remove(req.files.documentacionCasino.tempFilePath);
+      updatedFields.documentacionCasino.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
+    }
   }
 
   try {
@@ -146,8 +175,12 @@ export const deleteCasino = async (req, res) => {
       await deleteImage(casino.imgCasino.public_id);
     }
 
-    if (casino.documentacionCasino && casino.documentacionCasino.public_id) {
-      await deleteImage(casino.documentacionCasino.public_id);
+    if (casino.documentacionCasino && casino.documentacionCasino.length) {
+      for (let doc of casino.documentacionCasino) {
+        if (doc.public_id) {
+          await deleteImage(doc.public_id);
+        }
+      }
     }
 
     res.json({ message: "Casino eliminado con éxito" });

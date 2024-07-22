@@ -73,7 +73,7 @@ function ModalMaquina({ maquina, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="bg-gray-100 shadow-xl w-full max-w-7xl max-h-[90vh] overflow-y-auto p-6 relative text-sm flex">
+      <div className="bg-gray-100 shadow-xl w-full max-w-7xl max-h-[150vh] overflow-y-auto p-6 relative text-sm flex">
         <button
           className="absolute top-0 right-0 m-4 text-gray-600 hover:text-gray-900"
           onClick={onClose}

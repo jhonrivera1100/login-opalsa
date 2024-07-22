@@ -32,7 +32,7 @@ function BotonAgregar() {
       imgCasino: null,
       ciudadCasino: "",
       direccionCasino: "",
-      documentacionCasino: null,
+      documentacionCasino: [],
     },
   });
 
@@ -75,19 +75,20 @@ function BotonAgregar() {
         imgCasino: null,
         ciudadCasino: "",
         direccionCasino: "",
-        documentacionCasino: null,
+        documentacionCasino: [],
       },
     });
   };
 
-  const handleFileChange = (event) => {
+  const handleDocumentChange = (event, index) => {
     const file = event.target.files[0];
-    const section = getSelectedSection();
+    const newDocuments = [...formData.casino.documentacionCasino];
+    newDocuments[index] = file;
     setFormData({
       ...formData,
-      [section]: {
-        ...formData[section],
-        [event.target.name]: file,
+      casino: {
+        ...formData.casino,
+        documentacionCasino: newDocuments,
       },
     });
   };
@@ -109,13 +110,29 @@ function BotonAgregar() {
     try {
       const formDataToSend = new FormData();
       Object.keys(formData.casino).forEach((key) => {
-        formDataToSend.append(key, formData.casino[key]);
+        if (key === "documentacionCasino") {
+          formData.casino.documentacionCasino.forEach((doc) => {
+            formDataToSend.append("documentacionCasino", doc);
+          });
+        } else {
+          formDataToSend.append(key, formData.casino[key]);
+        }
       });
       await createCasino(formDataToSend);
       window.location.reload(); // Recarga la página
     } catch (error) {
       console.error("Error creating casino:", error);
     }
+  };
+
+  const addAnotherDocument = () => {
+    setFormData({
+      ...formData,
+      casino: {
+        ...formData.casino,
+        documentacionCasino: [...formData.casino.documentacionCasino, null],
+      },
+    });
   };
 
   const handleInputChange = (event, isFile = false) => {
@@ -484,12 +501,23 @@ function BotonAgregar() {
                   >
                     Documentación del Casino:
                   </label>
-                  <input
-                    type="file"
-                    name="documentacionCasino"
-                    onChange={(e) => handleInputChange(e, true)}
-                    className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                  />
+                  {formData.casino.documentacionCasino.map((doc, index) => (
+                    <div key={index}>
+                      <input
+                        type="file"
+                        name={`documentacionCasino-${index}`}
+                        onChange={(e) => handleDocumentChange(e, index)}
+                        className="border border-gray-300 rounded-md py-2 px-4 w-full text-black mb-2"
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300"
+                    onClick={addAnotherDocument}
+                  >
+                    + Agregar documento
+                  </button>
                 </div>
                 <div className="col-span-2 flex justify-center">
                   <button

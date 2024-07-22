@@ -4,14 +4,18 @@ import { getCasinosRequest } from "../api/casinos";
 import CasinoCard from "../components/casinoCard";
 import BotonAgregar from "../components/BotonAgregar";
 import MaquinaCard from "../components/MaquinaCard";
-import ModalMaquina from "../components/ModalMaquina"; // Asegúrate de importar o crear el componente ModalMaquina
+import ModalMaquina from "../components/ModalMaquina";
+import ModalDocumentos from "../components/ModalDocumentos";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
   const [maquinas, setMaquinas] = useState([]);
   const [casinos, setCasinos] = useState([]);
   const [selectedCasino, setSelectedCasino] = useState(null);
-  const [selectedMaquina, setSelectedMaquina] = useState(null); // Estado para almacenar la máquina seleccionada
+  const [selectedMaquina, setSelectedMaquina] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [documentos, setDocumentos] = useState([]);
+  const [isDocumentosModalOpen, setIsDocumentosModalOpen] = useState(false);
   const [currentPageMaquinas, setCurrentPageMaquinas] = useState(1);
   const [currentPageCasinos, setCurrentPageCasinos] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,6 +78,20 @@ function SeccionesHome() {
   const abrirDocumento = (url) => {
     window.open(url, "_blank");
   };
+
+  const handleVerDocumentos = (documentacion) => {
+    setDocumentos(documentacion);
+    setIsDocumentosModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const closeDocumentosModal = () => {
+    setIsDocumentosModalOpen(false);
+  };
+
 
   const renderSectionContent = () => {
     if (selectedCasino) {
@@ -325,6 +343,7 @@ function SeccionesHome() {
                 key={casino._id}
                 casino={casino}
                 onVerMas={() => setSelectedCasino(casino)}
+                onVerDocumentos={() => handleVerDocumentos(casino.documentacionCasino)}
               />
             ))}
         </div>
@@ -413,6 +432,11 @@ function SeccionesHome() {
           onClose={() => setSelectedMaquina(null)}
         />
       )}
+        <ModalDocumentos 
+        isOpen={isDocumentosModalOpen} // Asegúrate de usar el estado correcto para este modal
+        onClose={closeDocumentosModal} // Asegúrate de usar el método de cierre correcto
+        documentos={documentos}
+      />
     </div>
   );
 }
