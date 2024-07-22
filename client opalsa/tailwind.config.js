@@ -17,6 +17,9 @@ export default {
           900: "#0E2345",
         },
       },
+      backgroundImage: {
+        'casino-background': "url('https://res.cloudinary.com/dtqiwgbbp/image/upload/v1721338474/Maquinas/jix8shzajboqxs85gjpw.jpg')",
+      },
     },
   },
   plugins: [],
