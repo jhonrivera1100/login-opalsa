@@ -6,11 +6,14 @@ import { CgWebsite } from "react-icons/cg";
 import { MdAutoAwesomeMotion } from "react-icons/md";
 import { MdCasino } from "react-icons/md";
 
+const ITEMS_PER_PAGE = 8;
+
 const Historial = () => {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,6 +112,7 @@ const Historial = () => {
     }
 
     setFilteredItems(filtered);
+    setCurrentPage(0); // Reset to first page on search
   };
 
   useEffect(() => {
@@ -129,7 +133,19 @@ const Historial = () => {
     }
 
     setFilteredItems(filtered);
+    setCurrentPage(0); // Reset to first page on filter change
   }, [filter, items, searchQuery]);
+
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const currentItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => (startIndex + ITEMS_PER_PAGE < filteredItems.length ? prevPage + 1 : prevPage));
+  };
 
   return (
     <div>
@@ -140,27 +156,27 @@ const Historial = () => {
         </h1>
       </header>
       <div className="max-w-7xl mx-auto mt-5 p-6 pl-[75px]">
-        <div className="flex justify-center mb-4">
+        <div className="flex flex-wrap justify-center mb-4 space-x-2 space-y-2 md:space-y-0">
           <button
-            className={`mx-2 px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setFilter('all')}
           >
             Todos
           </button>
           <button
-            className={`mx-2 px-4 py-2 rounded ${filter === 'mantenimiento' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+            className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${filter === 'mantenimiento' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setFilter('mantenimiento')}
           >
             Mantenimientos
           </button>
           <button
-            className={`mx-2 px-4 py-2 rounded ${filter === 'movimiento' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${filter === 'movimiento' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setFilter('movimiento')}
           >
             Movimientos de Componentes
           </button>
           <button
-            className={`mx-2 px-4 py-2 rounded ${filter === 'moviMaquina' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+            className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${filter === 'moviMaquina' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
             onClick={() => setFilter('moviMaquina')}
           >
             Movimientos de Máquinas
@@ -176,7 +192,7 @@ const Historial = () => {
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {filteredItems.map((item) => (
+          {currentItems.map((item) => (
             <div key={item._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] shadow-xl m-4">
               <div className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${item.type === 'mantenimiento' ? 'bg-green-500' : item.type === 'movimiento' ? 'bg-blue-500' : 'bg-yellow-500'} left-4 -top-6`}>
                 {item.type === 'mantenimiento' ? <FaTools className="h-8 w-8" /> : item.type === 'movimiento' ? <MdAutoAwesomeMotion className="h-8 w-8" /> : <div className="h-8 w-8 bg-yellow-500 rounded-full "><MdCasino className="h-8 w-8" /></div>}
@@ -276,6 +292,22 @@ const Historial = () => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex justify-center mt-4">
+          <button
+            className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0}
+          >
+            Anterior
+          </button>
+          <button
+            className="mx-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            onClick={handleNextPage}
+            disabled={startIndex + ITEMS_PER_PAGE >= filteredItems.length}
+          >
+            Siguiente
+          </button>
         </div>
       </div>
     </div>
