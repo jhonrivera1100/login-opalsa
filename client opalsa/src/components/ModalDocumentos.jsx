@@ -23,7 +23,7 @@ function ModalDocumentos({ isOpen, onClose, documentos }) {
           Cerrar
         </button>
         .
-      </div>
+      </div>                  
     </div>
   );
 }

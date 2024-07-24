@@ -141,11 +141,8 @@ function SeccionesHome() {
       </div>
       <div className="text-center w-1/3 mr-20 mt-8">
         <h3 className="text-xl font-bold text-white mt-2 bg-black bg-opacity-25 inline-block py-1 px-2 rounded-md">
-          MÁQUINAS EN EL CASINO
+          MÁQUINAS EN EL CASINO:  {filteredMaquinas.length}
         </h3>
-        <p className="text-xl text-sky-200 bg-black bg-opacity-25 inline-block py-1 px-2 rounded-md mt-2">
-          {filteredMaquinas.length}
-        </p>
       </div>
     </div>
 
@@ -157,6 +154,16 @@ function SeccionesHome() {
         placeholder="Buscar por nombre o número de serie"
         className="px-4 py-2 border rounded-md w-1/2 mx-2"
       />
+
+
+
+
+
+
+
+
+
+      
       <select
         value={selectedBrand}
         onChange={handleFilterChange}
