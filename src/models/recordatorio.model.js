@@ -15,9 +15,13 @@ const RecordatorioSchema = new mongoose.Schema({
   },
   usuario: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
     required: true
-  }
+  },
+  visto: { 
+    type: Boolean,
+    default: false
+   } 
 });
 
 const Recordatorio = mongoose.model('Recordatorio', RecordatorioSchema);

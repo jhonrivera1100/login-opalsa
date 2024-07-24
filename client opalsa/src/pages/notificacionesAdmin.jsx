@@ -24,7 +24,11 @@ const NotificacionesAdmin = () => {
   const fetchRecordatorios = async () => {
     try {
       const response = await axios.get("/recordatorios");
-      setRecordatorios(response.data);
+      const recordatoriosConVisto = response.data.map(recordatorio => ({
+        ...recordatorio,
+        visto: recordatorio.visto || false // Asegurarse de que el campo visto esté definido
+      }));
+      setRecordatorios(recordatoriosConVisto);
     } catch (error) {
       console.error("Error al obtener recordatorios:", error);
     }
@@ -32,6 +36,21 @@ const NotificacionesAdmin = () => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleCheckboxChange = async (id, visto) => {
+    try {
+      console.log(`Actualizando recordatorio ${id} a visto: ${!visto}`);
+      const response = await axios.patch(`/recordatorios/${id}/visto`, { visto: !visto });
+      console.log('Respuesta del servidor:', response.data);
+      setRecordatorios(prevRecordatorios =>
+        prevRecordatorios.map(recordatorio =>
+          recordatorio._id === id ? { ...recordatorio, visto: response.data.visto } : recordatorio
+        )
+      );
+    } catch (error) {
+      console.error("Error al actualizar el estado de visto:", error);
+    }
   };
 
   const filteredRecordatorios = recordatorios.filter(recordatorio =>
@@ -80,7 +99,16 @@ const NotificacionesAdmin = () => {
           <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredRecordatorios.map(recordatorio => (
-                <div key={recordatorio._id} className="relative bg-white py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl">
+                <div key={recordatorio._id} className={`relative py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl ${recordatorio.visto ? 'bg-green-200' : 'bg-white'}`}>
+                  <div className="flex items-center justify-end space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={recordatorio.visto}
+                      onChange={() => handleCheckboxChange(recordatorio._id, recordatorio.visto)}
+                      className="form-checkbox h-5 w-5 text-green-600"
+                    />
+                    <label className="text-gray-600">Visto</label>
+                  </div>
                   <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-yellow-500 left-4 -top-4">
                     <GoDiscussionClosed className="w-8 h-8"/>
                   </div>
@@ -102,9 +130,9 @@ const NotificacionesAdmin = () => {
                         <strong>Título:</strong> {recordatorio.titulo}
                       </p>
                       <p className="text-gray-600 mb-2 cursor-pointer" onClick={() => handleDescriptionClick(recordatorio)}>
-                        <strong>Descripción:</strong> {recordatorio.descripcion.length > 20 ? `${recordatorio.descripcion.substring(0, 10)}...` : recordatorio.descripcion}
+                        <strong>Descripción:</strong> {recordatorio.descripcion.length > 10 ? `${recordatorio.descripcion.substring(0, 8)}...` : recordatorio.descripcion}
                       </p>
-                      <div className="flex justify-center">
+                      <div className="flex justify-center mt-2">
                         <button
                           className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
                           onClick={() => handleDelete(recordatorio._id)}

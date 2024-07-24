@@ -130,7 +130,7 @@ function RegisterPage() {
                     {errors.cedula && (
                       <p className="text-red-500 mt-2">Número de Cédula es requerido</p>
                     )}
-                    </div>
+                  </div>
                   <div className="relative">
                     <input
                       autoComplete="off"
@@ -138,17 +138,17 @@ function RegisterPage() {
                       name="ciudad"
                       type="text"
                       className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600"
-                      placeholder="ciudad"
+                      placeholder="Ciudad"
                       {...register("ciudad", { required: true })}
                     />
                     <label
                       htmlFor="ciudad"
                       className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"
                     >
-                      ciudad
+                      Ciudad
                     </label>
                     {errors.ciudad && (
-                      <p className="text-red-500 mt-2">ciudad es requerida</p>
+                      <p className="text-red-500 mt-2">Ciudad es requerida</p>
                     )}
                   </div>
                   <div className="relative">

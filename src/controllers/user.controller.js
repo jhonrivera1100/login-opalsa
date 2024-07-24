@@ -39,3 +39,29 @@ export const deleteUsers = async (req, res) => {
       res.status(500).json({ message: 'Error al actualizar el perfil', error });
     }
   };
+
+  export const updateUserRole = async (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+  
+    console.log(`Actualizando rol del usuario con ID: ${id} a ${role}`);
+  
+    try {
+      const user = await User.findByIdAndUpdate(
+        id,
+        { role },
+        { new: true, runValidators: true }
+      );
+  
+      if (!user) {
+        console.log('Usuario no encontrado');
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+  
+      console.log('Usuario actualizado:', user);
+      res.status(200).json(user);
+    } catch (error) {
+      console.error('Error al actualizar el rol:', error);
+      res.status(500).json({ message: 'Error al actualizar el rol', error });
+    }
+  };

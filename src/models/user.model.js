@@ -1,4 +1,3 @@
-// models/user.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -30,9 +29,15 @@ const userSchema = new mongoose.Schema({
   ciudad: {
     type: String,
     required: true,
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ['admin', 'user'],  // Puedes añadir más roles según tus necesidades
+    default: 'user'
   }
 }, {
   timestamps: true
 });
 
-export default mongoose.model('user', userSchema);
+export default mongoose.model('User', userSchema);

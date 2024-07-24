@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { signin, errors: signinErrors, isAuthenticated } = useAuth();
+  const { signin, errors: signinErrors, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
 
@@ -18,12 +18,16 @@ export default function LoginPage() {
     }
   });
 
-  // Redirigir al usuario a la página de inicio si está autenticado
+  // Redirigir al usuario a la página de inicio o admin si está autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      if (user?.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/");
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
