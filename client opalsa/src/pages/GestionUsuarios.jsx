@@ -52,6 +52,10 @@ function GestionUsuarios() {
     }
   };
 
+  const getRoleButtonClasses = (role) => {
+    return role === 'admin' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700';
+  };
+
   const filteredUsers = users.filter(user =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -83,8 +87,8 @@ function GestionUsuarios() {
                 <div className='font-semibold'>Cédula</div>
                 <div className='font-semibold'>Ciudad</div>
                 <div className='font-semibold'>Correo Electronico</div>
-                <div className='font-semibold pl-8'>Cargo</div>
-                <div className='font-semibold'>Rol</div>
+                <div className='font-semibold lg:pl-8'>Cargo</div>
+                <div className='font-semibold lg:pl-8'>Rol</div>
                 <div className='font-semibold'>Eliminar</div>
               </div>
               <div className='overflow-y-auto max-h-[650px]'>
@@ -102,13 +106,13 @@ function GestionUsuarios() {
                     <div>
                       <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
                     </div>
-                    <div className='pl-8'>
+                    <div className='lg:pl-8'>
                       <p className="text-gray-600">{user.cargo}</p>
                     </div>
-                    <div>
+                    <div className='lg:pl-3'>
                       <button
                         onClick={() => handleRoleChange(user._id, user.role)}
-                        className=' w-[105px] py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300'>
+                        className={`w-[105px] py-2 text-white rounded-lg transition duration-300  ${getRoleButtonClasses(user.role)}`}>
                         {user.role}
                       </button>
                     </div>

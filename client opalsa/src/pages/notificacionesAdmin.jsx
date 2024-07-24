@@ -79,15 +79,15 @@ const NotificacionesAdmin = () => {
   return (
     <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen">
       <Sidebar />
-      <div className="col-span-3 xl:col-span-5 p-8">
-        <div className="mb-4 flex justify-around">
+      <div className="lg:col-span-3 xl:col-span-5 p-4 lg:p-8">
+        <div className="mb-4 flex flex-col lg:flex-row lg:justify-between">
           <HeaderNotificaciones />
-          <div className="relative mb-4 pt-4">
-            <div className="relative w-full md:w-auto">
+          <div className="relative mt-4 lg:mt-0 lg:ml-4">
+            <div className="relative w-full">
               <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                className="bg-gray-100 outline-none py-2 pl-10 pr-4 rounded-xl w-full md:w-auto"
+                className="bg-gray-200 outline-none py-2 pl-10 pr-4 rounded-xl w-full"
                 placeholder="Buscar Recordatorios"
                 value={searchTerm}
                 onChange={handleSearchChange}
