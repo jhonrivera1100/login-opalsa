@@ -7,26 +7,36 @@ const CrearMantenimiento = () => {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fechaMantenimiento, setFechaMantenimiento] = useState("");
+  const [documentoRecordatorio, setDocumentoRecordatorio] = useState(null);
   const [error, setError] = useState(null);
+
+  const handleFileChange = (e) => {
+    setDocumentoRecordatorio(e.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const recordatorioData = {
-      titulo,
-      descripcion,
-      fechaRecordatorio: fechaMantenimiento, // Cambio de fechaMantenimiento a fechaRecordatorio
-      usuario: user.username, // Guarda el nombre del usuario en el recordatorio
-    };
+    const formData = new FormData();
+    formData.append('titulo', titulo);
+    formData.append('descripcion', descripcion);
+    formData.append('fechaRecordatorio', fechaMantenimiento);
+    formData.append('usuario', user.username);
+    formData.append('documentoRecordatorio', documentoRecordatorio);
 
     try {
-      const response = await axios.post("/recordatorios", recordatorioData); // Cambiar a la ruta correcta "/api/recordatorios"
+      const response = await axios.post("/recordatorios", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       console.log("Recordatorio creado:", response.data);
       setError(null);
       // Limpiar campos del formulario después del envío exitoso
       setTitulo("");
       setDescripcion("");
       setFechaMantenimiento("");
+      setDocumentoRecordatorio(null);
     } catch (error) {
       console.error("Error al crear recordatorio:", error);
       setError("Error al crear el recordatorio. Por favor, inténtalo de nuevo.");
@@ -69,6 +79,14 @@ const CrearMantenimiento = () => {
                 onChange={(e) => setFechaMantenimiento(e.target.value)}
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
                 required
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Documento</label>
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               />
             </div>
           </div>

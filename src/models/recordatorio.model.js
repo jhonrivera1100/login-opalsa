@@ -21,7 +21,11 @@ const RecordatorioSchema = new mongoose.Schema({
   visto: { 
     type: Boolean,
     default: false
-   } 
+  },
+  documentoRecordatorio: [{
+    url: String,
+    public_id: String,
+  }]
 });
 
 const Recordatorio = mongoose.model('Recordatorio', RecordatorioSchema);

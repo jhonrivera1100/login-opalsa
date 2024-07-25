@@ -12,8 +12,9 @@ import maquinaRoutes from './routes/maquinas.routes.js';
 import casinosRoutes from './routes/casinos.routes.js';
 import componenteRoutes from './routes/componente.routes.js';
 import mantenimientoRoutes from './routes/mantenimiento.routes.js';
-import movimientosCRoutes from './routes/movimientosC.routes.js'; // Importar rutas de movimientos
+import movimientosCRoutes from './routes/movimientosC.routes.js'; 
 import moviMaquinasRoutes from './routes/moviMaquinas.routes.js';
+
 const app = express();
 
 // Definir __dirname en ES Modules
@@ -40,7 +41,7 @@ app.use('/api', casinosRoutes);
 app.use('/api', componenteRoutes);
 app.use('/api', mantenimientoRoutes);
 app.use('/api', movimientosCRoutes); 
-app.use('/api', moviMaquinasRoutes ); 
+app.use('/api', moviMaquinasRoutes);
 
 // Middleware para servir archivos estáticos
 app.use('/upload', express.static(path.join(__dirname, 'upload')));

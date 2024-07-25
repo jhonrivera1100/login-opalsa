@@ -1,14 +1,11 @@
 import Recordatorio from "../models/recordatorio.model.js";
-import User from '../models/user.model.js'; 
+import User from '../models/user.model.js';
+import { uploadFile, deleteFile } from "../libs/cloudinary.js";
+import fs from 'fs-extra';
 
 export const createRecordatorio = async (req, res) => {
   try {
     const { titulo, descripcion, fechaRecordatorio, usuario } = req.body;
-
-    // Validar los datos
-    if (!titulo || !descripcion || !fechaRecordatorio || !usuario) {
-      return res.status(400).json({ message: "Todos los campos son requeridos." });
-    }
 
     // Buscar el ObjectId del usuario
     const usuarioObj = await User.findOne({ username: usuario });
@@ -16,11 +13,24 @@ export const createRecordatorio = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
+    let documentoRecordatorio = [];
+
+    // Manejo del archivo documentoRecordatorio
+    if (req.files && req.files.documentoRecordatorio) {
+      const result = await uploadFile(req.files.documentoRecordatorio.tempFilePath, 'Documentos');
+      await fs.remove(req.files.documentoRecordatorio.tempFilePath);
+      documentoRecordatorio.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
+    }
+
     const newRecordatorio = new Recordatorio({
       titulo,
       descripcion,
       fechaRecordatorio,
-      usuario: usuarioObj._id // Asignar el ObjectId del usuario
+      usuario: usuarioObj._id,
+      documentoRecordatorio,
     });
 
     await newRecordatorio.save();
@@ -30,7 +40,6 @@ export const createRecordatorio = async (req, res) => {
     res.status(500).json({ message: "Error al crear el recordatorio." });
   }
 };
-
 
 // Controlador para obtener todos los recordatorios
 export const getRecordatorios = async (req, res) => {
@@ -43,16 +52,29 @@ export const getRecordatorios = async (req, res) => {
   }
 };
 
-
 // Controlador para eliminar un recordatorio
 export const deleteRecordatorio = async (req, res) => {
   try {
     const { id } = req.params;
+    const recordatorio = await Recordatorio.findById(id);
+
+    if (!recordatorio) {
+      return res.status(404).json({ message: "Recordatorio no encontrado." });
+    }
+
+    // Eliminar el archivo de Cloudinary si existe
+    if (recordatorio.documentoRecordatorio && recordatorio.documentoRecordatorio.length > 0) {
+      for (const doc of recordatorio.documentoRecordatorio) {
+        await deleteFile(doc.public_id);
+      }
+    }
+
+    // Eliminar el recordatorio
     await Recordatorio.findByIdAndDelete(id);
     res.status(200).json({ message: "Recordatorio eliminado correctamente" });
   } catch (error) {
-    console.error("Error al eliminar el recordatorio:", error); // Log de error
-    res.status(500).json({ message: "Error al eliminar el recordatorio" });
+    console.error("Error al eliminar el recordatorio:", error);
+    res.status(500).json({ message: "Error al eliminar el recordatorio." });
   }
 };
 
