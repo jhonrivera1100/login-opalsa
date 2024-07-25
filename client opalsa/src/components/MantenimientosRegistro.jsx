@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getMaquinasRequest } from '../api/maquinas';
+import { getMaquinasRequest } from '../api/maquinas'; // Asegúrate de tener esta función en tu archivo api/maquinas.js
 import Select from 'react-select';
 
 const MantenimientoRegistro = () => {
@@ -78,6 +78,7 @@ const MantenimientoRegistro = () => {
       setArchivo(null);
     } catch (error) {
       console.error('Error al crear mantenimiento:', error);
+      setError('Error al crear mantenimiento. Inténtalo de nuevo.');
     }
   };
 
@@ -136,10 +137,10 @@ const MantenimientoRegistro = () => {
               className="w-full h-32 bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               placeholder="Descripción"
             ></textarea>
-          </div>
+          </div>                
           <div className="mt-4">
             <input
-              type="file"
+              type="file"         
               onChange={(e) => setArchivo(e.target.files[0])}
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
             />
@@ -150,11 +151,11 @@ const MantenimientoRegistro = () => {
               type="submit"
               className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
             >
-              Registrar
+            Enviar
             </button>
           </div>
         </form>
-      </div>
+      </div>                  
     </div>
   );
 };

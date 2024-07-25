@@ -1,8 +1,9 @@
 import Mantenimiento from '../models/mantenimiento.model.js';
 import Maquina from '../models/maquina.model.js';
-import fs from 'fs';
+import fs from 'fs-extra'; // Utilizamos fs-extra para la eliminación de archivos
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { uploadFile, deleteFile } from '../libs/cloudinary.js'; // Importa las funciones de Cloudinary
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,10 +22,22 @@ export const createMantenimiento = async (req, res) => {
     const { tipoMantenimiento, fechaMantenimiento, descripcion, nroSerieMaquina, nombreMaquina, ubicacionMaquina } = req.body;
     const archivo = req.files ? req.files.archivo : null;
 
-    // Buscar la máquina por número de serie (este paso puede omitirse ya que ya tienes nombre y ubicación)
+    // Buscar la máquina por número de serie
     const maquina = await Maquina.findOne({ nroSerieMaquina });
     if (!maquina) {
       return res.status(404).json({ message: 'Máquina no encontrada' });
+    }
+
+    let archivoData = null;
+    if (archivo) {
+      // Subir archivo a Cloudinary
+      const result = await uploadFile(archivo.tempFilePath, 'Mantenimientos');
+      // Eliminar archivo de la carpeta local
+      await fs.remove(archivo.tempFilePath);
+      archivoData = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
     }
 
     const nuevoMantenimiento = new Mantenimiento({
@@ -34,27 +47,11 @@ export const createMantenimiento = async (req, res) => {
       nroSerieMaquina,
       nombreMaquina,
       ubicacionMaquina,
-      archivo: archivo ? archivo.name : null,
+      archivo: archivoData,
     });
 
-    if (archivo) {
-      const uploadPath = path.join(__dirname, '../upload', archivo.name);
-      archivo.mv(uploadPath, async (err) => {
-        if (err) {
-          return res.status(500).json({ message: 'Error al guardar el archivo', error: err });
-        }
-
-        try {
-          await nuevoMantenimiento.save();
-          return res.status(201).json(nuevoMantenimiento);
-        } catch (saveError) {
-          return res.status(500).json({ message: 'Error al guardar el mantenimiento', error: saveError });
-        }
-      });
-    } else {
-      await nuevoMantenimiento.save();
-      return res.status(201).json(nuevoMantenimiento);
-    }
+    await nuevoMantenimiento.save();
+    res.status(201).json(nuevoMantenimiento);
   } catch (error) {
     return res.status(500).json({ message: 'Error al crear el mantenimiento', error });
   }
@@ -69,12 +66,9 @@ export const deleteMantenimiento = async (req, res) => {
       return res.status(404).json({ message: 'Mantenimiento no encontrado' });
     }
 
-    // Si hay un archivo asociado, eliminarlo
-    if (mantenimiento.archivo) {
-      const filePath = path.join(__dirname, '../upload', mantenimiento.archivo);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+    // Si hay un archivo asociado, eliminarlo de Cloudinary
+    if (mantenimiento.archivo && mantenimiento.archivo.public_id) {
+      await deleteFile(mantenimiento.archivo.public_id);
     }
 
     res.status(200).json({ message: 'Mantenimiento eliminado correctamente' });
