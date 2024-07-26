@@ -227,14 +227,7 @@ const Historial = () => {
                         <p className="text-sm text-gray-500">{item.ubicacionMaquina}</p>
                       </div>
                     )}
-                    {item.archivo && (
-                      <div className="my-1">
-                        <p className="font-semibold text-base mb-1">Documento</p>
-                        <a href={`http://localhost:4000/upload/${item.archivo}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-sm">
-                          {item.archivo}
-                        </a>
-                      </div>
-                    )}
+                    
                   </>
                 ) : item.type === 'movimiento' ? (
                   <>
