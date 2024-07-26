@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 const RegistroMantenimiento = () => {
   const { user } = useAuth();
-  const [showForm, setShowForm] = useState(null);
+  const [showForm, setShowForm] = useState('mantenimiento');
 
   const handleRecordatorioCreado = (nuevoRecordatorio) => {
     console.log("Nuevo recordatorio creado:", nuevoRecordatorio);
