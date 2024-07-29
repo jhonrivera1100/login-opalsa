@@ -76,6 +76,10 @@ const NotificacionesAdmin = () => {
     setSelectedRecordatorio(null);
   };
 
+  const handleOpenFile = (url) => {
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen">
       <Sidebar />
@@ -132,13 +136,21 @@ const NotificacionesAdmin = () => {
                       <p className="text-gray-600 mb-2 cursor-pointer" onClick={() => handleDescriptionClick(recordatorio)}>
                         <strong>Descripción:</strong> {recordatorio.descripcion.length > 10 ? `${recordatorio.descripcion.substring(0, 8)}...` : recordatorio.descripcion}
                       </p>
-                      <div className="flex justify-center mt-2">
+                      <div className="flex justify-center mt-2 space-x-2">
                         <button
                           className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
                           onClick={() => handleDelete(recordatorio._id)}
                         >
                           Eliminar
                         </button>
+                        {recordatorio.documentoRecordatorio.length > 0 && (
+                          <button
+                            className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300"
+                            onClick={() => handleOpenFile(recordatorio.documentoRecordatorio[0].url)}
+                          >
+                            Ver Archivo
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
