@@ -7,7 +7,7 @@ import MaquinaCard from "../components/MaquinaCard";
 import ModalMaquina from "../components/ModalMaquina";
 import ModalDocumentos from "../components/ModalDocumentos";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import { faMapMarkerAlt,faMapMarkedAlt  } from "@fortawesome/free-solid-svg-icons";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
@@ -127,9 +127,10 @@ function SeccionesHome() {
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                   {selectedCasino.ciudadCasino}
                 </p>
-                <p className="text-lg text-white">
-                  {selectedCasino.direccionCasino}
-                </p>
+                <p className="text-lg text-white flex items-center">
+          <FontAwesomeIcon icon={faMapMarkedAlt} className="mr-2" />
+          {selectedCasino.direccionCasino}
+        </p>
               </div>
               <div className="flex justify-center mt-4 w-1/3">
                 <img
@@ -139,9 +140,10 @@ function SeccionesHome() {
                 />
               </div>
               <div className="text-center w-1/3 mr-20 mt-20">
-                <h3 className="text-xl font-bold text-white mt-2 inline-block py-1 px-2 rounded-md">
+              <p className="text-sky-200 font-bold text-4xl">{filteredMaquinas.length}</p>
+                <h3 className="text-base font-bold text-white mt-2 inline-block py-1 px-2 rounded-md">
                   MÁQUINAS EN EL CASINO
-                  <p className="text-sky-200">{filteredMaquinas.length}</p>
+                 
                 </h3>
               </div>
             </div>
