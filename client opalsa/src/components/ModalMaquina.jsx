@@ -215,7 +215,7 @@ function ModalMaquina({ maquina, onClose }) {
           ) : (
             <>
               <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
-                <thead className="bg-white">
+                <thead className="bg-white ">
                   <tr>
                     <th
                       scope="col"

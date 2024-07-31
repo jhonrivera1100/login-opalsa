@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ModalMaquina from "./ModalMaquina";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
 function MaquinaCard({ maquina }) {
   const [showModal, setShowModal] = useState(false);
@@ -65,7 +67,8 @@ function MaquinaCard({ maquina }) {
               {maquina.marcaMaquina}
             </h4>
 
-            <div className="mt-1">
+            <div className="mt-1 flex items-center">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-gray-600" />
               <span className="text-gray-600 text-sm">
                 {maquina.ubicacionMaquina}
               </span>

@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
 
 function CasinoCard({ casino, onVerMas, onVerDocumentos }) {
   const handleVerDocumentos = () => {
@@ -16,8 +18,14 @@ function CasinoCard({ casino, onVerMas, onVerDocumentos }) {
       </div>
       <div className="flex flex-col items-center p-4">
         <h2 className="text-xl font-bold text-gray-900 text-center">{casino.nombreCasino}</h2>
-        <p className="text-sm text-gray-500 text-center">{casino.ciudadCasino}</p>
-        <p className="text-sm text-gray-500 text-center">{casino.direccionCasino}</p>
+        <p className="text-sm text-gray-500 text-center flex items-center">
+          <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+          {casino.ciudadCasino}
+        </p>
+        <p className="text-sm text-gray-500 text-center flex items-center">
+          <FontAwesomeIcon icon={faMapMarkedAlt} className="mr-2" />
+          {casino.direccionCasino}
+        </p>
         <div className="flex mt-4">
           <button 
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
