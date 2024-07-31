@@ -76,6 +76,7 @@ if (!isMatch) return res.status(400).json({message:"incorrect password"});
         id: userFound._id,
         username: userFound.username,
         email: userFound.email,
+        role: userFound.role,
         createdAt: userFound.createdAt,
         updateAt: userFound.updatedAt,
 })   
@@ -115,26 +116,20 @@ export const getUserCount = async (req, res) => {
 };
 
 
-export const verifyToken = async (req,res) =>{
-  const {token} = req.cookies 
-  if (!token) return res.status(401).json({ message: "Unauthorized"});
-  
-  jwt.verify(token,TOKEN_SECRET, async (err, user)=>{
-  if (err) return res.status(401).json({ message: "Unauthorized"});
-const userFound = await User.findById(user.id)
-if(!userFound) return res.status(401).json({ message:"Unauthorized"});
+export const verifyToken = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "No token provided" });
 
-return res.json({
-  id: userFound._id,
-  username: userFound.username,
-  email: userFound.email,
-  cedula: userFound.cedula,
-  cargo: userFound.cargo,
-  ciudad: userFound.ciudad,
-  role: userFound.role,
-  createdAt: userFound.createdAt,
-  updateAt: userFound.updatedAt,
-});
-});
-}
+    jwt.verify(token, TOKEN_SECRET, async (err, decoded) => {
+      if (err) return res.status(401).json({ message: "Unauthorized" });
 
+      const user = await User.findById(decoded.id);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      res.json(user);
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

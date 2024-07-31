@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs';
 
+// Definición del esquema de usuario
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -40,4 +42,11 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export default mongoose.model('User', userSchema);
+// Método para comparar contraseñas
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+const User = mongoose.model('User', userSchema);
+
+export default User;
