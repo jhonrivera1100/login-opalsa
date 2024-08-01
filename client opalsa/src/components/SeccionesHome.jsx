@@ -7,7 +7,10 @@ import MaquinaCard from "../components/MaquinaCard";
 import ModalMaquina from "../components/ModalMaquina";
 import ModalDocumentos from "../components/ModalDocumentos";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMapMarkerAlt,faMapMarkedAlt  } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMapMarkerAlt,
+  faMapMarkedAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
@@ -23,7 +26,7 @@ function SeccionesHome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [cityFilter, setCityFilter] = useState("");
-  const itemsPerPage = 12;
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +62,14 @@ function SeccionesHome() {
   const changeSection = (newSection) => {
     setSection(newSection);
     setSelectedCasino(null);
+    if (newSection === "Casinos") {
+      // Reset filters for machines when switching to Casinos
+      setSelectedBrand("");
+      setSearchQueryMaquinas("");
+      setCurrentPageMaquinas(1);
+    }
   };
+  
 
   const handlePreviousPageMaquinas = () => {
     setCurrentPageMaquinas((prevPage) => Math.max(prevPage - 1, 1));
@@ -128,9 +138,9 @@ function SeccionesHome() {
                   {selectedCasino.ciudadCasino}
                 </p>
                 <p className="text-lg text-white flex items-center">
-          <FontAwesomeIcon icon={faMapMarkedAlt} className="mr-2" />
-          {selectedCasino.direccionCasino}
-        </p>
+                  <FontAwesomeIcon icon={faMapMarkedAlt} className="mr-2" />
+                  {selectedCasino.direccionCasino}
+                </p>
               </div>
               <div className="flex justify-center mt-4 w-1/3">
                 <img
@@ -140,10 +150,11 @@ function SeccionesHome() {
                 />
               </div>
               <div className="text-center w-1/3 mr-20 mt-20">
-              <p className="text-sky-200 font-bold text-4xl">{filteredMaquinas.length}</p>
+                <p className="text-sky-200 font-bold text-4xl">
+                  {filteredMaquinas.length}
+                </p>
                 <h3 className="text-base font-bold text-white mt-2 inline-block py-1 px-2 rounded-md">
                   MÁQUINAS EN EL CASINO
-                 
                 </h3>
               </div>
             </div>
@@ -163,8 +174,8 @@ function SeccionesHome() {
                 className="px-4 py-2 border rounded-md"
               >
                 <option value="">Todas las marcas</option>
-                <option value="IGT">IGT</option>
-                <option value="MAQ">MAQ</option>
+                <option value="AINSWORTH">AINSWORTH</option>
+                <option value="NOVOMATIC">NOVOMATIC</option>
                 <option value="OTRO">OTRO</option>
               </select>
             </div>
@@ -178,7 +189,7 @@ function SeccionesHome() {
                     ></th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-sm text-blue-600 uppercase tracking-wider"
                     >
                       Serial
                     </th>
@@ -220,7 +231,7 @@ function SeccionesHome() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+                      <td className="px-4 py-2 whitespace-nowrap text-black font-medium text-left">
                         {maquina.nroSerieMaquina}
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
@@ -322,9 +333,10 @@ function SeccionesHome() {
               className="px-4 py-2 border rounded-md"
             >
               <option value="">Todas las marcas</option>
-              <option value="IGT">IGT</option>
-              <option value="MAQ">MAQ</option>
-              <option value="OTRO">OTRO</option>
+              <option value="AINSWORTH">AINSWORTH</option>
+              <option value="NOVOMATIC">NOVOMATIC</option>
+              <option value="WILLIAMS">WILLIAMS</option>
+              <option value="OPALSA">OTRO</option>
             </select>
           </div>
         )}
