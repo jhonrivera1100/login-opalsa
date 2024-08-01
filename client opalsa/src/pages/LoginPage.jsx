@@ -5,24 +5,28 @@ import { useState, useEffect } from "react";
 
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { signin, errors: signinErrors, isAuthenticated, user } = useAuth();
+  const { signin, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await signin(data); // Iniciar sesión con los datos del formulario
+      const loggedInUser = await signin(data);
+      if (loggedInUser?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setLoginError("Credenciales inválidas. Por favor, inténtalo de nuevo.");
     }
   });
 
-  // Redirigir al usuario a la página de inicio o admin si está autenticado
   useEffect(() => {
     if (isAuthenticated) {
       if (user?.role === "admin") {
-        navigate("/admin-dashboard");
+        navigate("/admin");
       } else {
         navigate("/");
       }
@@ -40,11 +44,11 @@ export default function LoginPage() {
             </div>
             <div className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-6 text-gray-700 sm:text-lg sm:leading-7">
-                {signinErrors.map((error, i) => (
-                  <div className="bg-red-500 p-2 text-white text-center my-2" key={i}>
-                    {error}
+                {loginError && (
+                  <div className="bg-red-500 p-2 text-white text-center my-2">
+                    {loginError}
                   </div>
-                ))}
+                )}
                 <form onSubmit={onSubmit} className="space-y-6">
                   <div className="relative">
                     <input

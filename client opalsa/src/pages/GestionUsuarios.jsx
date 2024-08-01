@@ -45,8 +45,9 @@ function GestionUsuarios() {
   const handleRoleChange = async (userId, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     try {
-      const response = await axios.put(`http://localhost:4000/api/users/${userId}/role`, { role: newRole });
-      setUsers(users.map(user => user._id === userId ? { ...user, role: response.data.role } : user));
+      await axios.put(`http://localhost:4000/api/users/${userId}/role`, { role: newRole });
+      // Recargar la página
+      window.location.reload();
     } catch (error) {
       console.error('Error al actualizar el rol:', error);
     }
@@ -112,7 +113,7 @@ function GestionUsuarios() {
                     <div className='lg:pl-3'>
                       <button
                         onClick={() => handleRoleChange(user._id, user.role)}
-                        className={`w-[105px] py-2 text-white rounded-lg transition duration-300  ${getRoleButtonClasses(user.role)}`}>
+                        className={`w-[105px] py-2 text-white rounded-lg transition duration-300 ${getRoleButtonClasses(user.role)}`}>
                         {user.role}
                       </button>
                     </div>
