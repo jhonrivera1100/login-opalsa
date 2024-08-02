@@ -15,7 +15,7 @@ export default function LoginPage() {
       if (loggedInUser?.role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/admin");
+        navigate("/admin"); // Asegúrate de que esta ruta exista
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
@@ -28,7 +28,7 @@ export default function LoginPage() {
       if (user?.role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/admin");
+        navigate("/admin"); // Asegúrate de que esta ruta exista
       }
     }
   }, [isAuthenticated, user, navigate]);
