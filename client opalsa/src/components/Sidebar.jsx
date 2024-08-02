@@ -38,7 +38,7 @@ function Sidebar() {
           <Link to="/notifi" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <IoNotificationsOutline /> Notificaciones
           </Link>
-          <Link to="/" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
+          <Link to="/GestionMaquinas" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <CgEreader /> Aplicacion
           </Link>
           <Link to="/login" onClick={logout} className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>

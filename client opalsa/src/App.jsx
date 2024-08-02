@@ -14,6 +14,7 @@ import GestionMaquinas from "./pages/GestionMaquinas";
 import AppAdmin from "./pages/appAdmin";
 import NotificacionesAdmin from "./pages/notificacionesAdmin";
 import GestionUsuarios from "./pages/GestionUsuarios";
+import RegistrarNotifi from "./pages/registrarNotifiAdm";
 import { MaquinasProvider } from "./context/MaquinasContext";
 import { ComponentesProvider } from "./context/ComponentesContext";
 import { NotificacionesProvider } from "./context/NotificacionesContext";
@@ -33,14 +34,15 @@ function App() {
                   <Route path="/register" element={<RegisterPage />} />
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/RegistroMantenimiento" element={<RegistroMantenimiento />} />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/registroNotifi" element={<RegistrarNotifi />} />
                     <Route element={<ProtectedAdmin />}>
                       <Route path="/admin" element={<AppAdmin />} />
                       <Route path="/Usuarios" element={<GestionUsuarios />} />
                       <Route path="/notifi" element={<NotificacionesAdmin />} />
                     <Route path="/Historial" element={<Historial />} />
                     <Route path="/GestionMaquinas" element={<GestionMaquinas />} />
+                    <Route path="/RegistroMantenimiento" element={<RegistroMantenimiento />} />
                     </Route>
                   </Route>
                 </Routes>

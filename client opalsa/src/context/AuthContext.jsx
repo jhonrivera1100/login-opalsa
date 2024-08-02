@@ -44,6 +44,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -54,31 +58,37 @@ export const AuthProvider = ({ children }) => {
   }, [errors]);
 
   useEffect(() => {
-    const checkLogin = async () => {
-      const token = Cookies.get("token");
-      if (!token) {
+    async function checkLogin() {
+      const cookies = Cookies.get();
+      if (!cookies.token) {
         setIsAuthenticated(false);
         setLoading(false);
-        setUser(null);
-        return;
+        return setUser(null);
       }
+
       try {
-        const res = await verifyTokenRequest(token);
+        const res = await verifyTokenRequest(cookies.token);
+        if (!res.data) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+
         setIsAuthenticated(true);
         setUser(res.data);
+        setLoading(false);
       } catch (error) {
         setIsAuthenticated(false);
         setUser(null);
-      } finally {
         setLoading(false);
       }
-    };
+    }
     checkLogin();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ signup, signin, logout, loading, user, setUser, isAuthenticated, errors }}
+      value={{ signup, signin, logout, loading, user, setUser, isAuthenticated, errors, updateUser }}
     >
       {children}
     </AuthContext.Provider>

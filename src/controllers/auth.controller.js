@@ -102,6 +102,7 @@ export const profile = async (req, res) =>{
         cedula: userFound.cedula,
         cargo: userFound.cargo,
         ciudad: userFound.ciudad,
+        role:userFound.role,
         createdAt: userFound.createdAt,
         updateAt: userFound.updatedAt,
  })

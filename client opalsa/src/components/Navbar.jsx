@@ -82,7 +82,6 @@ function Navbar() {
 
   const adminLinks = (
     <>
-      {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
       {renderLink("/GestionMaquinas", <FaCog className={getIconClass("/GestionMaquinas")} />, "Gestión")}
       {renderLink("/Historial", <FaHistory className={getIconClass("/Historial")} />, "Historial")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
@@ -94,7 +93,7 @@ function Navbar() {
   const userLinks = (
     <>
       {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
-      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
+      {renderLink("/registroNotifi", <FaTools className={getIconClass("/registroNotifi")} />, "Notificar")}
       {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
     </>
   );

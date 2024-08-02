@@ -1,8 +1,9 @@
 // src/components/Perfil.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UpdateProfileModal from '../components/ModalActualizarD';
 import { updateUserRequest } from '../api/auth';
+import axios from 'axios';
 
 const Perfil = () => {
   const { user, updateUser } = useAuth();
@@ -15,14 +16,14 @@ const Perfil = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
   const handleUpdate = async (formData) => {
     try {
-      if (!user || !user.id) { // Asegúrate de usar la clave correcta para el ID
+      console.log('Datos del formulario antes de actualizar:', formData);
+      if (!user || !user._id) { 
         console.error('ID de usuario no encontrado');
         return;
       }
-      const response = await updateUserRequest(user.id, formData); // Usa la clave correcta para el ID
+      const response = await axios.put(`http://localhost:4000/api/users/${user._id}`, formData, { withCredentials: true });
       console.log('Usuario actualizado:', response.data);
       updateUser(response.data);
       setIsModalOpen(false);
@@ -83,16 +84,7 @@ const Perfil = () => {
                   </div>
                 </div>
                 <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                  <div className="flex justify-center py-4 lg:pt-4 pt-8">
-                    <div className="mr-4 p-3 text-center">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">8</span>
-                      <span className="text-sm text-blueGray-400">Mantenimientos</span>
-                    </div>
-                    <div className="mr-4 p-3 text-center">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">10</span>
-                      <span className="text-sm text-blueGray-400">Notificaciones</span>
-                    </div>
-                  </div>
+                 
                 </div>
               </div>
               <div className="text-center mt-12">
@@ -111,8 +103,8 @@ const Perfil = () => {
               <div className="mt-10 py-10 border-t border-blueGray-200 text-center">
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full lg:w-9/12 px-4">
-                    <h3>Cédula: {user.cedula || 'No especificada'}</h3>
-                    <h3>Email: {user.email || 'No especificado'}</h3>
+                    <h3>Cédula: {user.cedula || 'recargar la pagina'}</h3>
+                    <h3>Email: {user.email || 'recargar la pagina'}</h3>
                   </div>
                 </div>
               </div>
