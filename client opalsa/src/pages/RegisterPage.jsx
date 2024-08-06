@@ -65,10 +65,10 @@ function RegisterPage() {
                       htmlFor="username"
                       className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"
                     >
-                      Nombre de Usuario
+                      Nombre y Apellido
                     </label>
                     {errors.username && (
-                      <p className="text-red-500 mt-2">Username es requerido</p>
+                      <p className="text-red-500 mt-2">Nombre y Apellido son requeridos</p>
                     )}
                   </div>
                   <div className="relative">
@@ -113,14 +113,15 @@ function RegisterPage() {
                   </div>
                   <div className="relative">
                     <input
-                      autoComplete="off"
-                      id="cedula"
-                      name="cedula"
-                      type="number"
-                      className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600"
-                      placeholder="Cédula"
-                      {...register("cedula", { required: true })}
-                    />
+  autoComplete="off"
+  id="cedula"
+  name="cedula"
+  type="number"
+  inputMode="numeric"
+  className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 appearance-none"
+  placeholder="Cédula"
+  {...register("cedula", { required: true })}
+/>
                     <label
                       htmlFor="cedula"
                       className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"

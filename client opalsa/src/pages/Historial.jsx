@@ -5,6 +5,7 @@ import { FaTools } from "react-icons/fa";
 import { CgWebsite } from "react-icons/cg";
 import { MdAutoAwesomeMotion } from "react-icons/md";
 import { MdCasino } from "react-icons/md";
+import Modal from "../components/modalMantenimiento";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -14,6 +15,9 @@ const Historial = () => {
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [dateFilter, setDateFilter] = useState("recent");
+  const [selectedDescription, setSelectedDescription] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,18 +123,24 @@ const Historial = () => {
       filtered = items.filter((item) => item.type === filter);
     }
 
-    if (filter === "mantenimiento") {
+    if (filter === "all" && query) {
       filtered = filtered.filter((item) =>
-        item.nroSerieMaquina.toLowerCase().includes(query)
+        item.fecha.toLocaleDateString().includes(query)
       );
-    } else if (filter === "movimiento") {
-      filtered = filtered.filter((item) =>
-        item.serialComponente.toLowerCase().includes(query)
-      );
-    } else if (filter === "moviMaquina") {
-      filtered = filtered.filter((item) =>
-        item.serialMaquina.toLowerCase().includes(query)
-      );
+    } else {
+      if (filter === "mantenimiento") {
+        filtered = filtered.filter((item) =>
+          item.nroSerieMaquina.toLowerCase().includes(query)
+        );
+      } else if (filter === "movimiento") {
+        filtered = filtered.filter((item) =>
+          item.serialComponente.toLowerCase().includes(query)
+        );
+      } else if (filter === "moviMaquina") {
+        filtered = filtered.filter((item) =>
+          item.serialMaquina.toLowerCase().includes(query)
+        );
+      }
     }
 
     setFilteredItems(filtered);
@@ -145,24 +155,37 @@ const Historial = () => {
     }
 
     if (searchQuery) {
-      if (filter === "mantenimiento") {
+      if (filter === "all") {
         filtered = filtered.filter((item) =>
-          item.nroSerieMaquina.toLowerCase().includes(searchQuery)
+          item.fecha.toLocaleDateString().includes(searchQuery)
         );
-      } else if (filter === "movimiento") {
-        filtered = filtered.filter((item) =>
-          item.serialComponente.toLowerCase().includes(searchQuery)
-        );
-      } else if (filter === "moviMaquina") {
-        filtered = filtered.filter((item) =>
-          item.serialMaquina.toLowerCase().includes(searchQuery)
-        );
+      } else {
+        if (filter === "mantenimiento") {
+          filtered = filtered.filter((item) =>
+            item.nroSerieMaquina.toLowerCase().includes(searchQuery)
+          );
+        } else if (filter === "movimiento") {
+          filtered = filtered.filter((item) =>
+            item.serialComponente.toLowerCase().includes(searchQuery)
+          );
+        } else if (filter === "moviMaquina") {
+          filtered = filtered.filter((item) =>
+            item.serialMaquina.toLowerCase().includes(searchQuery)
+          );
+        }
       }
+    }
+
+    // Filtrado por fecha
+    if (dateFilter === "recent") {
+      filtered.sort((a, b) => b.fecha - a.fecha);
+    } else if (dateFilter === "oldest") {
+      filtered.sort((a, b) => a.fecha - b.fecha);
     }
 
     setFilteredItems(filtered);
     setCurrentPage(0); // Reset to first page on filter change
-  }, [filter, items, searchQuery]);
+  }, [filter, items, searchQuery, dateFilter]);
 
   const startIndex = currentPage * ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(
@@ -181,8 +204,12 @@ const Historial = () => {
         : prevPage
     );
   };
-
-  return (
+  const handleDescriptionClick = (description) => {
+    setSelectedDescription(description);
+    setIsModalOpen(true);
+  };
+  
+return (
     <div>
       <Navbar /> {/* Componente Navbar */}
       <header className="flex items-center justify-center py-4">
@@ -234,15 +261,25 @@ const Historial = () => {
           </button>
         </div>
         <div className="flex justify-center mb-9 pt-7 ">
-          <input
-            type="text"
-            className="px-4 py-2 border rounded w-[500px]"
-            placeholder="Buscar Numero de Serie"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
+        <input
+    type="text"
+    className="px-4 py-2 border rounded w-[500px]"
+    placeholder={
+      filter === "all" ? "Buscar por fecha (D/M/AAAA)" : "Buscar por numero de serie o fecha (D/M/AAAA)"
+    }
+    value={searchQuery}
+    onChange={handleSearch}
+  />
+           <select
+    className="px-4 py-2 border rounded"
+    value={dateFilter}
+    onChange={(e) => setDateFilter(e.target.value)}
+  >
+    <option value="recent">Más Antiguos</option>
+    <option value="oldest">Más Recientes</option>
+  </select>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {currentItems.map((item) => (
             <div
               key={item._id}
@@ -326,7 +363,25 @@ const Historial = () => {
                         </p>
                       </div>
                     )}
-                    {item.archivo?.url && (
+                    {item.descripcion && (
+                      <div className="my-1">
+                        <p className="font-semibold text-base mb-1">
+                          Descripcion
+                        </p>
+                          <p className="text-gray-700">
+                {item.descripcion.length > 10
+                  ? `${item.descripcion.slice(0, 10)}...`
+                  : item.descripcion}
+                <button
+                  onClick={() => handleDescriptionClick(item.descripcion)}
+                  className="text-blue-500 underline ml-2"
+                >
+                  Ver más
+                </button>
+              </p>
+                      </div>
+                    )}
+{item.archivo?.url && (
                       <div className="my-1">
                         <p className="font-semibold text-base mb-1">Evidencia</p>
                         <a
@@ -409,7 +464,7 @@ const Historial = () => {
                         {item.oldCasinoNombre}
                       </p>
                     </div>
-                    <div className="my-1">
+<div className="my-1">
                       <p className="font-semibold text-base mb-1">
                         Casino Final
                       </p>
@@ -454,6 +509,18 @@ const Historial = () => {
           </button>
         </div>
       </div>
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <h2 className="text-xl font-bold">Descripción Completa</h2>
+          <p>{selectedDescription}</p>
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Cerrar
+          </button>
+        </Modal>
+      )}
     </div>
   );
 };
