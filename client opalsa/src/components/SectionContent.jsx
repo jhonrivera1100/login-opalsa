@@ -85,20 +85,20 @@ const SectionContent = ({
     .slice(startIndexCasinos, endIndexCasinos);
 
   return (
-    <div className="mx-auto bg-gray-100 w-10/12 h-144 overflow-auto p-4">
+    <div className="mx-auto bg-gray-100 w-11/12 md:w-10/12 h-144 overflow-auto p-4">
       {section === "Maquinas" && (
-        <div className="flex mb-4 w-full justify-center items-center">
+        <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearch}
             placeholder="Buscar por número de serie"
-            className="px-4 py-2 border rounded-md w-1/2 mx-2"
+            className="px-4 py-2 border rounded-md w-full md:w-1/2 mx-2 mb-2 md:mb-0"
           />
           <select
             value={selectedBrand}
             onChange={handleFilterChange}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las marcas</option>
             <option value="AINSWORTH">AINSWORTH</option>
@@ -109,18 +109,18 @@ const SectionContent = ({
         </div>
       )}
       {section === "Casinos" && (
-        <div className="flex mb-4 w-full justify-center items-center">
+        <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearch}
             placeholder="Buscar por nombre del casino"
-            className="px-4 py-2 border rounded-md w-1/2 mx-2"
+            className="px-4 py-2 border rounded-md w-full md:w-1/2 mx-2 mb-2 md:mb-0"
           />
           <select
             value={cityFilter}
             onChange={handleCityFilterChange}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las ciudades</option>
             <option value="Cali">Cali</option>
@@ -130,7 +130,7 @@ const SectionContent = ({
           </select>
         </div>
       )}
-      <div className="grid grid-cols-4 gap-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {section === "Maquinas" &&
           paginatedMaquinas.map((maquina) => (
             <MaquinaCard key={maquina._id} maquina={maquina} />

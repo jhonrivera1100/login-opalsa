@@ -63,7 +63,7 @@ function SeccionesHome() {
     setSelectedCasino(null);
     if (newSection === "Casinos") {
       setSelectedBrand("");
-      setSearchQueryMaquinas("");
+      setSearchQuery("");
       setCurrentPageMaquinas(1);
     }
   };
@@ -104,11 +104,11 @@ function SeccionesHome() {
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-center py-3 bg-gray-100 mt-4">
-        <div className="flex justify-center w-full">
-          <div className="flex space-x-4 ml-20">
+        <div className="flex flex-wrap justify-center w-full">
+          <div className="flex space-x-4 ml-4 md:ml-20">
             <button
               onClick={() => changeSection("Casinos")}
-              className={`w-32 py-2 px-4 rounded-md font-semibold focus:outline-none ${
+              className={`w-24 md:w-32 py-2 px-4 rounded-md font-semibold focus:outline-none ${
                 section === "Casinos"
                   ? "bg-blue-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-300"
@@ -118,7 +118,7 @@ function SeccionesHome() {
             </button>
             <button
               onClick={() => changeSection("Maquinas")}
-              className={`w-32 py-2 px-4 rounded-md font-semibold focus:outline-none ${
+              className={`w-24 md:w-32 py-2 px-4 rounded-md font-semibold focus:outline-none ${
                 section === "Maquinas"
                   ? "bg-blue-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-300"
@@ -128,7 +128,7 @@ function SeccionesHome() {
             </button>
           </div>
 
-          <div className="ml-12">
+          <div className="ml-4 md:ml-12 mt-2 md:mt-0">
             <BotonAgregar />
           </div>
         </div>
