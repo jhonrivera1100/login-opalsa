@@ -28,6 +28,7 @@ const casinoSchema = mongoose.Schema(
       }
     ],
     maquinas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Maquinas" }],
+    elementos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Elementos" }],
   },
   {
     timestamps: true,
