@@ -1,11 +1,11 @@
-import Casino from '../models/casino.model.js';
-import { uploadImage, uploadFile, deleteImage } from '../libs/cloudinary.js';
-import fs from 'fs-extra';
+import Casino from "../models/casino.model.js";
+import { uploadImage, uploadFile, deleteImage } from "../libs/cloudinary.js";
+import fs from "fs-extra";
 
 // Obtener todos los casinos
 export const getAllCasinos = async (req, res) => {
   try {
-    const casinos = await Casino.find().populate('maquinas');
+    const casinos = await Casino.find().populate("maquinas");
     res.json(casinos);
   } catch (error) {
     res.status(500).json({
@@ -18,22 +18,20 @@ export const getAllCasinos = async (req, res) => {
 // Obtener un casino por ID
 export const getCasinoById = async (req, res) => {
   try {
-    const casino = await Casino.findById(req.params.id).populate('maquinas');
-    if (!casino) return res.status(404).json({ message: "Casino no encontrado" });
+    const casino = await Casino.findById(req.params.id).populate("maquinas");
+    if (!casino)
+      return res.status(404).json({ message: "Casino no encontrado" });
     res.json(casino);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener el casino", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error al obtener el casino", error: error.message });
   }
 };
 
 // Crear un nuevo casino
 export const createCasino = async (req, res) => {
-  const {
-    nombreCasino,
-    ciudadCasino,
-    direccionCasino,
-    maquinas,
-  } = req.body;
+  const { nombreCasino, ciudadCasino, direccionCasino, maquinas } = req.body;
 
   let imgCasino = {};
   let documentacionCasino = [];
@@ -52,7 +50,7 @@ export const createCasino = async (req, res) => {
   if (req.files && req.files.documentacionCasino) {
     if (Array.isArray(req.files.documentacionCasino)) {
       for (let file of req.files.documentacionCasino) {
-        const result = await uploadFile(file.tempFilePath, 'Documentos');
+        const result = await uploadFile(file.tempFilePath, "Documentos");
         await fs.remove(file.tempFilePath);
         documentacionCasino.push({
           url: result.secure_url,
@@ -60,7 +58,10 @@ export const createCasino = async (req, res) => {
         });
       }
     } else {
-      const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
+      const result = await uploadFile(
+        req.files.documentacionCasino.tempFilePath,
+        "Documentos"
+      );
       await fs.remove(req.files.documentacionCasino.tempFilePath);
       documentacionCasino.push({
         url: result.secure_url,
@@ -91,12 +92,7 @@ export const createCasino = async (req, res) => {
 
 // Actualizar un casino existente
 export const updateCasino = async (req, res) => {
-  const {
-    nombreCasino,
-    ciudadCasino,
-    direccionCasino,
-    maquinas,
-  } = req.body;
+  const { nombreCasino, ciudadCasino, direccionCasino, maquinas } = req.body;
 
   let updatedFields = {
     nombreCasino,
@@ -136,7 +132,7 @@ export const updateCasino = async (req, res) => {
     updatedFields.documentacionCasino = [];
     if (Array.isArray(req.files.documentacionCasino)) {
       for (let file of req.files.documentacionCasino) {
-        const result = await uploadFile(file.tempFilePath, 'Documentos');
+        const result = await uploadFile(file.tempFilePath, "Documentos");
         await fs.remove(file.tempFilePath);
         updatedFields.documentacionCasino.push({
           url: result.secure_url,
@@ -144,7 +140,10 @@ export const updateCasino = async (req, res) => {
         });
       }
     } else {
-      const result = await uploadFile(req.files.documentacionCasino.tempFilePath, 'Documentos');
+      const result = await uploadFile(
+        req.files.documentacionCasino.tempFilePath,
+        "Documentos"
+      );
       await fs.remove(req.files.documentacionCasino.tempFilePath);
       updatedFields.documentacionCasino.push({
         url: result.secure_url,
@@ -154,8 +153,13 @@ export const updateCasino = async (req, res) => {
   }
 
   try {
-    const updatedCasino = await Casino.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
-    if (!updatedCasino) return res.status(404).json({ message: "Casino no encontrado" });
+    const updatedCasino = await Casino.findByIdAndUpdate(
+      req.params.id,
+      updatedFields,
+      { new: true }
+    );
+    if (!updatedCasino)
+      return res.status(404).json({ message: "Casino no encontrado" });
     res.json(updatedCasino);
   } catch (error) {
     res.status(500).json({
@@ -169,7 +173,8 @@ export const updateCasino = async (req, res) => {
 export const deleteCasino = async (req, res) => {
   try {
     const casino = await Casino.findByIdAndDelete(req.params.id);
-    if (!casino) return res.status(404).json({ message: "Casino no encontrado" });
+    if (!casino)
+      return res.status(404).json({ message: "Casino no encontrado" });
 
     if (casino.imgCasino && casino.imgCasino.public_id) {
       await deleteImage(casino.imgCasino.public_id);
@@ -185,6 +190,8 @@ export const deleteCasino = async (req, res) => {
 
     res.json({ message: "Casino eliminado con éxito" });
   } catch (error) {
-    res.status(500).json({ message: "Error al eliminar el casino", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error al eliminar el casino", error: error.message });
   }
 };

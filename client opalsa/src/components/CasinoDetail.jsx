@@ -100,11 +100,17 @@ const CasinoDetail = ({
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div className="flex items-center justify-center">
                       <div className="w-16 h-16 mr-2">
-                        <img
-                          src={maquina.imgMaquina.url}
-                          alt="Logo Maquina"
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                        {maquina.imgMaquina && maquina.imgMaquina.url ? (
+                          <img
+                            src={maquina.imgMaquina.url}
+                            alt="Logo Maquina"
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+                            <span>No Imagen</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>

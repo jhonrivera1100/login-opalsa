@@ -15,7 +15,8 @@ import AppAdmin from "./pages/appAdmin";
 import NotificacionesAdmin from "./pages/notificacionesAdmin";
 import GestionUsuarios from "./pages/GestionUsuarios";
 import RegistrarNotifi from "./pages/registrarNotifiAdm";
-import { MaquinasProvider } from "./context/MaquinasContext";
+import { MaquinasProvider } from "./context/MaquinasContext"
+import { ElementosProvider } from "./context/ElementosContext";
 import { ComponentesProvider } from "./context/ComponentesContext";
 import { NotificacionesProvider } from "./context/NotificacionesContext";
 import { CasinosProvider } from "./context/CasinosContext";
@@ -25,6 +26,7 @@ function App() {
   return (
     <AuthProvider>
       <CasinosProvider>
+        <ElementosProvider>
         <MaquinasProvider>
           <ComponentesProvider>
             <NotificacionesProvider>
@@ -50,6 +52,7 @@ function App() {
             </NotificacionesProvider>
           </ComponentesProvider>
         </MaquinasProvider>
+        </ElementosProvider>
       </CasinosProvider>
     </AuthProvider>
   );
