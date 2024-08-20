@@ -1,10 +1,11 @@
-// context/ElementosContext.js
 import React, { createContext, useContext, useState } from "react";
 import {
   getElementosRequest,
+  getElementoRequest,
   createElementosRequest,
   updateElementosRequest,
   deleteElementosRequest,
+  getElementosByCasinoRequest, // nueva función para obtener elementos por casino
 } from "../api/elementos";
 
 const ElementosContext = createContext();
@@ -26,7 +27,15 @@ export function ElementosProvider({ children }) {
       setElementos(res.data);
     } catch (error) {
       console.error("Error al obtener los elementos:", error);
-      throw error;
+    }
+  };
+
+  const getElementosByCasino = async (casinoId) => {
+    try {
+      const res = await getElementosByCasinoRequest(casinoId);
+      setElementos(res.data);
+    } catch (error) {
+      console.error("Error al obtener los elementos del casino:", error);
     }
   };
 
@@ -36,19 +45,19 @@ export function ElementosProvider({ children }) {
       setElementos([...elementos, res.data]);
     } catch (error) {
       console.error("Error al crear el elemento:", error);
-      throw error;
     }
   };
 
-  const updateElemento = async (id, newData) => {
+  const updateElemento = async (elementoData) => {
     try {
-      const res = await updateElementosRequest(id, newData);
-      setElementos(elementos.map((elemento) => 
-        elemento._id === id ? res.data : elemento
-      ));
+      const res = await updateElementosRequest(elementoData);
+      setElementos(
+        elementos.map((elemento) =>
+          elemento._id === res.data._id ? res.data : elemento
+        )
+      );
     } catch (error) {
       console.error("Error al actualizar el elemento:", error);
-      throw error;
     }
   };
 
@@ -58,7 +67,6 @@ export function ElementosProvider({ children }) {
       setElementos(elementos.filter((elemento) => elemento._id !== id));
     } catch (error) {
       console.error("Error al eliminar el elemento:", error);
-      throw error;
     }
   };
 
@@ -67,6 +75,7 @@ export function ElementosProvider({ children }) {
       value={{
         elementos,
         getElementos,
+        getElementosByCasino,
         createElemento,
         updateElemento,
         deleteElemento,

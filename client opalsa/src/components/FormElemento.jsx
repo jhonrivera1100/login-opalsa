@@ -161,20 +161,6 @@ function FormElemento({ closeModal }) {
         >
           Guardar Elemento
         </button>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 ml-4"
-        >
-          Limpiar
-        </button>
-        <button
-          type="button"
-          onClick={closeModal}
-          className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 ml-4"
-        >
-          Cerrar
-        </button>
       </div>
     </form>
   );

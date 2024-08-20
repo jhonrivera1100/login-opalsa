@@ -169,6 +169,24 @@ export const updateCasino = async (req, res) => {
   }
 };
 
+export const getCasinoElementos = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const casino = await Casino.findById(id).populate("elementos");
+
+    if (!casino) {
+      return res.status(404).json({ message: "Casino no encontrado" });
+    }
+
+    res.json(casino.elementos);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al obtener los elementos del casino",
+      error: error.message,
+    });
+  }
+};
+
 // Eliminar un casino
 export const deleteCasino = async (req, res) => {
   try {

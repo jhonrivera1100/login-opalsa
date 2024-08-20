@@ -6,12 +6,14 @@ import {
   crearElemento,
   eliminarElemento,
   actualizarElemento,
+  traerElementosPorCasino, // Asegúrate de implementar este método en tu controlador
 } from "../controllers/elementos.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createElementoSchema } from "../schemas/elementos.schema.js";
 
 const router = Router();
 
+// Rutas para elementos
 router.get("/elemento", authRequired, traerElementos);
 router.get("/elemento/:id", authRequired, traerElemento);
 router.post(
@@ -22,5 +24,8 @@ router.post(
 );
 router.delete("/elemento/:id", authRequired, eliminarElemento);
 router.put("/elemento/:id", authRequired, actualizarElemento);
+
+// Ruta para obtener elementos por casino
+router.get("/casinos/:casinoId/elemento", authRequired, traerElementosPorCasino);
 
 export default router;

@@ -26,9 +26,9 @@ function App() {
   return (
     <AuthProvider>
       <CasinosProvider>
+      <MaquinasProvider>
         <ElementosProvider>
-        <MaquinasProvider>
-          <ComponentesProvider>
+        <ComponentesProvider>
             <NotificacionesProvider>
               <BrowserRouter>
                 <Routes>
@@ -51,8 +51,8 @@ function App() {
               </BrowserRouter>
             </NotificacionesProvider>
           </ComponentesProvider>
-        </MaquinasProvider>
         </ElementosProvider>
+        </MaquinasProvider>
       </CasinosProvider>
     </AuthProvider>
   );

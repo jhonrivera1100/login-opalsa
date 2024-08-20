@@ -1,7 +1,9 @@
 // src/components/CasinoDetail.js
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapMarkerAlt, faMapMarkedAlt } from "@fortawesome/free-solid-svg-icons";
+import { useElementos } from '../context/ElementosContext';
+import ElementsModal from './ElementsModal';
 
 const CasinoDetail = ({
   selectedCasino,
@@ -14,6 +16,14 @@ const CasinoDetail = ({
   setSelectedMaquina,
   setSelectedCasino
 }) => {
+  const { getElementosByCasino } = useElementos();
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = async () => {
+    await getElementosByCasino(selectedCasino._id);
+    setShowModal(true);
+  };
+
   return (
     <div className="mx-auto w-10/12 h-144 overflow-auto p-4 bg-casino-background bg-cover bg-center">
       <div className="relative flex flex-col items-center">
@@ -165,7 +175,18 @@ const CasinoDetail = ({
             </tbody>
           </table>
         </div>
+        <button
+          onClick={handleOpenModal}
+          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md mt-4"
+        >
+          Elementos en el casino
+        </button>
       </div>
+      <ElementsModal
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        casinoId={selectedCasino._id}
+      />
     </div>
   );
 };
