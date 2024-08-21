@@ -40,10 +40,16 @@ function MaquinaCard({ maquina }) {
         onMouseLeave={handleMouseLeave}
       >
         <div className="relative">
-          <img
-            src={maquina.imgMaquina.url}
-            className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg"
-          />
+          {maquina.imgMaquina && maquina.imgMaquina.url ? (
+            <img
+              src={maquina.imgMaquina.url}
+              className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg"
+            />
+          ) : (
+            <div className="w-full h-[400px] bg-gray-300 flex items-center justify-center rounded-lg shadow-lg">
+              <span className="text-gray-500">No Image Available</span>
+            </div>
+          )}
           {hovered && (
             <div className="absolute inset-0 bg-white bg-opacity-50 transition-opacity duration-300"></div>
           )}
