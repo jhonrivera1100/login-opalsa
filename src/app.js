@@ -12,9 +12,13 @@ import maquinaRoutes from './routes/maquinas.routes.js';
 import casinosRoutes from './routes/casinos.routes.js';
 import componenteRoutes from './routes/componente.routes.js';
 import mantenimientoRoutes from './routes/mantenimiento.routes.js';
-import movimientosCRoutes from './routes/movimientosC.routes.js'; 
+import movimientosCRoutes from './routes/movimientosC.routes.js';
 import moviMaquinasRoutes from './routes/moviMaquinas.routes.js';
+<<<<<<< HEAD
 import ordenRoutes from './routes/orden.routes.js';
+=======
+import elementosRoutes from './routes/elementos.routes.js'; // Importa las rutas de elementos
+>>>>>>> c4984a03e87dec6484f4ef9e4b2cce36895ad9d3
 
 const app = express();
 
@@ -41,9 +45,13 @@ app.use('/api', maquinaRoutes);
 app.use('/api', casinosRoutes);
 app.use('/api', componenteRoutes);
 app.use('/api', mantenimientoRoutes);
-app.use('/api', movimientosCRoutes); 
+app.use('/api', movimientosCRoutes);
 app.use('/api', moviMaquinasRoutes);
+<<<<<<< HEAD
 app.use('/api', ordenRoutes); 
+=======
+app.use('/api', elementosRoutes); // Agrega las rutas de elementos
+>>>>>>> c4984a03e87dec6484f4ef9e4b2cce36895ad9d3
 
 // Middleware para servir archivos estáticos
 app.use('/upload', express.static(path.join(__dirname, 'upload')));

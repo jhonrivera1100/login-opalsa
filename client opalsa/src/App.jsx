@@ -15,7 +15,13 @@ import GestionMaquinas from "./pages/GestionMaquinas";
 import AppAdmin from "./pages/appAdmin";
 import NotificacionesAdmin from "./pages/notificacionesAdmin";
 import GestionUsuarios from "./pages/GestionUsuarios";
+<<<<<<< HEAD
 import { MaquinasProvider } from "./context/MaquinasContext";
+=======
+import RegistrarNotifi from "./pages/registrarNotifiAdm";
+import { MaquinasProvider } from "./context/MaquinasContext"
+import { ElementosProvider } from "./context/ElementosContext";
+>>>>>>> c4984a03e87dec6484f4ef9e4b2cce36895ad9d3
 import { ComponentesProvider } from "./context/ComponentesContext";
 import { NotificacionesProvider } from "./context/NotificacionesContext";
 import { CasinosProvider } from "./context/CasinosContext";
@@ -25,8 +31,9 @@ function App() {
   return (
     <AuthProvider>
       <CasinosProvider>
-        <MaquinasProvider>
-          <ComponentesProvider>
+      <MaquinasProvider>
+        <ElementosProvider>
+        <ComponentesProvider>
             <NotificacionesProvider>
               <BrowserRouter>
                 <Routes>
@@ -49,6 +56,7 @@ function App() {
               </BrowserRouter>
             </NotificacionesProvider>
           </ComponentesProvider>
+        </ElementosProvider>
         </MaquinasProvider>
       </CasinosProvider>
     </AuthProvider>
