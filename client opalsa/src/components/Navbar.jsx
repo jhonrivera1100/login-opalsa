@@ -11,6 +11,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+import { AiFillContainer } from "react-icons/ai";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
@@ -93,8 +94,9 @@ function Navbar() {
   const userLinks = (
     <>
       {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
-      {renderLink("/registroNotifi", <FaTools className={getIconClass("/registroNotifi")} />, "Notificar")}
+      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
       {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
+      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden")}
     </>
   );
 

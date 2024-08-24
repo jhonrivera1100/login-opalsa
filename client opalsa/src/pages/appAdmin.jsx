@@ -82,7 +82,7 @@ function AppAdmin() {
               <ul className='w-full overflow-y-auto max-h-[315px]'>
                 {recordatorios.map(recordatorio => (
                   <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
-                    <div>
+                    <div >
                       <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
                       <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
                     </div>
