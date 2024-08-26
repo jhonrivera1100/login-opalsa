@@ -344,7 +344,7 @@ function ModalMaquina({ maquina, onClose }) {
                     onClick={() => setShowAgregarModal(true)}
                     className="bg-blue-500 text-white px-2 py-2 rounded"
                   >
-                    Agregar Componente
+                    Agregar Componente    
                   </button>
                   <button
                     onClick={() => setShowTransferirModal(true)}
@@ -362,7 +362,7 @@ function ModalMaquina({ maquina, onClose }) {
           <AgregarComponenteModal
             maquinaId={maquina._id}
             onClose={() => setShowAgregarModal(false)}
-          />
+          />                                           
         )}
 
         {showTransferirModal && (

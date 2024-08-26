@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useElementos } from "../context/ElementosContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileAlt, faEdit, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faFileAlt, faEdit, faSave, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
 const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
-  const { getElementosByCasino, elementos, updateElemento } = useElementos();
+  const { getElementosByCasino, elementos, updateElemento, deleteElemento } = useElementos();
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editedData, setEditedData] = useState({});
-  
+
   useEffect(() => {
     if (isOpen && casinoId) {
       if (!hasFetched) {
@@ -47,6 +47,7 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
       nombreElemento: elemento.nombreElemento,
       marcaElemento: elemento.marcaElemento,
       tipoElemento: elemento.tipoElemento,
+      codigoElemento: elemento.codigoElemento, // Nuevo campo
     });
   };
 
@@ -59,6 +60,12 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
     setEditedData({ ...editedData, [e.target.name]: e.target.value });
   };
 
+  const handleDelete = (id) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este elemento?")) {
+      deleteElemento(id);
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -67,7 +74,7 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
       className="fixed inset-0 flex items-center justify-center z-50"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50"
     >
-      <div className="relative bg-white p-4 rounded-lg w-full max-w-4xl h-3/4 overflow-y-auto">
+      <div className="relative bg-white p-4 rounded-lg w-full max-w-5xl h-3/4 overflow-y-auto">
         <button
           onClick={onRequestClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -108,11 +115,17 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
                     <th className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider">
                       Tipo
                     </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider">
+                      Código
+                    </th>
                     <th className="px-6 py-3 text-center text-sm font-medium text-blue-600 uppercase tracking-wider">
                       Documentación
                     </th>
                     <th className="px-6 py-3 text-center text-sm font-medium text-blue-600 uppercase tracking-wider">
                       Editar
+                    </th>
+                    <th className="px-6 py-3 text-center text-sm font-medium text-blue-600 uppercase tracking-wider">
+                      Eliminar
                     </th>
                   </tr>
                 </thead>
@@ -122,10 +135,10 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
                       <tr key={elemento._id} className="hover:bg-gray-50">
                         <td
                           className="px-6 py-3 text-sm font-medium text-gray-900"
-                          onMouseEnter={() => handleMouseEnter(elemento.imgElemento.url)}
+                          onMouseEnter={() => handleMouseEnter(elemento.imgElemento?.url)}
                           onMouseLeave={handleMouseLeave}
                         >
-                          {elemento.imgElemento && elemento.imgElemento.url ? (
+                          {elemento.imgElemento?.url ? (
                             <img
                               src={elemento.imgElemento.url}
                               alt={elemento.nombreElemento}
@@ -174,9 +187,22 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
                             elemento.tipoElemento
                           )}
                         </td>
+                        <td className="px-6 py-3 text-sm text-gray-500">
+                          {editingId === elemento._id ? (
+                            <input
+                              type="text"
+                              name="codigoElemento"
+                              value={editedData.codigoElemento}
+                              onChange={handleChange}
+                              className="w-full border-b-2 focus:outline-none focus:border-blue-600"
+                            />
+                          ) : (
+                            elemento.codigoElemento
+                          )}
+                        </td>
                         <td className="px-6 py-3 text-center text-sm text-gray-500">
                           <div className="flex justify-center items-center h-12">
-                            {elemento.documentacionElemento && elemento.documentacionElemento.length > 0 && elemento.documentacionElemento[0].url ? (
+                            {elemento.documentacionElemento?.[0]?.url ? (
                               <a
                                 href={elemento.documentacionElemento[0].url}
                                 target="_blank"
@@ -209,20 +235,35 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
                             </button>
                           )}
                         </td>
+                        <td className="px-6 py-3 text-center">
+                          <button onClick={() => handleDelete(elemento._id)}>
+                            <FontAwesomeIcon
+                              icon={faTrashAlt}
+                              className="text-red-600 text-lg cursor-pointer"
+                            />
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td className="px-6 py-3 text-center" colSpan="6">
-                        No se encontraron elementos para este casino.
+                      <td
+                        colSpan="8"
+                        className="text-center text-sm font-medium text-gray-500 py-4"
+                      >
+                        No se encontraron elementos en este casino.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
               {zoomedImage && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-2 p-4 bg-white shadow-lg border border-gray-200 rounded-lg">
-                  <img src={zoomedImage} alt="Zoomed" className="w-64 h-64 object-cover rounded-lg" />
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-75 p-2 rounded-lg">
+                  <img
+                    src={zoomedImage}
+                    alt="Zoomed"
+                    className="max-w-xs max-h-xs object-contain"
+                  />
                 </div>
               )}
             </div>
