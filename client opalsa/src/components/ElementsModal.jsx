@@ -94,7 +94,7 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
             />
           </svg>
         </button>
-        <h2 className="text-2xl text-center font-bold mb-4">Elementos en el Casino</h2>
+        <h2 className="text-2xl text-center text-slate-500 font-bold mb-4">Elementos en el Casino</h2>
         <div className="w-full">
           {isLoading ? (
             <p className="text-center">Cargando...</p>

@@ -16,7 +16,7 @@ const CasinoDetail = ({
   setSelectedMaquina,
   setSelectedCasino
 }) => {
-  const { getElementosByCasino } = useElementos();
+  const { getElementosByCasino, elementos } = useElementos(); // Asegúrate de que `elementos` esté en el contexto
   const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = async () => {
@@ -65,6 +65,16 @@ const CasinoDetail = ({
         </div>
 
         <div className="flex mt-8 w-full justify-center items-center">
+        <button
+  onClick={handleOpenModal}
+  className="bg-white text-blue-500 font-bold py-2 px-4 rounded-md 
+             transition duration-300 ease-in-out 
+             hover:bg-blue-500 hover:text-white 
+             hover:shadow-lg hover:scale-105"
+>
+  Elementos en el casino
+</button>
+
           <input
             type="text"
             value={searchQuery}
@@ -167,21 +177,17 @@ const CasinoDetail = ({
               ))}
               {filteredMaquinas.length === 0 && (
                 <tr>
-                  <td className="px-4 py-2 text-center" colSpan="6">
-                    No se encontraron máquinas para este casino.
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                    No hay máquinas disponibles
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        <button
-          onClick={handleOpenModal}
-          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-md mt-4"
-        >
-          Elementos en el casino
-        </button>
+
       </div>
+
       <ElementsModal
         isOpen={showModal}
         onRequestClose={() => setShowModal(false)}
