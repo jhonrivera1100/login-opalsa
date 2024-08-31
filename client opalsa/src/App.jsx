@@ -9,12 +9,12 @@ import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./ProtectedRoute";
 import Historial from "./pages/Historial";
+import RespuestasOrden from "./pages/RespuestasOrden";
 import RegistroMantenimiento from "./pages/RegistroMantenimiento";
 import GestionMaquinas from "./pages/GestionMaquinas";
 import AppAdmin from "./pages/appAdmin";
 import NotificacionesAdmin from "./pages/notificacionesAdmin";
 import GestionUsuarios from "./pages/GestionUsuarios";
-import RegistrarNotifi from "./pages/registrarNotifiAdm";
 import { MaquinasProvider } from "./context/MaquinasContext"
 import { ElementosProvider } from "./context/ElementosContext";
 import { ComponentesProvider } from "./context/ComponentesContext";
@@ -37,14 +37,14 @@ function App() {
                   <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/registroNotifi" element={<RegistrarNotifi />} />
+                    <Route path="/RegistroMantenimiento" element={<RegistroMantenimiento />} />
+                    <Route path="/RespuestasOrden" element={<RespuestasOrden />} />
                     <Route element={<ProtectedAdmin />}>
                       <Route path="/admin" element={<AppAdmin />} />
                       <Route path="/Usuarios" element={<GestionUsuarios />} />
                       <Route path="/notifi" element={<NotificacionesAdmin />} />
                     <Route path="/Historial" element={<Historial />} />
                     <Route path="/GestionMaquinas" element={<GestionMaquinas />} />
-                    <Route path="/RegistroMantenimiento" element={<RegistroMantenimiento />} />
                     </Route>
                   </Route>
                 </Routes>
