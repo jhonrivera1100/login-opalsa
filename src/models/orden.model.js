@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const OrdenSchema = new mongoose.Schema({
   fechaOrden: { type: Date, required: true },
+  estadoOrden: { type: String, required: true, default: 'Orden en solicitud' },
   descripcionOrden: { type: String, required: true },
   nroSerieMaquina: { type: String, required: true },
   ubicacionMaquina: { type: String, required: true },
@@ -22,6 +23,5 @@ const OrdenSchema = new mongoose.Schema({
   aceptado: { type: Boolean, default: false },
   sobrantes: { type: String }
 });
-
 
 export default mongoose.model('Orden', OrdenSchema);

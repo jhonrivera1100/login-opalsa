@@ -36,12 +36,12 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Previene la actualización de la página
-  
+
     const componentesAsignados = selectedComponentes.map((comp) => ({
       serialComponente: comp.value,
       nombreComponente: comp.label,
     }));
-  
+
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
         fechaOrden: new Date(), // Ajusta si es necesario
@@ -51,13 +51,14 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         usuario,
         componentes: selectedComponentes.map(comp => comp.value), // Envia los valores seleccionados
         componentesAsignados,
-        sobrantes
+        sobrantes,
+        estadoOrden: 'Orden aceptada en proceso' // Actualiza el campo estadoOrden
       });
       console.log('Orden actualizada:', response.data);
       if (typeof onOrderAccepted === 'function') {
         onOrderAccepted(response.data); // Llama al callback solo si es una función
       }
-      setSuccessMessage('Componentes enviados exitosamente');
+      setSuccessMessage('Orden aceptada y enviada exitosamente');
       setTimeout(() => {
         onClose();
       }, 1000);
@@ -65,7 +66,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
       console.error('Error al actualizar la orden:', error.response ? error.response.data : error.message);
     }
   };
-  
 
   const componenteOptions = componentes.map((componente) => ({
     value: componente.serialComponente,
