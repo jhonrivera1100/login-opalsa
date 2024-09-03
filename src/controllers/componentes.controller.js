@@ -1,6 +1,6 @@
 import Componente from "../models/componente.model.js";
 import Maquinas from "../models/maquina.model.js";
-import { uploadFile } from "../libs/cloudinary.js";
+import { uploadFile, deleteImage } from "../libs/cloudinary.js";
 import fs from 'fs-extra';
 
 // Obtener todos los componentes
@@ -30,17 +30,17 @@ export const createComponente = async (req, res) => {
 
   let documentoComponente = {};
 
-  // Manejo del documento del componente
-  if (req.files && req.files.documentoComponente) {
-    const result = await uploadFile(req.files.documentoComponente.tempFilePath, 'Documentos');
-    await fs.remove(req.files.documentoComponente.tempFilePath);
-    documentoComponente = {
-      url: result.secure_url,
-      public_id: result.public_id,
-    };
-  }
-
   try {
+    // Manejo del documento del componente
+    if (req.files && req.files.documentoComponente) {
+      const result = await uploadFile(req.files.documentoComponente.tempFilePath, 'Documentos');
+      await fs.remove(req.files.documentoComponente.tempFilePath);
+      documentoComponente = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
+
     const nuevoComponente = new Componente({
       serialComponente,
       nombreComponente,
@@ -60,23 +60,21 @@ export const createComponente = async (req, res) => {
 
     res.status(201).json(componenteGuardado);
   } catch (error) {
-    res.status(400).json({ message: 'Error al crear el componente', error });
+    res.status(400).json({ message: 'Error al crear el componente', error: error.message });
   }
 };
 
 // Actualizar un componente por ID
 export const updateComponenteById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { maquina: nuevaMaquina } = req.body;
+  const { id } = req.params;
+  const { serialComponente, nombreComponente, marcaComponente, maquina: nuevaMaquina } = req.body;
 
-    // Obtener el componente actual
+  try {
     const componente = await Componente.findById(id);
     if (!componente) return res.status(404).json({ message: 'Componente no encontrado' });
 
     let documentoComponente = componente.documentoComponente;
 
-    // Si el documento del componente está cambiando, actualizarlo
     if (req.files && req.files.documentoComponente) {
       // Eliminar el documento actual de Cloudinary
       if (documentoComponente.public_id) {
@@ -93,7 +91,7 @@ export const updateComponenteById = async (req, res) => {
     }
 
     // Si la máquina está cambiando, actualizar las máquinas involucradas
-    if (componente.maquina.toString() !== nuevaMaquina) {
+    if (nuevaMaquina && componente.maquina.toString() !== nuevaMaquina) {
       // Remover el componente de la máquina actual
       const maquinaActual = await Maquinas.findById(componente.maquina);
       if (maquinaActual) {
@@ -107,16 +105,22 @@ export const updateComponenteById = async (req, res) => {
         maquinaNueva.componentes.push(componente._id);
         await maquinaNueva.save();
       }
+
+      // Actualizar la máquina del componente
+      componente.maquina = nuevaMaquina;
     }
 
-    // Actualizar el componente con la nueva máquina y el nuevo documento
-    componente.maquina = nuevaMaquina;
+    // Actualizar el componente con la nueva información
+    componente.serialComponente = serialComponente || componente.serialComponente;
+    componente.nombreComponente = nombreComponente || componente.nombreComponente;
+    componente.marcaComponente = marcaComponente || componente.marcaComponente;
     componente.documentoComponente = documentoComponente;
+
     const componenteActualizado = await componente.save();
 
     res.json(componenteActualizado);
   } catch (error) {
-    res.status(400).json({ message: 'Error al actualizar el componente', error });
+    res.status(400).json({ message: 'Error al actualizar el componente', error: error.message });
   }
 };
 
@@ -140,6 +144,6 @@ export const deleteComponenteById = async (req, res) => {
 
     res.json(componenteEliminado);
   } catch (error) {
-    res.status(400).json({ message: 'Error al eliminar el componente', error });
+    res.status(400).json({ message: 'Error al eliminar el componente', error: error.message });
   }
 };

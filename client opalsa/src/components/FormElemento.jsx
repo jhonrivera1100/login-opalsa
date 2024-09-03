@@ -9,6 +9,7 @@ function FormElemento({ closeModal }) {
   const [casinos, setCasinos] = useState([]);
   const [formData, setFormData] = useState({
     nombreElemento: "",
+    codigoElemento: "", // Nuevo campo
     marcaElemento: "",
     tipoElemento: "",
     ubicacionDeElemento: "",
@@ -40,6 +41,7 @@ function FormElemento({ closeModal }) {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("nombreElemento", data.nombreElemento);
+      formDataToSend.append("codigoElemento", data.codigoElemento); // Nuevo campo
       formDataToSend.append("marcaElemento", data.marcaElemento);
       formDataToSend.append("tipoElemento", data.tipoElemento);
       formDataToSend.append("ubicacionDeElemento", data.ubicacionDeElemento);
@@ -63,6 +65,7 @@ function FormElemento({ closeModal }) {
     reset();
     setFormData({
       nombreElemento: "",
+      codigoElemento: "", // Nuevo campo
       marcaElemento: "",
       tipoElemento: "",
       ubicacionDeElemento: "",
@@ -82,6 +85,19 @@ function FormElemento({ closeModal }) {
           name="nombreElemento"
           {...register("nombreElemento", { required: true })}
           placeholder="Nombre del Elemento"
+          onChange={(e) => handleInputChange(e)}
+          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+        />
+      </div>
+      <div>
+        <label htmlFor="codigoElemento" className="text-black font-bold block mb-1">
+          Código del Elemento:
+        </label>
+        <input
+          type="text"
+          name="codigoElemento"
+          {...register("codigoElemento", { required: true })} // Nuevo campo
+          placeholder="Código del Elemento"
           onChange={(e) => handleInputChange(e)}
           className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
         />

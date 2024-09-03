@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
-import { createMaquinasRequest } from "../api/maquinas.js";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  getMaquinasRequest,
+  getMaquinaRequest,
+  createMaquinasRequest,
+  updateMaquinasRequest,
+  deleteMaquinasRequest
+} from "../api/maquinas.js";
 
 const MaquinaContext = createContext();
 
@@ -14,16 +20,31 @@ export const useMaquinas = () => {
 export function MaquinasProvider({ children }) {
   const [maquinas, setMaquinas] = useState([]);
 
+  const loadMaquinas = async () => {
+    const res = await getMaquinasRequest();
+    setMaquinas(res.data);
+  };
+
   const createMaquina = async (maquinaData) => {
     const res = await createMaquinasRequest(maquinaData);
-    console.log(res);
+    setMaquinas([...maquinas, res.data]);
   };
+
+  const deleteMaquina = async (id) => {
+    await deleteMaquinasRequest(id);
+    setMaquinas(maquinas.filter((maquina) => maquina._id !== id));
+  };
+
+  useEffect(() => {
+    loadMaquinas();
+  }, []);
 
   return (
     <MaquinaContext.Provider
       value={{
         maquinas,
         createMaquina,
+        deleteMaquina, // Añadido en el contexto
       }}
     >
       {children}

@@ -46,6 +46,7 @@ export const traerElementosPorCasino = async (req, res) => {
 export const crearElemento = async (req, res) => {
   const {
     nombreElemento,
+    codigoElemento,  // Campo nuevo
     marcaElemento,
     tipoElemento,
     ubicacionDeElemento,
@@ -75,12 +76,12 @@ export const crearElemento = async (req, res) => {
 
     const newElemento = new Elementos({
       nombreElemento,
+      codigoElemento,  // Campo nuevo
       marcaElemento,
       tipoElemento,
       imgElemento,
       documentacionElemento,
       ubicacionDeElemento,
-      user: req.user.id, // Asegúrate de que req.user.id está disponible
     });
 
     const elementoGuardado = await newElemento.save();
@@ -97,6 +98,7 @@ export const crearElemento = async (req, res) => {
 export const actualizarElemento = async (req, res) => {
   const {
     nombreElemento,
+    codigoElemento,  // Campo nuevo
     marcaElemento,
     tipoElemento,
     ubicacionDeElemento,
@@ -104,6 +106,7 @@ export const actualizarElemento = async (req, res) => {
 
   let updatedFields = {
     nombreElemento,
+    codigoElemento,  // Campo nuevo
     marcaElemento,
     tipoElemento,
     ubicacionDeElemento,

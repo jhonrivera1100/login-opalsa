@@ -7,6 +7,11 @@ const elementoSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    codigoElemento: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     marcaElemento: {
       type: String,
       required: true,
