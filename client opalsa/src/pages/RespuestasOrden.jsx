@@ -8,7 +8,13 @@ import Modal from "../components/ModalNotificaciones";
 const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedOrden, setSelectedOrden] = useState(null);
+  const [descripcionCompleta, setDescripcionCompleta] = useState("");
+  const [usuarioCompleto, setUsuarioCompleto] = useState("");
+  const [serialCompleto, setSerialCompleto] = useState("");
 
   const { user, loading } = useAuth();
 
@@ -39,7 +45,20 @@ const RespuestasOrden = () => {
     setShowModal(true);
   };
 
-  
+  const handleDescriptionClick = (descripcionOrden) => {
+    setDescripcionCompleta(descripcionOrden);
+    setShowDescriptionModal(true);
+  };
+
+  const handleUserClick = (usuario) => {
+    setUsuarioCompleto(usuario.username || "Desconocido");
+    setShowUserModal(true);
+  };
+
+  const handleSerialClick = (nroSerieMaquina) => {
+    setSerialCompleto(nroSerieMaquina);
+    setShowSerialModal(true);
+  };
 
   const updateOrdenInState = (updatedOrden) => {
     setOrdenes((prevOrdenes) => 
@@ -75,19 +94,43 @@ const RespuestasOrden = () => {
                 className={`relative py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl ${orden.aceptado ? 'bg-green-200' : 'bg-white'}`}
               >
                 <div className="">
-                  <p className="text-xl font-bold">Orden</p>
+                  <p className=" flex justify-center text-xl text-sidebar-100 font-bold mb-5">Mi Orden </p>
                   <div className="text-gray-600 mb-2">
-                    <strong>Orden:</strong> {orden.descripcionOrden.length > 10 ? `${orden.descripcionOrden.substring(0, 8)}...` : orden.descripcionOrden}
+                    <strong>Orden:</strong>{" "}
+                    <span
+                      className={`cursor-pointer ${orden.descripcionOrden.length > 10 ? "text-gray-500" : ""}`}
+                      onClick={() => {
+                        if (orden.descripcionOrden.length > 10) {
+                          handleDescriptionClick(orden.descripcionOrden);
+                        }
+                      }}
+                    >
+                      {orden.descripcionOrden.length > 10
+                        ? `${orden.descripcionOrden.substring(0, 8)}...`
+                        : orden.descripcionOrden}
+                    </span>
                   </div>
                   <div className="text-gray-600 mb-2">
-                    <strong>Maquina Serial:</strong> {orden.nroSerieMaquina}
+                    <strong>Maquina Serial:</strong>{" "}
+                    <span
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() => handleSerialClick(orden.nroSerieMaquina)}
+                    >
+                      {orden.nroSerieMaquina}
+                    </span>
                   </div>
                   <div className="text-gray-600 mb-2">
                     <strong>Ubicación Maquina:</strong> <br />
                     {orden.ubicacionMaquina}
                   </div>
                   <div className="text-gray-600 mb-2">
-                    <strong>Usuario:</strong> {orden.usuario?.username || "Desconocido"}
+                    <strong>Usuario:</strong>{" "}
+                    <span
+                      className="text-gray-500 cursor-pointer"
+                      onClick={() => handleUserClick(orden.usuario)}
+                    >
+                      {orden.usuario?.username || "Desconocido"}
+                    </span>
                   </div>
                   <div className="text-gray-600 mb-2">
                     <strong>Fecha:</strong> {new Date(orden.fechaOrden).toLocaleDateString()}
@@ -132,10 +175,38 @@ const RespuestasOrden = () => {
           </ul>
         </Modal>
       )}
+
+      {showDescriptionModal && (
+        <Modal
+          title="Descripción Completa de la Orden"
+          onClose={() => setShowDescriptionModal(false)}
+        >
+          <h2 className="font-bold text-2xl mb-3">Descripción Completa</h2>
+          <p className="text-gray-600 mb-2">{descripcionCompleta}</p>
+        </Modal>
+      )}
+
+      {showUserModal && (
+        <Modal
+          title="Usuario Completo"
+          onClose={() => setShowUserModal(false)}
+        >
+          <h2 className="font-bold text-2xl mb-3">Usuario</h2>
+          <p className="text-gray-600 mb-2">{usuarioCompleto}</p>
+        </Modal>
+      )}
+
+      {showSerialModal && (
+        <Modal
+          title="Número de Serie Completo"
+          onClose={() => setShowSerialModal(false)}
+        >
+          <h2 className="font-bold text-2xl mb-3">Número de Serie</h2>
+          <p className="text-gray-600 mb-2">{serialCompleto}</p>
+        </Modal>
+      )}
     </div>
   );
 };
 
 export default RespuestasOrden;
-
-  
