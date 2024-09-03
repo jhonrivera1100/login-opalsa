@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getOrdenes, createOrden, deleteOrden, respuestaOrden, getOrdenesByUser, obtenerOrdenPorId} from "../controllers/orden.controller.js";
+import {getOrdenes, createOrden, deleteOrden, updateOrdenAsignados, getOrdenesByUser, obtenerOrdenPorId, updateAceptar, updateOrdenSobrantes} from "../controllers/orden.controller.js";
 
 const router = Router();
 
@@ -17,12 +17,20 @@ router.get('/ordenes/:id', obtenerOrdenPorId);
 
 router.post("/ordenes", createOrden);
 
-// Responder a una orden
+// mandar componentes sobrantes
 
-router.put("/ordenes/:id", respuestaOrden);
+router.put("/ordenes/:id", updateOrdenAsignados);
+
+// post la orden con los sobrantes
+
+router.put('/ordenes/:id/sobrantes', updateOrdenSobrantes);
 
 // Eliminar una orden
 
 router.delete("/ordenes/:id", deleteOrden);
+
+// Aceptar una orden
+
+router.patch("/ordenes/:id/aceptar", updateAceptar);
 
 export default router;

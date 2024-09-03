@@ -77,41 +77,26 @@ export const createOrden = async (req, res) => {
   }
 };
 
-export const respuestaOrden = async (req, res) => {
+export const updateOrdenAsignados = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fechaOrden, descripcionOrden, nroSerieMaquina, ubicacionMaquina, componentes } = req.body;
+    const { componentes, sobrantes, componentesAsignados } = req.body;
 
-    // Encuentra la orden actual antes de actualizarla
-    const ordenExistente = await Orden.findById(id).populate('usuario');
-    if (!ordenExistente) {
-      return res.status(404).json({ message: 'Orden no encontrada' });
-    }
-
-    const { usuario } = ordenExistente; // Conserva el usuario original
-
-    const maquina = await Maquina.findOne({ nroSerieMaquina });
-    if (!maquina) {
-      return res.status(404).json({ message: 'Máquina no encontrada' });
-    }
-
-    const componentesIds = await Promise.all(componentes.map(async (comp) => {
-      const componente = await Componente.findOne({ serialComponente: comp.serialComponente });
+    // Convertir los seriales de componentes en ObjectIds
+    const componentesIds = await Promise.all(componentes.map(async (serial) => {
+      const componente = await Componente.findOne({ serialComponente: serial });
       if (!componente) {
-        throw new Error(`Componente con serial ${comp.serialComponente} no encontrado`);
+        throw new Error(`Componente con serial ${serial} no encontrado`);
       }
       return componente._id;
     }));
 
-    // Actualiza la orden con los nuevos datos, pero mantiene el usuario original
     const ordenActualizada = await Orden.findByIdAndUpdate(
       id,
-      {
-        fechaOrden,
-        descripcionOrden,
-        nroSerieMaquina,
-        ubicacionMaquina,
+      { 
         componentes: componentesIds,
+        sobrantes,
+        componentesAsignados 
       },
       { new: true }
     ).populate('usuario').populate('componentes');
@@ -122,13 +107,10 @@ export const respuestaOrden = async (req, res) => {
 
     res.status(200).json(ordenActualizada);
   } catch (error) {
-    console.error('Error en el servidor al actualizar la orden:', error.message, error.stack);
+    console.error('Error al actualizar la orden:', error.message);
     res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
   }
 };
-
-
-
 
 export const deleteOrden = async (req, res) => {
   try {
@@ -145,3 +127,62 @@ export const deleteOrden = async (req, res) => {
   }
 };
  
+export const updateAceptar = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { aceptado } = req.body;
+
+    // Verificar si la orden existe
+    const orden = await Orden.findById(id);
+    if (!orden) {
+      return res.status(404).json({ message: "Orden no encontrada." });
+    }
+
+    // Actualizar el campo "aceptado"
+    orden.aceptado = aceptado;
+    await orden.save();
+
+    // Enviar respuesta con la orden actualizada
+    res.status(200).json(orden);
+  } catch (error) {
+    console.error("Error al actualizar el estado de aceptado:", error);
+    res.status(500).json({ message: "Error al actualizar el estado de aceptado." });
+  }
+};
+
+export const updateOrdenSobrantes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { componentesAsignados, sobrantes, componenteSobrantes } = req.body;
+
+    const componentesIds = await Promise.all(componentesAsignados.map(async (serial) => {
+      const componente = await Componente.findOne({ serialComponente: serial });
+      if (!componente) {
+        throw new Error(`Componente con serial ${serial} no encontrado`);
+      }
+      return componente._id;
+    }));
+
+    const ordenActualizada = await Orden.findByIdAndUpdate(
+      id,
+      { 
+        componentes: componentesIds, 
+        sobrantes, 
+        componenteSobrantes // Asegúrate de que este campo sea el correcto
+      },
+      { new: true }
+    ).populate('usuario').populate('componentes');
+
+    if (!ordenActualizada) {
+      return res.status(404).json({ message: 'Orden no encontrada' });
+    }
+
+    res.status(200).json(ordenActualizada);
+  } catch (error) {
+    console.error('Error al actualizar la orden:', error.message);
+    res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
+  }
+};
+
+
+

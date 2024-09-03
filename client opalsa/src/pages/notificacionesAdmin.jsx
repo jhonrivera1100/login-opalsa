@@ -10,12 +10,14 @@ import { FaRegUser } from "react-icons/fa";
 import { GoDiscussionClosed } from "react-icons/go";
 import { BsFileEarmarkText } from "react-icons/bs";
 import debounce from 'lodash/debounce';
+import ModalSobrantes from "../components/ModalSobrantes";
 
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [modalOrdenVisible, setModalOrdenVisible] = useState(false);
+  const [showSobrantesModal, setShowSobrantesModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const { user, isAuthenticated } = useAuth();
 
@@ -133,6 +135,49 @@ const NotificacionesAdmin = () => {
     []
   );
 
+  const handleCheckboxAceptar = useCallback(
+    debounce(async (id, aceptar) => {
+      try {
+        console.log(`Actualizando orden ${id} a aceptado: ${!aceptar}`);
+        const response = await axios.patch(`/ordenes/${id}/aceptar`, { aceptado: !aceptar });
+        console.log('Respuesta del servidor:', response.data);
+  
+        // Actualiza el estado local con la respuesta del servidor
+        setCombinedItems(prevItems =>
+          prevItems.map(item =>
+            item._id === id ? { ...item, aceptado: response.data.aceptado } : item
+          )
+        );
+      } catch (error) {
+        console.error("Error al actualizar el estado de aceptado:", error);
+      }
+    }, 50), // Ajusta el debounce según sea necesario
+    []
+  );
+  
+
+
+  const handleOpenSobrantesModal = (item) => {
+    setSelectedItem(item);
+    setShowSobrantesModal(true);
+  };
+
+  const closeSobrantesModal = () => {
+    setShowSobrantesModal(false);
+    setSelectedItem(null);
+  };
+
+  const handleSaveSobrantes = (data) => {
+    setCombinedItems(prevItems =>
+      prevItems.map(item =>
+        item._id === selectedItem._id ? { ...item, ...data } : item
+      )
+    );
+    closeSobrantesModal();
+  };
+
+  
+
   return (
     <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen">
       <Sidebar />
@@ -156,10 +201,18 @@ const NotificacionesAdmin = () => {
           <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredItems.map((item) => (
-                <div
-                  key={item._id}
-                  className={`relative py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl ${item.type === "recordatorio" ? (item.visto ? 'bg-green-200' : 'bg-white') : 'bg-white'}`}
-                >
+               <div
+               key={item._id}
+               className={`relative py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl ${
+                 item.type === "recordatorio"
+                   ? item.visto
+                     ? "bg-green-200"
+                     : "bg-white"
+                   : item.aceptado // Añade la condición para cuando está aceptado
+                   ? "bg-green-200" // Color de fondo cuando está aceptado
+                   : "bg-white" // Color de fondo cuando no está aceptado
+               }`}
+             >
                   <div
                     className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${
                       item.type === "recordatorio" ? "bg-yellow-500" : "bg-green-500"
@@ -184,6 +237,19 @@ const NotificacionesAdmin = () => {
                       </>
                     )}
                   </div>
+                  <div className="flex items-center justify-end space-x-2 absolute top-4 right-4">
+  {item.type === "orden" && (
+    <>
+      <input
+        type="checkbox"
+        checked={item.aceptado}
+        onChange={() => handleCheckboxAceptar(item._id, item.aceptado)} // Usa handleCheckboxAceptar aquí
+        className="form-checkbox h-5 w-5 text-green-600"
+      />
+      <label className="text-gray-600">Terminada</label>
+    </>
+  )}
+</div>
                   <div className="mt-8">
                     <p className="text-xl font-semibold my-2">
                       {item.type === "recordatorio" ? "Notificación" : "Solicitud de Orden"}
@@ -221,7 +287,7 @@ const NotificacionesAdmin = () => {
                             <strong>Descripción:</strong> <br />
                             {item.descripcion.length > 10 ? `${item.descripcion.substring(0, 8)}...` : item.descripcion}
                           </p>
-                          <div className="flex justify-center">
+                          <div className="flex justify-center mt-9">
                             {item.documentoRecordatorio?.length > 0 && (
                               <button
                                 className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300"
@@ -243,10 +309,23 @@ const NotificacionesAdmin = () => {
                           <p className="text-gray-600 mb-2">
                             <strong>Maquina Serial:</strong> <br /> {item.nroSerieMaquina}
                           </p>
-                          <p className="text-gray-600 mb-2 pb-2">
+                          <p className="text-gray-600 mb-2 ">
                             <strong>Ubicación Maquina:</strong> <br />
                             {item.ubicacionMaquina}
                           </p>
+                          
+                          <p className="text-gray-600  pb-2">
+                            <strong>Partes Sobrantes:</strong> 
+                            </p>
+                            <ul>
+                            {item.componenteSobrantes.map((componente, index) => (
+            <li key={`${componente.serialComponente}-${index}`}>
+              {componente.nombreComponente} <br /> (Serial: {componente.serialComponente})
+            </li>
+          ))}
+                            <li>{item.sobrantes }</li>
+                            </ul>
+                         
                         </>
                       )}
                       <div className="flex justify-center mt-2 space-x-2">
@@ -264,6 +343,15 @@ const NotificacionesAdmin = () => {
                         >
                           Eliminar
                         </button>
+                      </div>
+                      <div className=" flex justify-center mt-3 ">
+                      {item.type === "orden" && (
+                        <button 
+                        onClick={()=>handleOpenSobrantesModal(item)}
+                        className="bg-sky-500 rounded-md py-1 px-4 text-white hover:bg-sky-700 transition-colors duration-300">
+                          Sobrantes
+                        </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -306,6 +394,16 @@ const NotificacionesAdmin = () => {
           onClose={closeModalOrden} // Añade la función para cerrar el modal
         />
       )}
+
+{showSobrantesModal && (
+              <ModalSobrantes
+                item={selectedItem}
+                onClose={closeSobrantesModal}
+                onSave={handleSaveSobrantes} // Actualizar las órdenes al cerrar el modal y pasar la orden actualizada
+              />
+            )}
+      
+
     </div>
   );
   

@@ -4,9 +4,16 @@ import Select from 'react-select';
 import { useAuth } from '../context/AuthContext';
 import { getComponentesRequest } from '../api/componentes';
 
-const ModalOrden = ({ onClose, orden }) => {
+const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [componentes, setComponentes] = useState([]);
   const [selectedComponentes, setSelectedComponentes] = useState([]);
+  const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
+  const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.nroSerieMaquina || '');
+  const [ubicacionMaquina, setUbicacionMaquina] = useState(orden.ubicacionMaquina || '');
+  const [usuario, setUsuario] = useState(orden.usuario || '');
+  const [sobrantes, setSobrantes] = useState(orden.sobrantes || '');
+  const [ordenId, setOrdenId] = useState(orden._id || ''); // Asegúrate de tener el ID de la orden
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,33 +34,33 @@ const ModalOrden = ({ onClose, orden }) => {
     setSelectedComponentes(selectedOptions || []);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Previene la actualización de la página
   
-    // Definir componentesData aquí
-    const componentesData = selectedComponentes.map((componente) => ({
-      serialComponente: componente.value,
-      nombreComponente: componente.label,
+    const componentesAsignados = selectedComponentes.map((comp) => ({
+      serialComponente: comp.value,
+      nombreComponente: comp.label,
     }));
   
     try {
-      // Actualizar la orden sin cambiar el usuario
-      const updateResponse = await axios.put(`http://localhost:4000/api/ordenes/${orden._id}`, {
-        fechaOrden: new Date(),
-        descripcionOrden: orden.descripcionOrden,
-        nroSerieMaquina: orden.nroSerieMaquina,
-        ubicacionMaquina: orden.ubicacionMaquina,
-        usuario: user.username,  // Asegúrate de que el nombre de usuario es el correcto
-        componentes: componentesData,
+      const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
+        fechaOrden: new Date(), // Ajusta si es necesario
+        descripcionOrden,
+        nroSerieMaquina,
+        ubicacionMaquina,
+        usuario,
+        componentes: selectedComponentes.map(comp => comp.value), // Envia los valores seleccionados
+        componentesAsignados,
+        sobrantes
       });
-  
-      console.log('Orden actualizada:', updateResponse.data);
-  
-      // Obtener la orden actualizada
-      const getResponse = await axios.get(`http://localhost:4000/api/ordenes/${orden._id}`);
-      console.log('Datos de la orden actualizada:', getResponse.data);
-  
-      onClose(); // Cerrar el modal después de enviar
+      console.log('Orden actualizada:', response.data);
+      if (typeof onOrderAccepted === 'function') {
+        onOrderAccepted(response.data); // Llama al callback solo si es una función
+      }
+      setSuccessMessage('Componentes enviados exitosamente');
+      setTimeout(() => {
+        onClose();
+      }, 1000);
     } catch (error) {
       console.error('Error al actualizar la orden:', error.response ? error.response.data : error.message);
     }
@@ -69,6 +76,11 @@ const ModalOrden = ({ onClose, orden }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
         <h3 className="text-lg font-bold mb-4">Enviar Orden</h3>
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 p-3 rounded-lg mb-4">
+            {successMessage}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
             <Select
@@ -92,13 +104,13 @@ const ModalOrden = ({ onClose, orden }) => {
           </div>
           <div className="mt-4">
             <p className="text-gray-600 mb-2">
-              <strong>Descripción de la Orden:</strong> {orden.descripcionOrden}
+              <strong>Descripción de la Orden:</strong> {descripcionOrden}
             </p>
             <p className="text-gray-600 mb-2">
-              <strong>Maquina Serial:</strong> {orden.nroSerieMaquina}
+              <strong>Maquina Serial:</strong> {nroSerieMaquina}
             </p>
             <p className="text-gray-600 mb-2">
-              <strong>Ubicación de la Maquina:</strong> {orden.ubicacionMaquina}
+              <strong>Ubicación de la Maquina:</strong> {ubicacionMaquina}
             </p>
             <p className="text-gray-600 mb-2 pb-2">
               <strong>Usuario:</strong> {user.username}
@@ -116,7 +128,7 @@ const ModalOrden = ({ onClose, orden }) => {
               type="submit"
               className="bg-green-500 text-white py-2 px-4 rounded-lg"
             >
-              Aceptar
+              Enviar
             </button>
           </div>
         </form>
