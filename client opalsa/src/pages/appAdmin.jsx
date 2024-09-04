@@ -2,8 +2,6 @@ import React from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { FaUsers } from "react-icons/fa";
-import { AiOutlineRise } from "react-icons/ai";
-import { RiNotification2Line } from "react-icons/ri";
 import { Link } from 'react-router-dom';
 import axios from "../api/axios";
 import { useState, useEffect } from 'react';
@@ -78,16 +76,20 @@ function AppAdmin() {
           {/* Card 2 */}
           <div className='col-span-2 flex flex-col items-center'>
             <div className='w-full'>
-              <h2 className="text-2xl font-bold mb-4 text-center">Recordatorios</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center ">Recordatorios</h2>
               <ul className='w-full overflow-y-auto max-h-[315px]'>
-                {recordatorios.map(recordatorio => (
-                  <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
-                    <div >
-                      <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
-                      <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                    </div>
-                  </li>
-                ))}
+                {recordatorios.length === 0 ? (
+                  <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
+                ) : (
+                  recordatorios.map(recordatorio => (
+                    <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
+                      <div >
+                        <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
+                        <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
+                      </div>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>
@@ -95,7 +97,7 @@ function AppAdmin() {
           {/* Card 3 */}
           <div className="p-6 bg-gray-800 text-white rounded-xl w-full h-full shadow-xl">
             <div className="flex items-center gap-4 mb-4">
-              <h3 className="text-lg font-bold text-gray-100">Nueva Solicitud</h3>
+              <h3 className="text-lg font-bold text-gray-100">Ultimo Usuario Creado</h3>
             </div>
             {latestUser ? (
               <div className="flex items-center flex-col justify-between pt-3">
