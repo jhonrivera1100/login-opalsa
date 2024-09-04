@@ -80,7 +80,7 @@ export const createOrden = async (req, res) => {
 export const updateOrdenAsignados = async (req, res) => {
   try {
     const { id } = req.params;
-    const { componentes, sobrantes, componentesAsignados } = req.body;
+    const { componentes, sobrantes, componentesAsignados, estadoOrden } = req.body;
 
     // Convertir los seriales de componentes en ObjectIds
     const componentesIds = await Promise.all(componentes.map(async (serial) => {
@@ -96,7 +96,8 @@ export const updateOrdenAsignados = async (req, res) => {
       { 
         componentes: componentesIds,
         sobrantes,
-        componentesAsignados 
+        componentesAsignados,
+        estadoOrden // Actualiza el campo estadoOrden
       },
       { new: true }
     ).populate('usuario').populate('componentes');
@@ -111,6 +112,7 @@ export const updateOrdenAsignados = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
   }
 };
+
 
 export const deleteOrden = async (req, res) => {
   try {

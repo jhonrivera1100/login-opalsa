@@ -11,6 +11,7 @@ const GenerarOrden = () => {
     const [descripcionOrden, setDescripcionOrden] = useState('');
     const [fechaOrden, setFechaOrden] = useState('');
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
     const [maquinas, setMaquinas] = useState([]);
 
     useEffect(() => {
@@ -47,17 +48,24 @@ const GenerarOrden = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:4000/api/ordenes', {
+            await axios.post('http://localhost:4000/api/ordenes', {
                 fechaOrden,
                 descripcionOrden,
                 nroSerieMaquina,
                 ubicacionMaquina,
                 usuario: user.username, // Envía el usuario actual
             });
-            console.log('Orden creada:', response.data);
+            setSuccessMessage('Orden generada exitosamente');
+            // Limpiar el formulario
+            setNroSerieMaquina('');
+            setUbicacionMaquina('');
+            setDescripcionOrden('');
+            setFechaOrden('');
+            setError(null); // Limpiar el mensaje de error en caso de haberlo
         } catch (error) {
             console.error('Error al crear Orden:', error);
             setError('No se pudo crear la orden. Inténtalo de nuevo.');
+            setSuccessMessage(''); // Limpiar el mensaje de éxito en caso de error
         }
     };
 
@@ -105,6 +113,7 @@ const GenerarOrden = () => {
                     </div>
                     <div className="mt-4">
                         {error && <p className="text-red-500 text-xs italic">{error}</p>}
+                        {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
                         <button
                             type="submit"
                             className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
