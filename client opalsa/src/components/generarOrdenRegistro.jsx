@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
-import { useAuth } from '../context/AuthContext'; // Asegúrate de tener el contexto de autenticación importado
-import { getMaquinasRequest } from '../api/maquinas'; // Asegúrate de tener esta función en tu archivo api/maquinas.js
+import { useAuth } from '../context/AuthContext'; 
+import { getMaquinasRequest } from '../api/maquinas';
 
 const GenerarOrden = () => {
-    const { user } = useAuth(); // Obtén el usuario autenticado desde el contexto
+    const { user } = useAuth(); 
     const [nroSerieMaquina, setNroSerieMaquina] = useState('');
     const [ubicacionMaquina, setUbicacionMaquina] = useState('');
     const [descripcionOrden, setDescripcionOrden] = useState('');
     const [fechaOrden, setFechaOrden] = useState('');
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null); // Estado para manejar el mensaje de éxito
     const [maquinas, setMaquinas] = useState([]);
 
     useEffect(() => {
@@ -47,17 +48,28 @@ const GenerarOrden = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:4000/api/ordenes', {
+            await axios.post('http://localhost:4000/api/ordenes', {
                 fechaOrden,
                 descripcionOrden,
                 nroSerieMaquina,
                 ubicacionMaquina,
-                usuario: user.username, // Envía el usuario actual
+                usuario: user.username, 
             });
-            console.log('Orden creada:', response.data);
+            setSuccessMessage('Orden creada exitosamente');
+            setNroSerieMaquina('');
+            setUbicacionMaquina('');
+            setDescripcionOrden('');
+            setFechaOrden('');
+            setError(null); 
+
+            setTimeout(() => {
+                setSuccessMessage(null);
+              }, 3000);
+
         } catch (error) {
             console.error('Error al crear Orden:', error);
             setError('No se pudo crear la orden. Inténtalo de nuevo.');
+            setSuccessMessage(null);
         }
     };
 
@@ -104,10 +116,24 @@ const GenerarOrden = () => {
                         />
                     </div>
                     <div className="mt-4">
-                        {error && <p className="text-red-500 text-xs italic">{error}</p>}
+                    <div className='mt-5'>
+                {/* Mostrar la alerta de éxito si successMessage existe */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        {/* Mostrar la alerta de error si error existe */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+          </div>
                         <button
                             type="submit"
-                            className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
+                            className=" mt-5 uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
                         >
                             Enviar
                         </button>
