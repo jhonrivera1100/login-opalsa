@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 
-const CrearMantenimiento = () => {
+const CrearNotificacion = () => {
   const { user } = useAuth();
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fechaMantenimiento, setFechaMantenimiento] = useState("");
   const [documentoRecordatorio, setDocumentoRecordatorio] = useState(null);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // Estado para manejar el mensaje de éxito
 
   const handleFileChange = (e) => {
     setDocumentoRecordatorio(e.target.files[0]);
@@ -32,14 +33,22 @@ const CrearMantenimiento = () => {
       });
       console.log("Recordatorio creado:", response.data);
       setError(null);
+      setSuccessMessage('Notificacion creada exitosamente'); // Mostrar mensaje de éxito
       // Limpiar campos del formulario después del envío exitoso
       setTitulo("");
       setDescripcion("");
       setFechaMantenimiento("");
       setDocumentoRecordatorio(null);
+
+      // Ocultar mensaje de éxito después de 3 segundos
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+      
     } catch (error) {
       console.error("Error al crear recordatorio:", error);
       setError("Error al crear el recordatorio. Por favor, inténtalo de nuevo.");
+      setSuccessMessage(null); // Limpiar el mensaje de éxito en caso de error
     }
   };
 
@@ -49,7 +58,9 @@ const CrearMantenimiento = () => {
         <div className="flex justify-center">
           <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">Notificar Al Administrador</h2>
         </div>
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">{error}</div>}
+
+    
+
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
             <div className="col-span-1">
@@ -90,6 +101,21 @@ const CrearMantenimiento = () => {
               />
             </div>
           </div>
+          <div className='mt-5'>
+                {/* Mostrar la alerta de éxito si successMessage existe */}
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        {/* Mostrar la alerta de error si error existe */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+          </div>
           <div className="mt-4">
             <button
               type="submit"
@@ -104,4 +130,4 @@ const CrearMantenimiento = () => {
   );
 };
 
-export default CrearMantenimiento;
+export default CrearNotificacion;

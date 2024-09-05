@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getMaquinasRequest } from '../api/maquinas'; // Asegúrate de tener esta función en tu archivo api/maquinas.js
+import { getMaquinasRequest } from '../api/maquinas';
 import Select from 'react-select';
 
 const MantenimientoRegistro = () => {
@@ -12,6 +12,7 @@ const MantenimientoRegistro = () => {
   const [descripcion, setDescripcion] = useState('');
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // Estado para el mensaje de éxito
   const [maquinas, setMaquinas] = useState([]);
   const [mantenimientos, setMantenimientos] = useState([]);
 
@@ -50,7 +51,7 @@ const MantenimientoRegistro = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const formData = new FormData();
     formData.append('tipoMantenimiento', tipoMantenimiento);
     formData.append('fechaMantenimiento', fechaMantenimiento);
@@ -68,7 +69,10 @@ const MantenimientoRegistro = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
       setMantenimientos([...mantenimientos, response.data]);
+      setSuccessMessage('Mantenimiento registrado exitosamente'); // Establecer mensaje de éxito
+      setError(null); // Limpiar error
       setTipoMantenimiento('');
       setFechaMantenimiento('');
       setDescripcion('');
@@ -79,6 +83,7 @@ const MantenimientoRegistro = () => {
     } catch (error) {
       console.error('Error al crear mantenimiento:', error);
       setError('Error al crear mantenimiento. Inténtalo de nuevo.');
+      setSuccessMessage(null); // Limpiar mensaje de éxito en caso de error
     }
   };
 
@@ -145,7 +150,23 @@ const MantenimientoRegistro = () => {
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
             />
           </div>
-          {error && <p className="text-red-500 text-xs italic">{error}</p>}
+          
+          {/* Mostrar la alerta de éxito si successMessage existe */}
+          <div className='mt-5'>
+            {successMessage && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+                <p>{successMessage}</p>
+              </div>
+            )}
+
+            {/* Mostrar la alerta de error si error existe */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
+          </div>
+
           <div className="mt-4">
             <button
               type="submit"
