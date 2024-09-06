@@ -10,53 +10,89 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
   const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.nroSerieMaquina || '');
   const [ubicacionMaquina, setUbicacionMaquina] = useState(orden.ubicacionMaquina || '');
-  const [usuario, setUsuario] = useState(orden.usuario || '');
-  const [sobrantes, setSobrantes] = useState(orden.sobrantes || '');
-  const [ordenId, setOrdenId] = useState(orden._id || ''); // Asegúrate de tener el ID de la orden
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [usuario, setUsuario] = useState({});
+  const [ordenId, setOrdenId] = useState(orden._id || '');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [elementosOrden, setElementosOrden] = useState(orden.elementoOrden || []);
+  const [numeroOrden, setNumeroOrden] = useState(orden.numeroOrden || '');
+  const [fechaOrden, setFechaOrden] = useState('');
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchComponentes = async () => {
       try {
         const response = await getComponentesRequest();
-        console.log('Componentes recibidos:', response.data);
         setComponentes(response.data);
       } catch (err) {
         console.error('Error al obtener los Componentes:', err);
       }
     };
 
+    const fetchOrden = async () => {
+      try {
+        if (ordenId) {
+          const response = await axios.get(`http://localhost:4000/api/ordenes/${ordenId}`).then(res => res.data);
+          setDescripcionOrden(response.descripcionOrden);
+          setNroSerieMaquina(response.maquina ? response.maquina.nroSerieMaquina : 'Desconocido');
+          setUbicacionMaquina(response.maquina ? response.maquina.ubicacionMaquina : 'Desconocida');
+          setElementosOrden(response.elementoOrden);
+          setUsuario(response.usuario);
+          setNumeroOrden(response.numeroOrden);
+          setFechaOrden(new Date(response.fechaOrden).toLocaleDateString());
+
+          // Actualizar selectedComponentes con los componentes actuales de la orden
+          const componentesSeleccionados = response.componentesAsignados.map((comp) => ({
+            value: comp._id,
+            label: `${comp.nombreComponente} (Serial: ${comp.serialComponente})`,
+          }));
+          setSelectedComponentes(componentesSeleccionados);
+        }
+      } catch (err) {
+        console.error('Error al obtener la orden:', err);
+      }
+    };
+
     fetchComponentes();
-  }, []);
+    fetchOrden();
+  }, [ordenId]);
 
   const handleComponentesChange = (selectedOptions) => {
     setSelectedComponentes(selectedOptions || []);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // Previene la actualización de la página
+  const handleElementosChange = (index, field, value) => {
+    const newElementosOrden = [...elementosOrden];
+    newElementosOrden[index] = { ...newElementosOrden[index], [field]: value };
+    setElementosOrden(newElementosOrden);
+  };
 
-    const componentesAsignados = selectedComponentes.map((comp) => ({
-      serialComponente: comp.value,
-      nombreComponente: comp.label,
-    }));
+  const handleAddElemento = () => {
+    setElementosOrden([...elementosOrden, { nombre: '', cantidad: 0 }]);
+  };
+
+  const handleRemoveElemento = (index) => {
+    setElementosOrden(elementosOrden.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const componentesAsignados = selectedComponentes.map((comp) => comp.value); // Obtener solo los IDs
 
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
-        fechaOrden: new Date(), // Ajusta si es necesario
+        fechaOrden: new Date(),
         descripcionOrden,
         nroSerieMaquina,
         ubicacionMaquina,
-        usuario,
-        componentes: selectedComponentes.map(comp => comp.value), // Envia los valores seleccionados
+        usuario: usuario._id, 
         componentesAsignados,
-        sobrantes,
-        estadoOrden: 'Orden aceptada en proceso' // Actualiza el campo estadoOrden
+        estadoOrden: 'Orden aprobada',
+        elementoOrden: elementosOrden,
       });
-      console.log('Orden actualizada:', response.data);
+
       if (typeof onOrderAccepted === 'function') {
-        onOrderAccepted(response.data); // Llama al callback solo si es una función
+        onOrderAccepted(response.data);
       }
       setSuccessMessage('Orden aceptada y enviada exitosamente');
       setTimeout(() => {
@@ -68,21 +104,67 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
-    value: componente.serialComponente,
-    label: componente.nombreComponente,
+    value: componente._id,
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
   }));
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-        <h3 className="text-lg font-bold mb-4">Enviar Orden</h3>
+      <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg shadow-xl p-6">
+        <div className="p-4 border-b mb-4">
+          <h2 className="text-2xl font-semibold">Detalles de la Orden</h2>
+          <p className="text-sm text-gray-500">Revisa y completa la información de la orden</p>
+        </div>
+
         {successMessage && (
           <div className="bg-green-100 text-green-800 p-3 rounded-lg mb-4">
             {successMessage}
           </div>
         )}
+
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-5 mt-5">
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Número de orden</p>
+            <p>{numeroOrden}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Fecha de la Orden</p>
+            <p>{fechaOrden}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Descripción de la Orden</p>
+            <p>{descripcionOrden}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Serial de la Maquina</p>
+            <p>{nroSerieMaquina}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Ubicación de la Maquina</p>
+            <p>{ubicacionMaquina}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Usuario</p>
+            <p>{usuario.username || 'No disponible'}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Correo</p>
+            <p>{usuario.email || 'No disponible'}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
+            <p className="text-gray-600">Cargo</p>
+            <p>{usuario.cargo || 'No disponible'}</p>
+          </div>
+
+          <div className="mt-4">
+            <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
             <Select
               value={selectedComponentes}
               onChange={handleComponentesChange}
@@ -91,44 +173,57 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               placeholder="Selecciona los Componentes"
             />
-            <div className="mt-4">
-              <h4 className="text-gray-600 mb-2 font-bold">Componentes Seleccionados:</h4>
-              <ul className="list-disc pl-5">
-                {selectedComponentes.map((componente, index) => (
-                  <li key={index} className="text-gray-600">
-                    {componente.label} (Serial: {componente.value})
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
+
           <div className="mt-4">
-            <p className="text-gray-600 mb-2">
-              <strong>Descripción de la Orden:</strong> {descripcionOrden}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Maquina Serial:</strong> {nroSerieMaquina}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>Ubicación de la Maquina:</strong> {ubicacionMaquina}
-            </p>
-            <p className="text-gray-600 mb-2 pb-2">
-              <strong>Usuario:</strong> {user.username}
-            </p>
+            <h4 className="text-gray-600 mb-2 font-bold">Asignar elementos</h4>
+            {elementosOrden.map((elemento, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input
+                  type="text"
+                  value={elemento.nombre}
+                  onChange={(e) => handleElementosChange(index, 'nombre', e.target.value)}
+                  placeholder="Nombre del Elemento"
+                  className="px-4 py-2 border rounded mr-2 w-1/2"
+                />
+                <input
+                  type="number"
+                  value={elemento.cantidad}
+                  onChange={(e) => handleElementosChange(index, 'cantidad', e.target.value)}
+                  placeholder="Cantidad"
+                  className="px-4 py-2 border rounded mr-2 w-1/4"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveElemento(index)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  Eliminar
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddElemento}
+              className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+            >
+              Agregar Elemento
+            </button>
           </div>
-          <div className="flex justify-end space-x-2 mt-5">
+
+          <div className="mt-6 flex justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="bg-red-500 text-white py-2 px-4 rounded-lg"
+              className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded-lg"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
             >
-              Enviar
+              Aceptar Orden
             </button>
           </div>
         </form>

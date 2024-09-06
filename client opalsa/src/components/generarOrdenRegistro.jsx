@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
-import { useAuth } from '../context/AuthContext'; 
-import { getMaquinasRequest } from '../api/maquinas';
+import { useAuth } from '../context/AuthContext'; // Asegúrate de tener el contexto de autenticación importado
+import { getMaquinasRequest } from '../api/maquinas'; // Asegúrate de tener esta función en tu archivo api/maquinas.js
 
 const GenerarOrden = () => {
-    const { user } = useAuth(); 
+    const { user } = useAuth(); // Obtén el usuario autenticado desde el contexto
     const [nroSerieMaquina, setNroSerieMaquina] = useState('');
     const [ubicacionMaquina, setUbicacionMaquina] = useState('');
     const [descripcionOrden, setDescripcionOrden] = useState('');
-    const [fechaOrden, setFechaOrden] = useState('');
+    const [tipoDeMantenimiento, setTipoDeMantenimiento] = useState(null); // Tipo de mantenimiento puede ser null inicialmente
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null); // Estado para manejar el mensaje de éxito
     const [maquinas, setMaquinas] = useState([]);
+
+    const fechaOrden = new Date().toISOString().split('T')[0]; // Fecha actual en formato ISO
 
     useEffect(() => {
         const fetchMaquinas = async () => {
             try {
                 const response = await getMaquinasRequest();
-                console.log('Maquinas recibidas:', response.data);
                 setMaquinas(response.data);
             } catch (err) {
                 console.error('Error al obtener las máquinas:', err);
@@ -48,28 +48,17 @@ const GenerarOrden = () => {
         e.preventDefault();
 
         try {
-            await axios.post('http://localhost:4000/api/ordenes', {
-                fechaOrden,
+            const response = await axios.post('http://localhost:4000/api/ordenes', {
                 descripcionOrden,
                 nroSerieMaquina,
-                ubicacionMaquina,
-                usuario: user.username, 
+                usuario: user.username, // Envía el usuario actual
+                tipoDeMantenimiento,
+                fechaOrden
             });
-            setSuccessMessage('Orden creada exitosamente');
-            setNroSerieMaquina('');
-            setUbicacionMaquina('');
-            setDescripcionOrden('');
-            setFechaOrden('');
-            setError(null); 
-
-            setTimeout(() => {
-                setSuccessMessage(null);
-              }, 3000);
-
+            console.log('Orden creada:', response.data);
         } catch (error) {
             console.error('Error al crear Orden:', error);
             setError('No se pudo crear la orden. Inténtalo de nuevo.');
-            setSuccessMessage(null);
         }
     };
 
@@ -77,6 +66,14 @@ const GenerarOrden = () => {
         value: maquina.nroSerieMaquina,
         label: maquina.nroSerieMaquina,
     }));
+
+    const tipoMantenimientoOptions = [
+        { value: 'preventivo', label: 'Preventivo' },
+        { value: 'correctivo', label: 'Correctivo' },
+        { value: 'predictivo', label: 'Predictivo' },
+        { value: 'software', label: 'Software' },
+        { value: 'estético', label: 'Estético' },
+    ];
 
     return (
         <div className="container mx-auto my-4 px-4 lg:px-20">
@@ -86,6 +83,7 @@ const GenerarOrden = () => {
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="mt-4">
+                        <label className="block text-gray-700 font-bold mb-2">Descripción de la Orden</label>
                         <textarea
                             value={descripcionOrden}
                             onChange={(e) => setDescripcionOrden(e.target.value)}
@@ -94,46 +92,51 @@ const GenerarOrden = () => {
                         ></textarea>
                     </div>
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 mt-5">
-                        <Select
-                            value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
-                            onChange={handleSerieChange}
-                            options={maquinaOptions}
-                            className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                            placeholder="Número de Serie"
-                        />
-                        <input
-                            type="text"
-                            value={ubicacionMaquina}
-                            readOnly
-                            className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                            placeholder="Ubicación de la Máquina"
-                        />
-                        <input
-                            type="date"
-                            value={fechaOrden}
-                            onChange={(e) => setFechaOrden(e.target.value)}
-                            className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                        />
+                        <div className="mt-4">
+                            <label className="block text-gray-700 font-bold mb-2">Número de Serie de la Máquina</label>
+                            <Select
+                                value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
+                                onChange={handleSerieChange}
+                                options={maquinaOptions}
+                                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                                placeholder="Número de Serie"
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-gray-700 font-bold mb-2">Ubicación de la Máquina</label>
+                            <input
+                                type="text"
+                                value={ubicacionMaquina}
+                                readOnly
+                                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                                placeholder="Ubicación de la Máquina"
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-gray-700 font-bold mb-2">Fecha de Orden</label>
+                            <input
+                                type="date"
+                                value={fechaOrden}
+                                readOnly // Hace que el campo de fecha no sea editable
+                                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                            />
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-gray-700 font-bold mb-2">Tipo de Procedimiento</label>
+                            <Select
+                                value={tipoDeMantenimiento ? tipoMantenimientoOptions.find(option => option.value === tipoDeMantenimiento) : null}
+                                onChange={(selectedOption) => setTipoDeMantenimiento(selectedOption ? selectedOption.value : null)}
+                                options={tipoMantenimientoOptions}
+                                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                                placeholder="Tipo de procedimiento"
+                            />
+                        </div>
                     </div>
                     <div className="mt-4">
-                    <div className='mt-5'>
-                {/* Mostrar la alerta de éxito si successMessage existe */}
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
-            <p>{successMessage}</p>
-          </div>
-        )}
-
-        {/* Mostrar la alerta de error si error existe */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
-            {error}
-          </div>
-        )}
-          </div>
+                        {error && <p className="text-red-500 text-xs italic">{error}</p>}
                         <button
                             type="submit"
-                            className=" mt-5 uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
+                            className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
                         >
                             Enviar
                         </button>
