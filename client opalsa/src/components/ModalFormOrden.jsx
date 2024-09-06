@@ -69,7 +69,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
   const componenteOptions = componentes.map((componente) => ({
     value: componente.serialComponente,
-    label: componente.nombreComponente,
+    label: `${componente.nombreComponente} (${componente.serialComponente})`
   }));
 
   return (

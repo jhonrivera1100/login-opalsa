@@ -4,7 +4,7 @@ import { getMaquinasRequest } from '../api/maquinas';
 import Select from 'react-select';
 
 const MantenimientoRegistro = () => {
-  const [maquinaSeleccionada, setMaquinaSeleccionada] = useState(null); // Guardar la máquina seleccionada
+  const [maquinaSeleccionada, setMaquinaSeleccionada] = useState(''); // Guardar la máquina seleccionada
   const [tipoMantenimiento, setTipoMantenimiento] = useState('');
   const [fechaMantenimiento, setFechaMantenimiento] = useState('');
   const [descripcion, setDescripcion] = useState('');

@@ -8,14 +8,20 @@ import { uploadFile, deleteFile } from '../libs/cloudinary.js'; // Importa las f
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Controlador actualizado
 export const getMantenimientos = async (req, res) => {
   try {
-    const mantenimientos = await Mantenimiento.find();
-    res.json(mantenimientos);
+    // Buscar mantenimientos y popular el campo 'maquina' con sus detalles
+    const mantenimientos = await Mantenimiento.find().populate('maquina', 'marcaMaquina nroSerieMaquina ubicacionMaquina');
+    
+    res.status(200).json(mantenimientos);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los mantenimientos', error });
+    res.status(500).json({ message: 'Error al obtener mantenimientos', error });
   }
 };
+
+
+
 
 export const createMantenimiento = async (req, res) => {
   try {
