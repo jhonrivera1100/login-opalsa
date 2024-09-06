@@ -19,12 +19,13 @@ export const getMantenimientos = async (req, res) => {
 
 export const createMantenimiento = async (req, res) => {
   try {
-    const { tipoMantenimiento, fechaMantenimiento, descripcion, nroSerieMaquina, nombreMaquina, ubicacionMaquina } = req.body;
+    const { tipoMantenimiento, fechaMantenimiento, descripcion, maquina } = req.body;
     const archivo = req.files ? req.files.archivo : null;
 
-    // Buscar la máquina por número de serie
-    const maquina = await Maquina.findOne({ nroSerieMaquina });
-    if (!maquina) {
+    console.log('Datos recibidos:', { tipoMantenimiento, fechaMantenimiento, descripcion, maquina });
+
+    const maquinas = await Maquina.findOne({ nroSerieMaquina: maquina });
+    if (!maquinas) {
       return res.status(404).json({ message: 'Máquina no encontrada' });
     }
 
@@ -44,18 +45,19 @@ export const createMantenimiento = async (req, res) => {
       tipoMantenimiento,
       fechaMantenimiento,
       descripcion,
-      nroSerieMaquina,
-      nombreMaquina,
-      ubicacionMaquina,
+      maquina: maquinas._id, // Guardar la referencia a la máquina por su ID
       archivo: archivoData,
     });
 
     await nuevoMantenimiento.save();
     res.status(201).json(nuevoMantenimiento);
   } catch (error) {
+    console.error('Error al crear el mantenimiento:', error); // Agrega este log para ver el error exacto
     return res.status(500).json({ message: 'Error al crear el mantenimiento', error });
   }
 };
+
+
 
 export const deleteMantenimiento = async (req, res) => {
   try {

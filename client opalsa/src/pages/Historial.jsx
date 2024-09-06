@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
-import { FaTools } from "react-icons/fa";
-import { CgWebsite } from "react-icons/cg";
-import { MdAutoAwesomeMotion } from "react-icons/md";
-import { MdCasino } from "react-icons/md";
 import MovimientoMaquinaCard from "../components/MovimientoMaquinaCard";
 import Modal from "../components/modalMantenimiento";
 
@@ -124,23 +120,25 @@ const Historial = () => {
       filtered = items.filter((item) => item.type === filter);
     }
 
-    if (filter === "all" && query) {
-      filtered = filtered.filter((item) =>
-        item.fecha.toLocaleDateString().includes(query)
-      );
-    } else {
-      if (filter === "mantenimiento") {
+    if (query) {
+      if (filter === "all") {
         filtered = filtered.filter((item) =>
-          item.nroSerieMaquina.toLowerCase().includes(query)
+          item.fecha.toLocaleDateString().includes(query)
         );
-      } else if (filter === "movimiento") {
-        filtered = filtered.filter((item) =>
-          item.serialComponente.toLowerCase().includes(query)
-        );
-      } else if (filter === "moviMaquina") {
-        filtered = filtered.filter((item) =>
-          item.serialMaquina.toLowerCase().includes(query)
-        );
+      } else {
+        if (filter === "mantenimiento") {
+          filtered = filtered.filter((item) =>
+            item.nroSerieMaquina.toLowerCase().includes(query)
+          );
+        } else if (filter === "movimiento") {
+          filtered = filtered.filter((item) =>
+            item.serialComponente.toLowerCase().includes(query)
+          );
+        } else if (filter === "moviMaquina") {
+          filtered = filtered.filter((item) =>
+            item.serialMaquina.toLowerCase().includes(query)
+          );
+        }
       }
     }
 
@@ -205,6 +203,7 @@ const Historial = () => {
         : prevPage
     );
   };
+
   const handleDescriptionClick = (description) => {
     setSelectedDescription(description);
     setIsModalOpen(true);
@@ -261,7 +260,7 @@ const Historial = () => {
             Movimientos de Máquinas
           </button>
         </div>
-        <div className="flex justify-center mb-9 pt-7 ">
+        <div className="flex justify-center mb-9 pt-7">
           <input
             type="text"
             className="px-4 py-2 border rounded w-[500px]"
@@ -284,16 +283,12 @@ const Historial = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {currentItems.map((item) => (
-                   <div className="flex flex-wrap">
-                   {paginatedItems.map((item) => (
-                     <MovimientoMaquinaCard
-                       key={item._id}
-                       item={item}
-                       handleDescriptionClick={handleDescriptionClick}
-                       deleteItem={deleteItem}
-                     />
-                   ))}
-                 </div>
+            <MovimientoMaquinaCard
+              key={item._id}
+              item={item}
+              handleDescriptionClick={handleDescriptionClick}
+              deleteItem={deleteItem}
+            />
           ))}
         </div>
         <div className="flex justify-center mt-4">
