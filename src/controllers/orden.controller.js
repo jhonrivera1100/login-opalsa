@@ -8,10 +8,12 @@ import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 export const getOrdenes = async (req, res) => {
   try {
     const ordenes = await Orden.find()
-      .populate('usuario', 'username') // Popula el usuario con solo el campo 'username'
-      .populate('maquina') // Popula la máquina asociada
-      .populate('elementoOrden') // Opcional: si necesitas poblar elementos de la orden
-      .populate('elementoOrdenSobrantes'); // Opcional: si necesitas poblar elementos sobrantes
+      .populate('usuario', 'username')
+      .populate('maquina')
+      .populate('elementoOrden')
+      .populate('elementoOrdenSobrantes')
+      .populate('componentesAsignados')
+      .populate('componentesSobrantes');
 
     res.json(ordenes);
   } catch (error) {
@@ -26,9 +28,11 @@ export const getOrdenesByUser = async (req, res) => {
     const userId = req.user._id;
     const ordenes = await Orden.find({ usuario: userId })
       .populate('usuario')
-      .populate('maquina') // Popula la máquina asociada
+      .populate('maquina')
       .populate('elementoOrden')
-      .populate('elementoOrdenSobrantes');
+      .populate('elementoOrdenSobrantes')
+      .populate('componentesAsignados')
+      .populate('componentesSobrantes');
 
     res.json(ordenes);
   } catch (error) {
@@ -43,9 +47,11 @@ export const obtenerOrdenPorId = async (req, res) => {
     const { id } = req.params;
     const orden = await Orden.findById(id)
       .populate('usuario')
-      .populate('maquina') // Popula la máquina asociada
+      .populate('maquina')
       .populate('elementoOrden')
-      .populate('elementoOrdenSobrantes');
+      .populate('elementoOrdenSobrantes')
+      .populate('componentesAsignados')
+      .populate('componentesSobrantes');
     
     if (!orden) {
       return res.status(404).json({ message: 'Orden no encontrada' });
@@ -61,32 +67,30 @@ export const obtenerOrdenPorId = async (req, res) => {
 // Crear una nueva orden
 export const createOrden = async (req, res) => {
   try {
-    const { descripcionOrden, nroSerieMaquina, usuario, tipoDeMantenimiento } = req.body;
+    const { descripcionOrden, nroSerieMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
-    // Obtener la fecha y generar el número de orden
-    const fechaOrden = new Date(); // Fecha actual
-    const numeroOrden = uuidv4(); // Genera un número único
+    const fechaOrden = new Date();
+    const numeroOrden = uuidv4();
 
-    // Buscar el usuario
     const usuarioObj = await User.findOne({ username: usuario });
     if (!usuarioObj) {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
-    // Buscar la máquina
     const maquina = await Maquina.findOne({ nroSerieMaquina });
     if (!maquina) {
       return res.status(404).json({ message: 'Máquina no encontrada' });
     }
 
-    // Crear la nueva orden
     const nuevaOrden = new Orden({
       fechaOrden,
       descripcionOrden,
-      maquina: maquina._id, // Usa el ID de la máquina
+      maquina: maquina._id,
       usuario: usuarioObj._id,
       numeroOrden,
       tipoDeMantenimiento,
+      componentesAsignados,
+      componentesSobrantes,
       elementoOrden: [],
       elementoOrdenSobrantes: [],
       fechaCumplimiento: null
@@ -95,7 +99,7 @@ export const createOrden = async (req, res) => {
     await nuevaOrden.save();
     res.status(201).json(nuevaOrden);
   } catch (error) {
-    console.error('Error en el servidor al crear la orden:', error.message);
+    console.error('Error al crear la orden:', error.message);
     res.status(500).json({ message: 'Error al crear la orden', error: error.message });
   }
 };
@@ -104,21 +108,25 @@ export const createOrden = async (req, res) => {
 export const updateOrdenAsignados = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estadoOrden = 'Orden en solicitud', elementoOrden = [], tareaRealizada = '' } = req.body;
+    const { estadoOrden = 'Orden en solicitud', elementoOrden = [], tareaRealizada = '', componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
     const ordenActualizada = await Orden.findByIdAndUpdate(
       id,
       { 
         estadoOrden,
         elementoOrden,
-        tareaRealizada
+        tareaRealizada,
+        componentesAsignados,
+        componentesSobrantes
       },
       { new: true }
     )
     .populate('usuario')
-    .populate('maquina') // Popula la máquina asociada
+    .populate('maquina')
     .populate('elementoOrden')
-    .populate('elementoOrdenSobrantes');
+    .populate('elementoOrdenSobrantes')
+    .populate('componentesAsignados')
+    .populate('componentesSobrantes');
 
     if (!ordenActualizada) {
       return res.status(404).json({ message: 'Orden no encontrada' });
@@ -175,12 +183,14 @@ export const updateOrdenSobrantes = async (req, res) => {
     const { id } = req.params;
     const {
       estadoOrden = 'Orden en solicitud',
-      elementoOrden = [], // Elementos asignados
-      elementoOrdenSobrantes = [], // Elementos sobrantes
-      tareaRealizada = '' // Actualizar la tarea realizada
+      elementoOrden = [],
+      elementoOrdenSobrantes = [],
+      tareaRealizada = '',
+      componentesAsignados = [],
+      componentesSobrantes = []
     } = req.body;
 
-    // Validar que las cantidades sobrantes no excedan las cantidades asignadas
+    // Validar que las cantidades sobrantes no excedan las asignadas
     elementoOrden.forEach((elemento) => {
       const sobrante = elementoOrdenSobrantes.find(s => s.nombre === elemento.nombre);
       if (sobrante && sobrante.cantidadSobrante > elemento.cantidad) {
@@ -188,7 +198,6 @@ export const updateOrdenSobrantes = async (req, res) => {
       }
     });
 
-    // Actualizar la orden con los datos proporcionados
     const ordenActualizada = await Orden.findById(id);
     if (!ordenActualizada) {
       return res.status(404).json({ message: 'Orden no encontrada' });
@@ -198,6 +207,8 @@ export const updateOrdenSobrantes = async (req, res) => {
     ordenActualizada.elementoOrden = elementoOrden;
     ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
     ordenActualizada.tareaRealizada = tareaRealizada;
+    ordenActualizada.componentesAsignados = componentesAsignados;
+    ordenActualizada.componentesSobrantes = componentesSobrantes;
 
     await ordenActualizada.save();
 

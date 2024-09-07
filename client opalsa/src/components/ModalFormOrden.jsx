@@ -40,8 +40,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           setNumeroOrden(response.numeroOrden);
           setFechaOrden(new Date(response.fechaOrden).toLocaleDateString());
 
-          // Actualizar selectedComponentes con los componentes actuales de la orden
-          const componentesSeleccionados = []; // Ya no se necesita esta parte
+          // Actualizar selectedComponentes con los componentes ya asignados a la orden
+          const componentesSeleccionados = response.componentesAsignados.map(component => ({
+            value: component.serialComponente,
+            label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
+          }));
           setSelectedComponentes(componentesSeleccionados);
         }
       } catch (err) {
@@ -74,8 +77,10 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Eliminar la asignación de componentes
-    const componentesAsignados = []; // No se usa más
+    const componentesAsignados = selectedComponentes.map(component => ({
+      nombreComponente: component.label.split(' (Serial:')[0],
+      serialComponente: component.value,
+    }));
 
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
@@ -86,6 +91,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         usuario: usuario._id, 
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
+        componentesAsignados,
       });
 
       if (typeof onOrderAccepted === 'function') {
@@ -103,6 +109,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const componenteOptions = componentes.map((componente) => ({
     value: componente._id,
     label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+    marcaComponente: componente.marcaComponente,
   }));
 
   return (
@@ -161,6 +168,20 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           </div>
 
           <div className="mt-4">
+            <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
+            <Select
+              isMulti
+              name="componentes"
+              options={componenteOptions}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={selectedComponentes} // Mostrar los componentes ya seleccionados
+              onChange={handleComponentesChange}
+              placeholder="Selecciona componentes"
+            />
+          </div>
+
+          <div className="mt-4">
             <h4 className="text-gray-600 mb-2 font-bold">Asignar elementos</h4>
             {elementosOrden.map((elemento, index) => (
               <div key={index} className="flex items-center mb-2">
@@ -181,7 +202,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
                 <button
                   type="button"
                   onClick={() => handleRemoveElemento(index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  className="px-4 py-2 bg-red-500 text-white rounded"
                 >
                   Eliminar
                 </button>
@@ -190,25 +211,25 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             <button
               type="button"
               onClick={handleAddElemento}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+              className="px-4 py-2 bg-blue-500 text-white rounded"
             >
-              Agregar Elemento
+              Añadir Elemento
             </button>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-4 flex justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
+              className="px-4 py-2 bg-gray-500 text-white rounded"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className="px-4 py-2 bg-green-500 text-white rounded"
             >
-              Aceptar Orden
+              Guardar Orden
             </button>
           </div>
         </form>
