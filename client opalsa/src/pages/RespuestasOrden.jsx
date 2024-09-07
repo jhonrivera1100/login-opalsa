@@ -158,95 +158,50 @@ const RespuestasOrden = () => {
                     />
                   </svg>
                 </div>
-                <div className="text-xl font-bold">{orden.numeroOrden}</div>
-                <div className="text-sm text-gray-500 mt-2">
-                  {orden.fechaOrden ? formatDate(orden.fechaOrden) : 'Fecha no disponible'}
+                <div className="mt-4">
+                  <h4 className="text-xl font-semibold text-gray-800">{orden.numeroOrden}</h4>
+                  <p className="mt-1 text-gray-600">Estado: {orden.estadoOrden}</p>
+                  <p className="mt-1 text-gray-600">Fecha: {formatDate(orden.fechaOrden)}</p>
+                  <button
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    onClick={() => handleShowMore(orden)}
+                  >
+                    Inspeccionar orden
+                  </button>
                 </div>
-                <div className="text-sm text-gray-700 mt-4">
-                  Estado: {orden.estadoOrden}
-                </div>
-                <button
-                  className="mt-4 bg-teal-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleShowMore(orden)}
-                >
-                  Ver más
-                </button>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Modal para mostrar más detalles de la orden */}
-      {showModal && selectedOrden && (
-        <Modal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title={`Orden: ${selectedOrden.numeroOrden}`}
-        >
-          <div>
-            <h2 className="text-lg font-semibold">Detalles de la Orden</h2>
-            <p><strong>Descripción:</strong> {selectedOrden.descripcionOrden}</p>
-            <p><strong>Tarea Realizada:</strong> {selectedOrden.tareaRealizada}</p>
-            <p><strong>Fecha de Cumplimiento:</strong> {selectedOrden.fechaCumplimiento ? formatDate(selectedOrden.fechaCumplimiento) : 'No disponible'}</p>
-            <p><strong>Componentes Asignados:</strong> {selectedOrden.componentesAsignados.length > 0 ? selectedOrden.componentesAsignados.join(", ") : "Ninguno"}</p>
-            <p><strong>Elementos de la Orden:</strong> {selectedOrden.elementoOrden.map((item, index) => (
-              <div key={index}>{item.nombre}: {item.cantidad}</div>
-            ))}</p>
-            <p><strong>Elementos Sobrantes:</strong> {selectedOrden.elementoOrdenSobrantes.map((item, index) => (
-              <div key={index}>{item.nombre}: {item.cantidadSobrante}</div>
-            ))}</p>
-            <button
-              className="mt-4 bg-teal-500 text-white px-4 py-2 rounded"
-              onClick={() => handleCompUserModalOpen(selectedOrden)}
-            >
-              Ver Componentes
-            </button>
-          </div>
-        </Modal>
-      )}
-
-      {/* Modal para mostrar la descripción completa */}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        orden={selectedOrden}
+        onShowDescription={handleDescriptionClick}
+        onShowUser={handleUserClick}
+        onShowSerial={handleSerialClick}
+        onShowCompUserModal={handleCompUserModalOpen}
+      />
+      <ModalComponentes
+        show={showCompUserModal}
+        onClose={handleModalClose}
+        orden={selectedOrden}
+      />
       {showDescriptionModal && (
-        <Modal
-          isOpen={showDescriptionModal}
-          onClose={() => setShowDescriptionModal(false)}
-          title="Descripción Completa"
-        >
+        <Modal onClose={() => setShowDescriptionModal(false)} title="Descripción de la Orden">
           <p>{descripcionCompleta}</p>
         </Modal>
       )}
-
-      {/* Modal para mostrar la información del usuario */}
       {showUserModal && (
-        <Modal
-          isOpen={showUserModal}
-          onClose={() => setShowUserModal(false)}
-          title="Información del Usuario"
-        >
+        <Modal onClose={() => setShowUserModal(false)} title="Usuario">
           <p>{usuarioCompleto}</p>
         </Modal>
       )}
-
-      {/* Modal para mostrar el número de serie de la máquina */}
       {showSerialModal && (
-        <Modal
-          isOpen={showSerialModal}
-          onClose={() => setShowSerialModal(false)}
-          title="Número de Serie"
-        >
+        <Modal onClose={() => setShowSerialModal(false)} title="Número de Serie">
           <p>{serialCompleto}</p>
         </Modal>
-      )}
-
-      {/* Modal para mostrar el modal de componentes */}
-      {showCompUserModal && (
-        <ModalComponentes
-          isOpen={showCompUserModal}
-          onClose={() => handleModalClose(null)}
-          orden={selectedOrden}
-          onUpdate={updateOrdenInState}
-        />
       )}
     </div>
   );

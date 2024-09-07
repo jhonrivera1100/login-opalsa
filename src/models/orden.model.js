@@ -8,12 +8,6 @@ const OrdenSchema = new mongoose.Schema({
   usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   tareaRealizada: { type: String },
   numeroOrden: { type: String, unique: true, required: true },
-  componentesAsignados: [
-    { type: mongoose.Schema.Types.ObjectId, ref: 'Componente' } // Referencia al modelo Componente
-  ],
-  componenteSobrantes: [
-    { type: mongoose.Schema.Types.ObjectId, ref: 'Componente' } // Referencia al modelo Componente
-  ],
   sobrantes: { type: String },
   elementoOrden: [
     {

@@ -2,7 +2,6 @@ import User from '../models/user.model.js';
 import Orden from '../models/orden.model.js';
 import Maquina from '../models/maquina.model.js';
 import mongoose from 'mongoose';
-import Componente from '../models/componente.model.js';
 import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 
 // Obtener todas las órdenes
@@ -11,8 +10,8 @@ export const getOrdenes = async (req, res) => {
     const ordenes = await Orden.find()
       .populate('usuario', 'username') // Popula el usuario con solo el campo 'username'
       .populate('maquina') // Popula la máquina asociada
-      .populate('componentesAsignados') // Popula los componentes asignados
-      .populate('componenteSobrantes'); // Popula los componentes sobrantes
+      .populate('elementoOrden') // Opcional: si necesitas poblar elementos de la orden
+      .populate('elementoOrdenSobrantes'); // Opcional: si necesitas poblar elementos sobrantes
 
     res.json(ordenes);
   } catch (error) {
@@ -28,8 +27,8 @@ export const getOrdenesByUser = async (req, res) => {
     const ordenes = await Orden.find({ usuario: userId })
       .populate('usuario')
       .populate('maquina') // Popula la máquina asociada
-      .populate('componentesAsignados')
-      .populate('componenteSobrantes');
+      .populate('elementoOrden')
+      .populate('elementoOrdenSobrantes');
 
     res.json(ordenes);
   } catch (error) {
@@ -45,8 +44,8 @@ export const obtenerOrdenPorId = async (req, res) => {
     const orden = await Orden.findById(id)
       .populate('usuario')
       .populate('maquina') // Popula la máquina asociada
-      .populate('componentesAsignados')
-      .populate('componenteSobrantes');
+      .populate('elementoOrden')
+      .populate('elementoOrdenSobrantes');
     
     if (!orden) {
       return res.status(404).json({ message: 'Orden no encontrada' });
@@ -88,9 +87,6 @@ export const createOrden = async (req, res) => {
       usuario: usuarioObj._id,
       numeroOrden,
       tipoDeMantenimiento,
-      componentesAsignados: [], // Inicialmente vacío
-      componenteSobrantes: [], // Inicialmente vacío
-      tareaRealizada: '', // Inicialmente vacío
       elementoOrden: [],
       elementoOrdenSobrantes: [],
       fechaCumplimiento: null
@@ -104,25 +100,15 @@ export const createOrden = async (req, res) => {
   }
 };
 
-// Actualizar una orden (asignados, tarea realizada)
+// Actualizar una orden (tarea realizada y elementos)
 export const updateOrdenAsignados = async (req, res) => {
   try {
     const { id } = req.params;
-    const { componentesAsignados = [], estadoOrden = 'Orden en solicitud', elementoOrden = [], tareaRealizada = '' } = req.body;
-
-    // Buscar los componentes por ID y obtener sus IDs
-    const componentesIds = await Promise.all(componentesAsignados.map(async (id) => {
-      const componente = await Componente.findById(id);
-      if (!componente) {
-        throw new Error(`Componente con ID ${id} no encontrado`);
-      }
-      return componente._id;
-    }));
+    const { estadoOrden = 'Orden en solicitud', elementoOrden = [], tareaRealizada = '' } = req.body;
 
     const ordenActualizada = await Orden.findByIdAndUpdate(
       id,
       { 
-        componentesAsignados: componentesIds,
         estadoOrden,
         elementoOrden,
         tareaRealizada
@@ -131,8 +117,8 @@ export const updateOrdenAsignados = async (req, res) => {
     )
     .populate('usuario')
     .populate('maquina') // Popula la máquina asociada
-    .populate('componentesAsignados')
-    .populate('componenteSobrantes');
+    .populate('elementoOrden')
+    .populate('elementoOrdenSobrantes');
 
     if (!ordenActualizada) {
       return res.status(404).json({ message: 'Orden no encontrada' });
@@ -188,35 +174,11 @@ export const updateOrdenSobrantes = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      componentesAsignados = [],
-      componenteSobrantes = [], // IDs de componentes sobrantes
       estadoOrden = 'Orden en solicitud',
       elementoOrden = [], // Elementos asignados
       elementoOrdenSobrantes = [], // Elementos sobrantes
       tareaRealizada = '' // Actualizar la tarea realizada
     } = req.body;
-
-    // Buscar los componentes por ID y obtener sus IDs
-    const componentesIds = await Promise.all(componentesAsignados.map(async (id) => {
-      const componente = await Componente.findById(id);
-      if (!componente) {
-        throw new Error(`Componente con ID ${id} no encontrado`);
-      }
-      return componente._id;
-    }));
-
-    // Validar que los componentes sobrantes estén en los componentes asignados
-    const componentesAsignadosIds = new Set(componentesIds.map(id => id.toString()));
-    const componenteSobrantesIds = await Promise.all(componenteSobrantes.map(async (id) => {
-      const componente = await Componente.findById(id);
-      if (!componente) {
-        throw new Error(`Componente con ID ${id} no encontrado`);
-      }
-      if (!componentesAsignadosIds.has(componente._id.toString())) {
-        throw new Error(`El componente con ID ${id} no está en los componentes asignados.`);
-      }
-      return componente._id;
-    }));
 
     // Validar que las cantidades sobrantes no excedan las cantidades asignadas
     elementoOrden.forEach((elemento) => {
@@ -227,25 +189,21 @@ export const updateOrdenSobrantes = async (req, res) => {
     });
 
     // Actualizar la orden con los datos proporcionados
-       // Actualizar la orden con los datos proporcionados
-       const ordenActualizada = await Orden.findById(id);
-       if (!ordenActualizada) {
-         return res.status(404).json({ message: 'Orden no encontrada' });
-       }
-   
-       ordenActualizada.componentesAsignados = componentesIds;
-       ordenActualizada.componenteSobrantes = componenteSobrantesIds;
-       ordenActualizada.estadoOrden = estadoOrden;
-       ordenActualizada.elementoOrden = elementoOrden;
-       ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
-       ordenActualizada.tareaRealizada = tareaRealizada;
-   
-       await ordenActualizada.save();
-   
-       res.status(200).json(ordenActualizada);
-     } catch (error) {
-       console.error('Error al actualizar la orden:', error.message);
-       res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
-     }
-   };
-   
+    const ordenActualizada = await Orden.findById(id);
+    if (!ordenActualizada) {
+      return res.status(404).json({ message: 'Orden no encontrada' });
+    }
+
+    ordenActualizada.estadoOrden = estadoOrden;
+    ordenActualizada.elementoOrden = elementoOrden;
+    ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
+    ordenActualizada.tareaRealizada = tareaRealizada;
+
+    await ordenActualizada.save();
+
+    res.status(200).json(ordenActualizada);
+  } catch (error) {
+    console.error('Error al actualizar la orden:', error.message);
+    res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
+  }
+};

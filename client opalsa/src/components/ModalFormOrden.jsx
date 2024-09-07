@@ -41,10 +41,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           setFechaOrden(new Date(response.fechaOrden).toLocaleDateString());
 
           // Actualizar selectedComponentes con los componentes actuales de la orden
-          const componentesSeleccionados = response.componentesAsignados.map((comp) => ({
-            value: comp._id,
-            label: `${comp.nombreComponente} (Serial: ${comp.serialComponente})`,
-          }));
+          const componentesSeleccionados = []; // Ya no se necesita esta parte
           setSelectedComponentes(componentesSeleccionados);
         }
       } catch (err) {
@@ -77,7 +74,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const componentesAsignados = selectedComponentes.map((comp) => comp.value); // Obtener solo los IDs
+    // Eliminar la asignación de componentes
+    const componentesAsignados = []; // No se usa más
 
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
@@ -86,7 +84,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         nroSerieMaquina,
         ubicacionMaquina,
         usuario: usuario._id, 
-        componentesAsignados,
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
       });
@@ -161,18 +158,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
             <p className="text-gray-600">Cargo</p>
             <p>{usuario.cargo || 'No disponible'}</p>
-          </div>
-
-          <div className="mt-4">
-            <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
-            <Select
-              value={selectedComponentes}
-              onChange={handleComponentesChange}
-              options={componenteOptions}
-              isMulti
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Selecciona los Componentes"
-            />
           </div>
 
           <div className="mt-4">
