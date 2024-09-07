@@ -4,13 +4,15 @@ import { getMaquinasRequest } from '../api/maquinas';
 import Select from 'react-select';
 
 const MantenimientoRegistro = () => {
-  const [maquinaSeleccionada, setMaquinaSeleccionada] = useState(''); // Guardar la máquina seleccionada
+  const [nroSerieMaquina, setNroSerieMaquina] = useState('');
+  const [nombreMaquina, setNombreMaquina] = useState('');
+  const [ubicacionMaquina, setUbicacionMaquina] = useState('');
   const [tipoMantenimiento, setTipoMantenimiento] = useState('');
   const [fechaMantenimiento, setFechaMantenimiento] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null); 
+  const [successMessage, setSuccessMessage] = useState(null); // Estado para el mensaje de éxito
   const [maquinas, setMaquinas] = useState([]);
   const [mantenimientos, setMantenimientos] = useState([]);
 
@@ -28,19 +30,22 @@ const MantenimientoRegistro = () => {
     fetchMaquinas();
   }, []);
 
-  // Actualizar marca y ubicación de la máquina seleccionada
   const handleSerieChange = (selectedOption) => {
     if (selectedOption) {
       const selectedSerie = selectedOption.value;
+      setNroSerieMaquina(selectedSerie);
       const selectedMaquina = maquinas.find(maquina => maquina.nroSerieMaquina === selectedSerie);
-      
       if (selectedMaquina) {
-        setMaquinaSeleccionada(selectedMaquina); // Actualizar con la máquina encontrada
+        setNombreMaquina(selectedMaquina.marcaMaquina);
+        setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
       } else {
-        setMaquinaSeleccionada(null);
+        setNombreMaquina('');
+        setUbicacionMaquina('');
       }
     } else {
-      setMaquinaSeleccionada(null);
+      setNroSerieMaquina('');
+      setNombreMaquina('');
+      setUbicacionMaquina('');
     }
   };
 
@@ -51,27 +56,36 @@ const MantenimientoRegistro = () => {
     formData.append('tipoMantenimiento', tipoMantenimiento);
     formData.append('fechaMantenimiento', fechaMantenimiento);
     formData.append('descripcion', descripcion);
-    formData.append('maquina', maquinaSeleccionada ? maquinaSeleccionada.nroSerieMaquina : ''); // Asegúrate de que se envía el número de serie correcto
+    formData.append('nroSerieMaquina', nroSerieMaquina);
+    formData.append('nombreMaquina', nombreMaquina);
+    formData.append('ubicacionMaquina', ubicacionMaquina);
     if (archivo) {
       formData.append('archivo', archivo);
     }
-  
+
     try {
       const response = await axios.post('http://localhost:4000/api/mantenimientos', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Mantenimiento creado:', response.data);
-      setSuccessMessage('Mantenimiento registrado exitosamente');
+      
+      setMantenimientos([...mantenimientos, response.data]);
+      setSuccessMessage('Mantenimiento registrado exitosamente'); // Establecer mensaje de éxito
+      setError(null); // Limpiar error
+      setTipoMantenimiento('');
+      setFechaMantenimiento('');
+      setDescripcion('');
+      setNroSerieMaquina('');
+      setNombreMaquina('');
+      setUbicacionMaquina('');
+      setArchivo(null);
     } catch (error) {
       console.error('Error al crear mantenimiento:', error);
-      setError('Error al registrar el mantenimiento.');
+      setError('Error al crear mantenimiento. Inténtalo de nuevo.');
+      setSuccessMessage(null); // Limpiar mensaje de éxito en caso de error
     }
   };
-  
-  
-  
 
   const maquinaOptions = maquinas.map(maquina => ({
     value: maquina.nroSerieMaquina,
@@ -87,7 +101,7 @@ const MantenimientoRegistro = () => {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 mt-5">
             <Select
-              value={maquinaOptions.find(option => option.value === (maquinaSeleccionada ? maquinaSeleccionada.nroSerieMaquina : ''))}
+              value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
               onChange={handleSerieChange}
               options={maquinaOptions}
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
@@ -95,14 +109,14 @@ const MantenimientoRegistro = () => {
             />
             <input
               type="text"
-              value={maquinaSeleccionada ? maquinaSeleccionada.marcaMaquina : ''}
+              value={nombreMaquina}
               readOnly
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               placeholder="Marca de la Máquina"
             />
             <input
               type="text"
-              value={maquinaSeleccionada ? maquinaSeleccionada.ubicacionMaquina : ''}
+              value={ubicacionMaquina}
               readOnly
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               placeholder="Ubicación de la Máquina"

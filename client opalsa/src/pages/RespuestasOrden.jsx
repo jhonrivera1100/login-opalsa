@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import HeaderRespuestas from "../components/HeaderRespOrd";
 import Modal from "../components/ModalNotificaciones";
 import ModalComponentes from "../components/modalCompUser";
+import modalRespOrden from "../components/modalRespOrden";
 
 const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -176,35 +177,6 @@ const RespuestasOrden = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal para mostrar más detalles de la orden */}
-      {showModal && selectedOrden && (
-        <Modal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title={`Orden: ${selectedOrden.numeroOrden}`}
-        >
-          <div>
-            <h2 className="text-lg font-semibold">Detalles de la Orden</h2>
-            <p><strong>Descripción:</strong> {selectedOrden.descripcionOrden}</p>
-            <p><strong>Tarea Realizada:</strong> {selectedOrden.tareaRealizada}</p>
-            <p><strong>Fecha de Cumplimiento:</strong> {selectedOrden.fechaCumplimiento ? formatDate(selectedOrden.fechaCumplimiento) : 'No disponible'}</p>
-            <p><strong>Componentes Asignados:</strong> {selectedOrden.componentesAsignados.length > 0 ? selectedOrden.componentesAsignados.join(", ") : "Ninguno"}</p>
-            <p><strong>Elementos de la Orden:</strong> {selectedOrden.elementoOrden.map((item, index) => (
-              <div key={index}>{item.nombre}: {item.cantidad}</div>
-            ))}</p>
-            <p><strong>Elementos Sobrantes:</strong> {selectedOrden.elementoOrdenSobrantes.map((item, index) => (
-              <div key={index}>{item.nombre}: {item.cantidadSobrante}</div>
-            ))}</p>
-            <button
-              className="mt-4 bg-teal-500 text-white px-4 py-2 rounded"
-              onClick={() => handleCompUserModalOpen(selectedOrden)}
-            >
-              Ver Componentes
-            </button>
-          </div>
-        </Modal>
-      )}
 
       {/* Modal para mostrar la descripción completa */}
       {showDescriptionModal && (

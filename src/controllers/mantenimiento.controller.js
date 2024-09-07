@@ -8,30 +8,23 @@ import { uploadFile, deleteFile } from '../libs/cloudinary.js'; // Importa las f
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Controlador actualizado
 export const getMantenimientos = async (req, res) => {
   try {
-    // Buscar mantenimientos y popular el campo 'maquina' con sus detalles
-    const mantenimientos = await Mantenimiento.find().populate('maquina', 'marcaMaquina nroSerieMaquina ubicacionMaquina');
-    
-    res.status(200).json(mantenimientos);
+    const mantenimientos = await Mantenimiento.find();
+    res.json(mantenimientos);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener mantenimientos', error });
+    res.status(500).json({ message: 'Error al obtener los mantenimientos', error });
   }
 };
 
-
-
-
 export const createMantenimiento = async (req, res) => {
   try {
-    const { tipoMantenimiento, fechaMantenimiento, descripcion, maquina } = req.body;
+    const { tipoMantenimiento, fechaMantenimiento, descripcion, nroSerieMaquina, nombreMaquina, ubicacionMaquina } = req.body;
     const archivo = req.files ? req.files.archivo : null;
 
-    console.log('Datos recibidos:', { tipoMantenimiento, fechaMantenimiento, descripcion, maquina });
-
-    const maquinas = await Maquina.findOne({ nroSerieMaquina: maquina });
-    if (!maquinas) {
+    // Buscar la máquina por número de serie
+    const maquina = await Maquina.findOne({ nroSerieMaquina });
+    if (!maquina) {
       return res.status(404).json({ message: 'Máquina no encontrada' });
     }
 
@@ -51,19 +44,18 @@ export const createMantenimiento = async (req, res) => {
       tipoMantenimiento,
       fechaMantenimiento,
       descripcion,
-      maquina: maquinas._id, // Guardar la referencia a la máquina por su ID
+      nroSerieMaquina,
+      nombreMaquina,
+      ubicacionMaquina,
       archivo: archivoData,
     });
 
     await nuevoMantenimiento.save();
     res.status(201).json(nuevoMantenimiento);
   } catch (error) {
-    console.error('Error al crear el mantenimiento:', error); // Agrega este log para ver el error exacto
     return res.status(500).json({ message: 'Error al crear el mantenimiento', error });
   }
 };
-
-
 
 export const deleteMantenimiento = async (req, res) => {
   try {
@@ -84,4 +76,3 @@ export const deleteMantenimiento = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el mantenimiento', error });
   }
 };
- 
