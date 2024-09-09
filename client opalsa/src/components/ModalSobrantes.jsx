@@ -3,32 +3,24 @@ import axios from 'axios';
 import Select from 'react-select';
 
 const ModalSobrantes = ({ item, onClose }) => {
-  const [selectedComponents, setSelectedComponents] = useState([]);
-  const [tareaRealizada, setTareaRealizada] = useState(''); // Nuevo estado
-  const [componentesAsignados, setComponentesAsignados] = useState([]);
   const [selectedElementos, setSelectedElementos] = useState([]);
   const [elementoOrden, setElementoOrden] = useState([]);
   const [elementoOrdenSobrantes, setElementoOrdenSobrantes] = useState([]);
+  const [tareaRealizada, setTareaRealizada] = useState(''); // Nuevo estado
+  const [componentesAsignados, setComponentesAsignados] = useState([]); // Nuevo estado para componentesAsignados
+  const [componentesSobrantes, setComponentesSobrantes] = useState([]); // Nuevo estado para componentesSobrantes
 
   useEffect(() => {
     if (item) {
-      setComponentesAsignados(item.componentesAsignados || []);
       setTareaRealizada(item.tareaRealizada || ''); // Asignación de tarea
-      setSelectedComponents(
-        item.componenteSobrantes?.map((comp) => ({
-          value: comp._id,
-          label: `${comp.nombreComponente} (${comp.serialComponente})`,
-        })) || []
-      );
       setElementoOrden(item.elementoOrden || []);
       setElementoOrdenSobrantes(item.elementoOrdenSobrantes || []);
+      setComponentesAsignados(item.componentesAsignados || []); // Inicialización de componentesAsignados
+
+      // Inicialmente no se selecciona ningún elemento
+      setSelectedElementos([]);
     }
   }, [item]);
-
-  const componentOptions = componentesAsignados.map((componente) => ({
-    value: componente._id,
-    label: `${componente.nombreComponente} (${componente.serialComponente})`,
-  }));
 
   const elementoOptions = elementoOrden.map((elemento) => ({
     value: elemento.nombre,
@@ -36,9 +28,10 @@ const ModalSobrantes = ({ item, onClose }) => {
     cantidadAsignada: elemento.cantidad,
   }));
 
-  const handleComponentesChange = (selectedOptions) => {
-    setSelectedComponents(selectedOptions || []);
-  };
+  const componenteOptions = componentesAsignados.map((componente) => ({
+    value: componente.serialComponente,
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+  }));
 
   const handleElementosChange = (selectedOptions) => {
     setSelectedElementos(selectedOptions || []);
@@ -61,20 +54,25 @@ const ModalSobrantes = ({ item, onClose }) => {
     });
   };
 
+  const handleComponentesChange = (selectedOptions) => {
+    const nuevosComponentesSobrantes = selectedOptions.map((componente) => ({
+      marcaComponente: '',
+      serialComponente: componente.value,
+      nombreComponente: componente.label.split(' ')[0], // Extrae el nombre del componente
+    }));
+    setComponentesSobrantes(nuevosComponentesSobrantes);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const data = {
-      componentesAsignados: componentesAsignados.map((comp) => ({
-        _id: comp._id,
-      })),
-      componenteSobrantes: selectedComponents.map((comp) => ({
-        _id: comp.value,
-      })),
       elementoOrden,
       elementoOrdenSobrantes,
       tareaRealizada, // Nuevo campo
       estadoOrden: 'Orden Finalizada',
+      componentesAsignados, // Incluimos componentesAsignados en los datos a enviar
+      componentesSobrantes, // Incluimos componentesSobrantes en los datos a enviar
     };
 
     try {
@@ -94,23 +92,9 @@ const ModalSobrantes = ({ item, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-        <h3 className="text-lg font-bold mb-4">Seleccionar Componentes y Sobrantes</h3>
+        <h3 className="text-lg font-bold mb-4">Seleccionar Elementos, Sobrantes y Componentes Asignados</h3>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
-            <div className="mb-4">
-              <label htmlFor="componentes" className="block text-sm font-medium text-gray-700">
-                Componentes:
-              </label>
-              <Select
-                id="componentes"
-                value={selectedComponents}
-                onChange={handleComponentesChange}
-                options={componentOptions}
-                isMulti
-                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                placeholder="Selecciona los Componentes"
-              />
-            </div>
             <div className="mb-4">
               <label htmlFor="elementos" className="block text-sm font-medium text-gray-700">
                 Elementos Orden:
@@ -141,6 +125,22 @@ const ModalSobrantes = ({ item, onClose }) => {
                 />
               </div>
             ))}
+
+            {/* Nueva sección para los componentesAsignados */}
+            <div className="mb-4">
+              <label htmlFor="componentes" className="block text-sm font-medium text-gray-700">
+                Componentes Asignados:
+              </label>
+              <Select
+                id="componentes"
+                options={componenteOptions}
+                isMulti
+                onChange={handleComponentesChange}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Selecciona los Componentes Asignados"
+              />
+            </div>
+
             <div>
               <label htmlFor="tareaRealizada" className="block text-sm font-medium text-gray-700">Tarea Realizada:</label>
               <input 

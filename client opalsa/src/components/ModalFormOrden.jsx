@@ -40,10 +40,10 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           setNumeroOrden(response.numeroOrden);
           setFechaOrden(new Date(response.fechaOrden).toLocaleDateString());
 
-          // Actualizar selectedComponentes con los componentes actuales de la orden
-          const componentesSeleccionados = response.componentesAsignados.map((comp) => ({
-            value: comp._id,
-            label: `${comp.nombreComponente} (Serial: ${comp.serialComponente})`,
+          // Actualizar selectedComponentes con los componentes ya asignados a la orden
+          const componentesSeleccionados = response.componentesAsignados.map(component => ({
+            value: component.serialComponente,
+            label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
           }));
           setSelectedComponentes(componentesSeleccionados);
         }
@@ -76,9 +76,12 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const componentesAsignados = selectedComponentes.map((comp) => comp.value); // Obtener solo los IDs
-
+  
+    const componentesAsignados = selectedComponentes.map(component => ({
+      nombreComponente: component.label.split(' (Serial:')[0],
+      serialComponente: component.value,  // Usar el serialComponente como value
+    }));
+  
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
         fechaOrden: new Date(),
@@ -86,11 +89,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         nroSerieMaquina,
         ubicacionMaquina,
         usuario: usuario._id, 
-        componentesAsignados,
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
+        componentesAsignados,  // Guardar los componentes asignados con su serial
       });
-
+  
       if (typeof onOrderAccepted === 'function') {
         onOrderAccepted(response.data);
       }
@@ -104,8 +107,9 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
-    value: componente._id,
-    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+    value: componente.serialComponente, // Usar serialComponente como value
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`, // Mostrar serial en el label
+    marcaComponente: componente.marcaComponente,
   }));
 
   return (
@@ -166,12 +170,14 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           <div className="mt-4">
             <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
             <Select
-              value={selectedComponentes}
-              onChange={handleComponentesChange}
-              options={componenteOptions}
               isMulti
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Selecciona los Componentes"
+              name="componentes"
+              options={componenteOptions}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              value={selectedComponentes} // Mostrar los componentes ya seleccionados
+              onChange={handleComponentesChange}
+              placeholder="Selecciona componentes"
             />
           </div>
 
@@ -196,7 +202,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
                 <button
                   type="button"
                   onClick={() => handleRemoveElemento(index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  className="px-4 py-2 bg-red-500 text-white rounded"
                 >
                   Eliminar
                 </button>
@@ -205,25 +211,25 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             <button
               type="button"
               onClick={handleAddElemento}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+              className="px-4 py-2 bg-blue-500 text-white rounded"
             >
-              Agregar Elemento
+              Añadir Elemento
             </button>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-4 flex justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
+              className="px-4 py-2 bg-gray-500 text-white rounded"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className="px-4 py-2 bg-green-500 text-white rounded"
             >
-              Aceptar Orden
+              Guardar Orden
             </button>
           </div>
         </form>
