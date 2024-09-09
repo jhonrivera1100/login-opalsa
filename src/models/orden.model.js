@@ -5,7 +5,11 @@ const OrdenSchema = new mongoose.Schema({
   estadoOrden: { type: String, required: true, default: 'Orden en solicitud' },
   descripcionOrden: { type: String, required: true },
   maquina: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquinas', required: true }, // Referencia al modelo Maquinas
-  usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  usuario: {
+    username: { type: String, required: true },
+    email: { type: String, required: true },
+    cargo: { type: String, required: true }
+  },
   tareaRealizada: { type: String },
   numeroOrden: { type: String, unique: true, required: true },
   elementoOrden: [

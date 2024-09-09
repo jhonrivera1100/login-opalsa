@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 export const getOrdenes = async (req, res) => {
   try {
     const ordenes = await Orden.find()
-      .populate('usuario', 'username')
       .populate('maquina')
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
@@ -26,8 +25,7 @@ export const getOrdenes = async (req, res) => {
 export const getOrdenesByUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const ordenes = await Orden.find({ usuario: userId })
-      .populate('usuario')
+    const ordenes = await Orden.find({ 'usuario._id': userId })
       .populate('maquina')
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
@@ -46,7 +44,6 @@ export const obtenerOrdenPorId = async (req, res) => {
   try {
     const { id } = req.params;
     const orden = await Orden.findById(id)
-      .populate('usuario')
       .populate('maquina')
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
@@ -86,7 +83,11 @@ export const createOrden = async (req, res) => {
       fechaOrden,
       descripcionOrden,
       maquina: maquina._id,
-      usuario: usuarioObj._id,
+      usuario: {
+        username: usuarioObj.username,
+        email: usuarioObj.email,
+        cargo: usuarioObj.cargo
+      },
       numeroOrden,
       tipoDeMantenimiento,
       componentesAsignados,
@@ -121,7 +122,6 @@ export const updateOrdenAsignados = async (req, res) => {
       },
       { new: true }
     )
-    .populate('usuario')
     .populate('maquina')
     .populate('elementoOrden')
     .populate('elementoOrdenSobrantes')
@@ -177,7 +177,6 @@ export const updateAceptar = async (req, res) => {
   }
 };
 
-// Actualizar la orden incluyendo sobrantes y tarea realizada
 // Actualizar la orden incluyendo sobrantes y tarea realizada
 export const updateOrdenSobrantes = async (req, res) => {
   try {

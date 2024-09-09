@@ -51,13 +51,13 @@ const GenerarOrden = () => {
             const response = await axios.post('http://localhost:4000/api/ordenes', {
                 descripcionOrden,
                 nroSerieMaquina,
-                usuario: user.username, // Envía el usuario actual
+                usuario: user.username, // Envía el username del usuario actual
                 tipoDeMantenimiento,
                 fechaOrden
             });
             console.log('Orden creada:', response.data);
         } catch (error) {
-            console.error('Error al crear Orden:', error);
+            console.error('Error al crear la orden:', error);
             setError('No se pudo crear la orden. Inténtalo de nuevo.');
         }
     };
