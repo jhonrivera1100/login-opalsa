@@ -174,7 +174,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             <p>{usuario.email || 'No disponible'}</p>
           </div>
 
-          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
             <p className="text-gray-600">Cargo</p>
             <p>{usuario.cargo || 'No disponible'}</p>
           </div>
