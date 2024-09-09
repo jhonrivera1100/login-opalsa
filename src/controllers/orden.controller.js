@@ -178,6 +178,7 @@ export const updateAceptar = async (req, res) => {
 };
 
 // Actualizar la orden incluyendo sobrantes y tarea realizada
+// Actualizar la orden incluyendo sobrantes y tarea realizada
 export const updateOrdenSobrantes = async (req, res) => {
   try {
     const { id } = req.params;
@@ -187,7 +188,7 @@ export const updateOrdenSobrantes = async (req, res) => {
       elementoOrdenSobrantes = [],
       tareaRealizada = '',
       componentesAsignados = [],
-      componentesSobrantes = []
+      componentesSobrantes = [] // Asegúrate de que no contiene campos no permitidos
     } = req.body;
 
     // Validar que las cantidades sobrantes no excedan las asignadas
@@ -197,6 +198,12 @@ export const updateOrdenSobrantes = async (req, res) => {
         throw new Error(`La cantidad sobrante para el elemento ${elemento.nombre} excede la cantidad asignada.`);
       }
     });
+
+    // Filtra los componentes sobrantes para asegurarte de que solo contiene los campos válidos
+    const componentesSobrantesFiltrados = componentesSobrantes.map((componente) => ({
+      serialComponente: componente.serialComponente,
+      nombreComponente: componente.nombreComponente,
+    }));
 
     const ordenActualizada = await Orden.findById(id);
     if (!ordenActualizada) {
@@ -208,7 +215,7 @@ export const updateOrdenSobrantes = async (req, res) => {
     ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
     ordenActualizada.tareaRealizada = tareaRealizada;
     ordenActualizada.componentesAsignados = componentesAsignados;
-    ordenActualizada.componentesSobrantes = componentesSobrantes;
+    ordenActualizada.componentesSobrantes = componentesSobrantesFiltrados;
 
     await ordenActualizada.save();
 

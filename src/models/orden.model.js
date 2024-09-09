@@ -28,14 +28,12 @@ const OrdenSchema = new mongoose.Schema({
   // Nuevos campos añadidos
   componentesAsignados: [
     {
-      marcaComponente: { type: String, required: true },
       serialComponente: { type: String, required: true },
       nombreComponente: { type: String, required: true },
     }
   ],
   componentesSobrantes: [
     {
-      marcaComponente: { type: String, required: true },
       serialComponente: { type: String, required: true },
       nombreComponente: { type: String, required: true },
     }

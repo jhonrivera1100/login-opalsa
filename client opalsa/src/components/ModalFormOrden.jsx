@@ -76,12 +76,12 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const componentesAsignados = selectedComponentes.map(component => ({
       nombreComponente: component.label.split(' (Serial:')[0],
-      serialComponente: component.value,
+      serialComponente: component.value,  // Usar el serialComponente como value
     }));
-
+  
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
         fechaOrden: new Date(),
@@ -91,9 +91,9 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         usuario: usuario._id, 
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
-        componentesAsignados,
+        componentesAsignados,  // Guardar los componentes asignados con su serial
       });
-
+  
       if (typeof onOrderAccepted === 'function') {
         onOrderAccepted(response.data);
       }
@@ -107,8 +107,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
-    value: componente._id,
-    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+    value: componente.serialComponente, // Usar serialComponente como value
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`, // Mostrar serial en el label
     marcaComponente: componente.marcaComponente,
   }));
 
