@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import HeaderRespuestas from "../components/HeaderRespOrd";
 import Modal from "../components/ModalNotificaciones";
 import ModalComponentes from "../components/modalCompUser";
-import modalRespOrden from "../components/modalRespOrden";
+import ModalRespOrden from "../components/modalRespOrden";
 
 const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -17,6 +17,7 @@ const RespuestasOrden = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [showCompUserModal, setShowCompUserModal] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false); 
   const [selectedOrden, setSelectedOrden] = useState(null);
   const [descripcionCompleta, setDescripcionCompleta] = useState("");
   const [usuarioCompleto, setUsuarioCompleto] = useState("");
@@ -66,34 +67,18 @@ const RespuestasOrden = () => {
     setFilteredOrdenes(filtered);
   };
 
-  const handleAccept = () => {
-    setShowModal(false);
-  };
-
   const handleShowMore = (orden) => {
-    setSelectedOrden(orden);
-    setShowModal(true);
+    setSelectedOrden(orden); // Set the selected order to pass to the modal
+    setShowOrderModal(true); // Open the modal
   };
 
-  const handleDescriptionClick = (descripcionOrden) => {
-    setDescripcionCompleta(descripcionOrden);
-    setShowDescriptionModal(true);
+  const handleModalClose = () => {
+    setShowOrderModal(false); // Close the modal
   };
 
-  const handleUserClick = (usuario) => {
-    setUsuarioCompleto(usuario.username || "Desconocido");
-    setShowUserModal(true);
-  };
-
-  const handleSerialClick = (nroSerieMaquina) => {
-    setSerialCompleto(nroSerieMaquina);
-    setShowSerialModal(true);
-  };
-
-  const handleCompUserModalOpen = (orden) => {
-    setSelectedOrden(orden);
-    setShowCompUserModal(true);
-  };
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
 
   const updateOrdenInState = (updatedOrden) => {
     setOrdenes((prevOrdenes) =>
@@ -102,17 +87,6 @@ const RespuestasOrden = () => {
       )
     );
   };
-
-  const handleModalClose = async (updatedOrden) => {
-    setShowCompUserModal(false);
-    if (updatedOrden) {
-      updateOrdenInState(updatedOrden); // Actualiza el estado con la orden modificada
-    }
-  };
-
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
 
   return (
     <div className="lg:col-span-3 xl:col-span-3 p-4 lg:p-8">
@@ -167,8 +141,8 @@ const RespuestasOrden = () => {
                   Estado: {orden.estadoOrden}
                 </div>
                 <button
-                  className="mt-4 bg-teal-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleShowMore(orden)}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => handleShowMore(orden)} // Open modal on click
                 >
                   Ver más
                 </button>
@@ -177,6 +151,14 @@ const RespuestasOrden = () => {
           </div>
         </div>
       </div>
+
+      {showOrderModal && (
+        <ModalRespOrden
+          isOpen={showOrderModal}
+          onClose={handleModalClose}
+          orden={selectedOrden}
+        />
+      )}
 
       {/* Modal para mostrar la descripción completa */}
       {showDescriptionModal && (

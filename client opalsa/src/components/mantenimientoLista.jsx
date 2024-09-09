@@ -6,7 +6,6 @@ import { CgWebsite } from "react-icons/cg";
 const MantenimientosList = () => {
   const [mantenimientos, setMantenimientos] = useState([]);
   const [selectedMantenimiento, setSelectedMantenimiento] = useState(null);
-  const [maquinaSeleccionada, setMaquinaSeleccionada] = useState('');
 
   useEffect(() => {
     const fetchMantenimientos = async () => {
@@ -66,19 +65,22 @@ const MantenimientosList = () => {
                   {mantenimiento.descripcion.length > 25 ? `${mantenimiento.descripcion.substring(0, 25)}...` : mantenimiento.descripcion}
                 </p>
               </div>
-             
-              <div className="card">
-  <h2>{mantenimiento.tipoMantenimiento}</h2>
-  <p>{mantenimiento.descripcion}</p>
-  <p>Fecha: {new Date(mantenimiento.fechaMantenimiento).toLocaleDateString()}</p>
-  
-  {/* Información de la máquina */}
-  <h3>Detalles de la Máquina</h3>
-  <p>Número de Serie: {mantenimiento.maquina.nroSerieMaquina}</p>
-  <p>Nombre: {mantenimiento.maquina.marcaMaquina}</p>
-  <p>Ubicación: {mantenimiento.maquina.ubicacionMaquina}</p>
-</div>
-
+              {mantenimiento.nombreMaquina && (
+                <div className="my-1">
+                  <p className="font-semibold text-base mb-1">Nombre de la Máquina</p>
+                  <p className="text-sm text-gray-500">{mantenimiento.nombreMaquina}</p>
+                </div>
+              )}
+              <div className="my-1">
+                <p className="font-semibold text-base mb-1">Número de Serie</p>
+                <p className="text-sm text-gray-500">{mantenimiento.nroSerieMaquina}</p>
+              </div>
+              {mantenimiento.ubicacionMaquina && (
+                <div className="my-1">
+                  <p className="font-semibold text-base mb-1">Ubicación</p>
+                  <p className="text-sm text-gray-500">{mantenimiento.ubicacionMaquina}</p>
+                </div>
+              )}
               {mantenimiento.archivo && mantenimiento.archivo.url && (
                 <div className="my-1">
                   <p className="font-semibold text-base mb-1">Documento</p>

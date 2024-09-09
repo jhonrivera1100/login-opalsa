@@ -8,9 +8,8 @@ const mantenimientoSchema = new mongoose.Schema({
     url: { type: String },
     public_id: { type: String },
   },
-  maquina: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquinas' },
   nroSerieMaquina: { type: String, required: true },
-  marcaMaquina: { type: String, required: true },
+  nombreMaquina: { type: String, required: true },
   ubicacionMaquina: { type: String, required: true },
 });
 
