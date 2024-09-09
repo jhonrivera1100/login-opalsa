@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
-import { useAuth } from '../context/AuthContext'; // Asegúrate de tener el contexto de autenticación importado
-import { getMaquinasRequest } from '../api/maquinas'; // Asegúrate de tener esta función en tu archivo api/maquinas.js
+import { useAuth } from '../context/AuthContext';
+import { getMaquinasRequest } from '../api/maquinas';
 
 const GenerarOrden = () => {
     const { user } = useAuth(); // Obtén el usuario autenticado desde el contexto
-    const [nroSerieMaquina, setNroSerieMaquina] = useState('');
-    const [ubicacionMaquina, setUbicacionMaquina] = useState('');
+    const [maquinaSeleccionada, setMaquinaSeleccionada] = useState(null); // Aquí almacenaremos la máquina seleccionada como un objeto completo
     const [descripcionOrden, setDescripcionOrden] = useState('');
-    const [tipoDeMantenimiento, setTipoDeMantenimiento] = useState(null); // Tipo de mantenimiento puede ser null inicialmente
+    const [tipoDeMantenimiento, setTipoDeMantenimiento] = useState([]); // Tipo de mantenimiento puede ser un array vacío inicialmente
     const [error, setError] = useState(null);
     const [maquinas, setMaquinas] = useState([]);
 
@@ -28,32 +27,41 @@ const GenerarOrden = () => {
         fetchMaquinas();
     }, []);
 
+    // Maneja el cambio de la máquina seleccionada
     const handleSerieChange = (selectedOption) => {
         if (selectedOption) {
-            const selectedSerie = selectedOption.value;
-            setNroSerieMaquina(selectedSerie);
-            const selectedMaquina = maquinas.find(maquina => maquina.nroSerieMaquina === selectedSerie);
-            if (selectedMaquina) {
-                setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
-            } else {
-                setUbicacionMaquina('');
-            }
+            const selectedMaquina = maquinas.find(maquina => maquina._id === selectedOption.value);
+            setMaquinaSeleccionada(selectedMaquina);
         } else {
-            setNroSerieMaquina('');
-            setUbicacionMaquina('');
+            setMaquinaSeleccionada(null);
         }
     };
 
+    // Maneja el cambio en el campo de tipo de mantenimiento
+    const handleTipoMantenimientoChange = (selectedOptions) => {
+        const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+        setTipoDeMantenimiento(selectedValues);
+    };
+
+    // Maneja el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!maquinaSeleccionada) {
+            setError('Debes seleccionar una máquina.');
+            return;
+        }
 
         try {
             const response = await axios.post('http://localhost:4000/api/ordenes', {
                 descripcionOrden,
-                nroSerieMaquina,
+                nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
+                marcaMaquina: maquinaSeleccionada.marcaMaquina,
+                ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
                 usuario: user.username, // Envía el username del usuario actual
                 tipoDeMantenimiento,
-                fechaOrden
+                componentesAsignados: [], // Enviar vacíos si no hay componentes asignados
+                componentesSobrantes: [], // Enviar vacíos si no hay componentes sobrantes
             });
             console.log('Orden creada:', response.data);
         } catch (error) {
@@ -62,11 +70,13 @@ const GenerarOrden = () => {
         }
     };
 
+    // Opciones para el selector de máquinas
     const maquinaOptions = maquinas.map(maquina => ({
-        value: maquina.nroSerieMaquina,
-        label: maquina.nroSerieMaquina,
+        value: maquina._id, // Usar el ID de la máquina para el valor
+        label: `${maquina.nroSerieMaquina} - ${maquina.marcaMaquina}`, // Mostrar más información en la etiqueta
     }));
 
+    // Opciones para el tipo de mantenimiento
     const tipoMantenimientoOptions = [
         { value: 'preventivo', label: 'Preventivo' },
         { value: 'correctivo', label: 'Correctivo' },
@@ -95,18 +105,18 @@ const GenerarOrden = () => {
                         <div className="mt-4">
                             <label className="block text-gray-700 font-bold mb-2">Número de Serie de la Máquina</label>
                             <Select
-                                value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
+                                value={maquinaOptions.find(option => option.value === (maquinaSeleccionada ? maquinaSeleccionada._id : null))}
                                 onChange={handleSerieChange}
                                 options={maquinaOptions}
                                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                                placeholder="Número de Serie"
+                                placeholder="Selecciona una máquina"
                             />
                         </div>
                         <div className="mt-4">
                             <label className="block text-gray-700 font-bold mb-2">Ubicación de la Máquina</label>
                             <input
                                 type="text"
-                                value={ubicacionMaquina}
+                                value={maquinaSeleccionada ? maquinaSeleccionada.ubicacionMaquina : ''}
                                 readOnly
                                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
                                 placeholder="Ubicación de la Máquina"
@@ -124,11 +134,12 @@ const GenerarOrden = () => {
                         <div className="mt-4">
                             <label className="block text-gray-700 font-bold mb-2">Tipo de Procedimiento</label>
                             <Select
-                                value={tipoDeMantenimiento ? tipoMantenimientoOptions.find(option => option.value === tipoDeMantenimiento) : null}
-                                onChange={(selectedOption) => setTipoDeMantenimiento(selectedOption ? selectedOption.value : null)}
+                                isMulti
+                                value={tipoDeMantenimiento.map(value => tipoMantenimientoOptions.find(option => option.value === value))}
+                                onChange={handleTipoMantenimientoChange}
                                 options={tipoMantenimientoOptions}
                                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                                placeholder="Tipo de procedimiento"
+                                placeholder="Selecciona los tipos de procedimiento"
                             />
                         </div>
                     </div>

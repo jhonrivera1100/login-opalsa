@@ -8,14 +8,16 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [componentes, setComponentes] = useState([]);
   const [selectedComponentes, setSelectedComponentes] = useState([]);
   const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
-  const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.nroSerieMaquina || '');
-  const [ubicacionMaquina, setUbicacionMaquina] = useState(orden.ubicacionMaquina || '');
+  const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.maquina?.nroSerieMaquina || '');
+  const [marcaMaquina, setMarcaMaquina] = useState(orden.maquina?.marcaMaquina || '');
+  const [ubicacionMaquina, setUbicacionMaquina] = useState(orden.maquina?.ubicacionMaquina || '');
   const [usuario, setUsuario] = useState({});
   const [ordenId, setOrdenId] = useState(orden._id || '');
   const [successMessage, setSuccessMessage] = useState('');
   const [elementosOrden, setElementosOrden] = useState(orden.elementoOrden || []);
   const [numeroOrden, setNumeroOrden] = useState(orden.numeroOrden || '');
   const [fechaOrden, setFechaOrden] = useState('');
+  const [tiposMantenimiento, setTiposMantenimiento] = useState([]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -34,6 +36,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           const response = await axios.get(`http://localhost:4000/api/ordenes/${ordenId}`).then(res => res.data);
           setDescripcionOrden(response.descripcionOrden);
           setNroSerieMaquina(response.maquina ? response.maquina.nroSerieMaquina : 'Desconocido');
+          setMarcaMaquina(response.maquina ? response.maquina.marcaMaquina : 'Desconocida');
           setUbicacionMaquina(response.maquina ? response.maquina.ubicacionMaquina : 'Desconocida');
           setElementosOrden(response.elementoOrden);
           setUsuario(response.usuario);
@@ -46,6 +49,9 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
           }));
           setSelectedComponentes(componentesSeleccionados);
+
+          // Actualizar tipos de mantenimiento
+          setTiposMantenimiento(response.tipoDeMantenimiento);
         }
       } catch (err) {
         console.error('Error al obtener la orden:', err);
@@ -87,6 +93,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         fechaOrden: new Date(),
         descripcionOrden,
         nroSerieMaquina,
+        marcaMaquina, // Incluir marcaMaquina en la actualización
         ubicacionMaquina,
         usuario: usuario._id, 
         estadoOrden: 'Orden aprobada',
@@ -148,6 +155,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           </div>
 
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Marca de la Maquina</p>
+            <p>{marcaMaquina}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
             <p className="text-gray-600">Ubicación de la Maquina</p>
             <p>{ubicacionMaquina}</p>
           </div>
@@ -165,6 +177,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
             <p className="text-gray-600">Cargo</p>
             <p>{usuario.cargo || 'No disponible'}</p>
+          </div>
+
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+            <p className="text-gray-600">Tipos de Procedimiento</p>
+            <p>{tiposMantenimiento.join(', ') || 'No disponible'}</p>
           </div>
 
           <div className="mt-4">
