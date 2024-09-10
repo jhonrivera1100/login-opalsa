@@ -52,7 +52,7 @@ const NotificacionesCard = ({
         <div className="flex justify-between mt-4">
           <button
             className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition duration-300"
-            onClick={() => handleDelete(recordatorio._id)}
+            onClick={() => handleDelete(recordatorio._id, "recordatorio")}
           >
             Eliminar
           </button>

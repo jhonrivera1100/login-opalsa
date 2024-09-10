@@ -108,6 +108,7 @@ const NotificacionesAdmin = () => {
   };
 
   const handleDeleteItem = async (id, type) => {
+    console.log(`Eliminando ${type} con ID: ${id}`); // Añade esto para depuración
     try {
       if (type === "recordatorio") {
         await axios.delete(`/recordatorios/${id}`);
@@ -121,6 +122,7 @@ const NotificacionesAdmin = () => {
       console.error("Error al eliminar item:", error);
     }
   };
+  
 
   const handleCheckboxChange = useCallback(
     debounce(async (id, visto) => {
