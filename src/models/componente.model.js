@@ -21,6 +21,11 @@ const componenteSchema = new mongoose.Schema({
     url: String,
     public_id: String,
   },
+  usuarioEncargado: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false, // No es obligatorio al crear el componente
+  },
   maquina: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Maquinas", // Asegúrate de que la referencia coincide con el nombre del modelo Maquinas
