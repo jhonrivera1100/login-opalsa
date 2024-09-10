@@ -3,8 +3,6 @@ import Navbar from "../components/Navbar";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import HeaderRespuestas from "../components/HeaderRespOrd";
-import Modal from "../components/ModalNotificaciones";
-import ModalComponentes from "../components/modalCompUser";
 import ModalRespOrden from "../components/modalRespOrden";
 
 const RespuestasOrden = () => {
@@ -13,13 +11,11 @@ const RespuestasOrden = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [showCompUserModal, setShowCompUserModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false); 
   const [selectedOrden, setSelectedOrden] = useState(null);
-  const [descripcionCompleta, setDescripcionCompleta] = useState("");
   const [usuarioCompleto, setUsuarioCompleto] = useState("");
   const [serialCompleto, setSerialCompleto] = useState("");
 
@@ -80,14 +76,6 @@ const RespuestasOrden = () => {
     return <div>Cargando...</div>;
   }
 
-  const updateOrdenInState = (updatedOrden) => {
-    setOrdenes((prevOrdenes) =>
-      prevOrdenes.map((orden) =>
-        orden._id === updatedOrden._id ? updatedOrden : orden
-      )
-    );
-  };
-
   return (
     <div className="lg:col-span-3 xl:col-span-3 p-4 lg:p-8">
       <Navbar />
@@ -144,24 +132,17 @@ const RespuestasOrden = () => {
                     Inspeccionar orden
                   </button>
                 </div>
-<<<<<<< HEAD
-                <div className="text-sm text-gray-700 mt-4">
-                  Estado: {orden.estadoOrden}
-                </div>
                 <button
                   className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                   onClick={() => handleShowMore(orden)} // Open modal on click
                 >
-                  Ver más
+                  Ver Componentes
                 </button>
-=======
->>>>>>> 6e723dd65d397adae471f8b9b6faa2212dca054a
               </div>
             ))}
           </div>
         </div>
       </div>
-<<<<<<< HEAD
 
       {showOrderModal && (
         <ModalRespOrden
@@ -169,39 +150,6 @@ const RespuestasOrden = () => {
           onClose={handleModalClose}
           orden={selectedOrden}
         />
-      )}
-
-      {/* Modal para mostrar la descripción completa */}
-=======
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        orden={selectedOrden}
-        onShowDescription={handleDescriptionClick}
-        onShowUser={handleUserClick}
-        onShowSerial={handleSerialClick}
-        onShowCompUserModal={handleCompUserModalOpen}
-      />
-      <ModalComponentes
-        show={showCompUserModal}
-        onClose={handleModalClose}
-        orden={selectedOrden}
-      />
->>>>>>> 6e723dd65d397adae471f8b9b6faa2212dca054a
-      {showDescriptionModal && (
-        <Modal onClose={() => setShowDescriptionModal(false)} title="Descripción de la Orden">
-          <p>{descripcionCompleta}</p>
-        </Modal>
-      )}
-      {showUserModal && (
-        <Modal onClose={() => setShowUserModal(false)} title="Usuario">
-          <p>{usuarioCompleto}</p>
-        </Modal>
-      )}
-      {showSerialModal && (
-        <Modal onClose={() => setShowSerialModal(false)} title="Número de Serie">
-          <p>{serialCompleto}</p>
-        </Modal>
       )}
     </div>
   );

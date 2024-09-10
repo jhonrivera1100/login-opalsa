@@ -3,15 +3,13 @@ import Sidebar from "../components/Sidebar";
 import HeaderNotificaciones from "../components/HeaderNotificaciones";
 import axios from "../api/axios";
 import OrdenCard from "../components/OrdenCard";
+import NotificacionesCard from "../components/NotificacionesCard"; // Importa NotificacionesCard
 import { FiSearch } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import Modal from "../components/ModalNotificaciones";
 import ModalOrden from "../components/ModalFormOrden"; // Importa el ModalOrden
-import { FaRegUser } from "react-icons/fa";
-import { GoDiscussionClosed } from "react-icons/go";
-import { BsFileEarmarkText } from "react-icons/bs";
-import debounce from "lodash/debounce";
 import ModalSobrantes from "../components/ModalSobrantes";
+import debounce from "lodash/debounce";
 
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
@@ -37,21 +35,20 @@ const NotificacionesAdmin = () => {
         axios.get("/ordenes"),
       ]);
 
-      const combinedItems = [
-        ...recordatoriosResponse.data.map((recordatorio) => ({
-          ...recordatorio,
-          type: "recordatorio",
-          fecha: new Date(recordatorio.fechaRecordatorio),
-          descripcion: recordatorio.descripcion || "",
-        })),
-        ...ordenesResponse.data.map((orden) => ({
-          ...orden,
-          type: "orden",
-          fecha: new Date(orden.fechaOrden),
-          descripcionOrden: orden.descripcionOrden || "",
-        })),
-      ];
+      const recordatorios = recordatoriosResponse.data.map(recordatorio => ({
+        ...recordatorio,
+        type: "recordatorio",
+        fecha: new Date(recordatorio.fechaRecordatorio),
+      }));
 
+      const ordenes = ordenesResponse.data.map(orden => ({
+        ...orden,
+        type: "orden",
+        fecha: new Date(orden.fechaOrden),
+      }));
+
+      // Asegúrate de que no haya duplicados en los datos combinados
+      const combinedItems = [...recordatorios, ...ordenes];
       combinedItems.sort((a, b) => b.fecha - a.fecha);
 
       setCombinedItems(combinedItems);
@@ -210,18 +207,27 @@ const NotificacionesAdmin = () => {
         <div className="w-full pt-6">
           <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredItems.map((item) => (
-                <OrdenCard
-                  key={item._id}
-                  item={item}
-                  handleCheckboxAceptar={handleCheckboxAceptar}
-                  handleDescriptionClick={handleDescriptionClick}
-                  handleUserClick={handleUserClick}
-                  handleAcceptOrder={handleAcceptOrder}
-                  handleDeleteItem={handleDeleteItem}
-                  handleOpenSobrantesModal={handleOpenSobrantesModal}
-                />
-              ))}
+              {filteredItems.map((item) =>
+                item.type === "orden" ? (
+                  <OrdenCard
+                    key={item._id}
+                    item={item}
+                    handleCheckboxAceptar={handleCheckboxAceptar}
+                    handleDescriptionClick={handleDescriptionClick}
+                    handleUserClick={handleUserClick}
+                    handleAcceptOrder={handleAcceptOrder}
+                    handleDeleteItem={handleDeleteItem}
+                    handleOpenSobrantesModal={handleOpenSobrantesModal}
+                  />
+                ) : (
+                  <NotificacionesCard
+                    key={item._id}
+                    recordatorio={item}
+                    handleCheckboxChange={handleCheckboxChange}
+                    handleDelete={handleDeleteItem}
+                  />
+                )
+              )}
             </div>
           </div>
         </div>
@@ -246,29 +252,21 @@ const NotificacionesAdmin = () => {
                 </React.Fragment>
               ))}
             </p>
-            <button
-              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-              onClick={closeModal}
-            >
-              Cerrar
-            </button>
           </div>
         </Modal>
       )}
 
-      {/* Modal para mostrar detalles de la orden */}
+      {/* Modal para aceptar orden */}
       {modalOrdenVisible && selectedItem && (
-        <ModalOrden
-          orden={selectedItem} // Pasa la orden seleccionada al ModalOrden
-          onClose={closeModalOrden} // Añade la función para cerrar el modal
-        />
+        <ModalOrden onClose={closeModalOrden} item={selectedItem} />
       )}
 
-      {showSobrantesModal && (
+      {/* Modal para manejar sobrantes */}
+      {showSobrantesModal && selectedItem && (
         <ModalSobrantes
           item={selectedItem}
           onClose={closeSobrantesModal}
-          onSave={handleSaveSobrantes} // Actualizar las órdenes al cerrar el modal y pasar la orden actualizada
+          onSave={handleSaveSobrantes}
         />
       )}
     </div>

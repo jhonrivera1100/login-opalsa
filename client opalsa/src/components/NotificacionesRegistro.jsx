@@ -10,6 +10,7 @@ const CrearNotificacion = () => {
   const [documentoRecordatorio, setDocumentoRecordatorio] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null); // Estado para manejar el mensaje de éxito
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileChange = (e) => {
     setDocumentoRecordatorio(e.target.files[0]);
@@ -17,14 +18,15 @@ const CrearNotificacion = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsSubmitting(true);
+  
     const formData = new FormData();
     formData.append('titulo', titulo);
     formData.append('descripcion', descripcion);
     formData.append('fechaRecordatorio', fechaMantenimiento);
     formData.append('usuario', user.username);
     formData.append('documentoRecordatorio', documentoRecordatorio);
-
+  
     try {
       const response = await axios.post("/recordatorios", formData, {
         headers: {
@@ -33,22 +35,18 @@ const CrearNotificacion = () => {
       });
       console.log("Recordatorio creado:", response.data);
       setError(null);
-      setSuccessMessage('Notificacion creada exitosamente'); // Mostrar mensaje de éxito
-      // Limpiar campos del formulario después del envío exitoso
+      setSuccessMessage('Notificación creada exitosamente');
       setTitulo("");
       setDescripcion("");
       setFechaMantenimiento("");
       setDocumentoRecordatorio(null);
-
-      // Ocultar mensaje de éxito después de 3 segundos
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-      
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error("Error al crear recordatorio:", error);
       setError("Error al crear el recordatorio. Por favor, inténtalo de nuevo.");
-      setSuccessMessage(null); // Limpiar el mensaje de éxito en caso de error
+      setSuccessMessage(null);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -120,6 +118,7 @@ const CrearNotificacion = () => {
             <button
               type="submit"
               className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-gray-100 p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
+              disabled={isSubmitting}
             >
               Crear
             </button>
