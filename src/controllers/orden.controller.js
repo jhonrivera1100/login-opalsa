@@ -8,8 +8,6 @@ import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 export const getOrdenes = async (req, res) => {
   try {
     const ordenes = await Orden.find()
-      .populate('usuario', 'username')
-      .populate('maquina')
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
       .populate('componentesAsignados')
@@ -26,9 +24,7 @@ export const getOrdenes = async (req, res) => {
 export const getOrdenesByUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const ordenes = await Orden.find({ usuario: userId })
-      .populate('usuario')
-      .populate('maquina')
+    const ordenes = await Orden.find({ 'usuario._id': userId })
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
       .populate('componentesAsignados')
@@ -46,8 +42,6 @@ export const obtenerOrdenPorId = async (req, res) => {
   try {
     const { id } = req.params;
     const orden = await Orden.findById(id)
-      .populate('usuario')
-      .populate('maquina')
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
       .populate('componentesAsignados')
@@ -67,26 +61,34 @@ export const obtenerOrdenPorId = async (req, res) => {
 // Crear una nueva orden
 export const createOrden = async (req, res) => {
   try {
-    const { descripcionOrden, nroSerieMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
+    const { descripcionOrden, nroSerieMaquina, marcaMaquina, ubicacionMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
     const fechaOrden = new Date();
     const numeroOrden = uuidv4();
 
+    // Verificar que el usuario exista
     const usuarioObj = await User.findOne({ username: usuario });
     if (!usuarioObj) {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
-    const maquina = await Maquina.findOne({ nroSerieMaquina });
-    if (!maquina) {
-      return res.status(404).json({ message: 'Máquina no encontrada' });
-    }
+    // Guardar los detalles de la máquina directamente desde la solicitud
+    const maquinaInfo = {
+      nroSerieMaquina,
+      marcaMaquina,
+      ubicacionMaquina
+    };
 
     const nuevaOrden = new Orden({
       fechaOrden,
       descripcionOrden,
-      maquina: maquina._id,
-      usuario: usuarioObj._id,
+      maquina: maquinaInfo, // Almacenamos directamente la información de la máquina
+      usuario: {
+        username: usuarioObj.username,
+        email: usuarioObj.email,
+        cargo: usuarioObj.cargo
+      },
+      idUsuario: usuarioObj._id, // Almacenar el ID del usuario en el campo idUsuario
       numeroOrden,
       tipoDeMantenimiento,
       componentesAsignados,
@@ -121,8 +123,6 @@ export const updateOrdenAsignados = async (req, res) => {
       },
       { new: true }
     )
-    .populate('usuario')
-    .populate('maquina')
     .populate('elementoOrden')
     .populate('elementoOrdenSobrantes')
     .populate('componentesAsignados')
@@ -178,7 +178,7 @@ export const updateAceptar = async (req, res) => {
 };
 
 // Actualizar la orden incluyendo sobrantes y tarea realizada
-// Actualizar la orden incluyendo sobrantes y tarea realizada
+// Actualizar la orden incluyendo sobrantes, tarea realizada y fecha de cumplimiento
 export const updateOrdenSobrantes = async (req, res) => {
   try {
     const { id } = req.params;
@@ -188,7 +188,8 @@ export const updateOrdenSobrantes = async (req, res) => {
       elementoOrdenSobrantes = [],
       tareaRealizada = '',
       componentesAsignados = [],
-      componentesSobrantes = [] // Asegúrate de que no contiene campos no permitidos
+      componentesSobrantes = [],
+      fechaCumplimiento = null // Incluye fechaCumplimiento
     } = req.body;
 
     // Validar que las cantidades sobrantes no excedan las asignadas
@@ -198,12 +199,6 @@ export const updateOrdenSobrantes = async (req, res) => {
         throw new Error(`La cantidad sobrante para el elemento ${elemento.nombre} excede la cantidad asignada.`);
       }
     });
-
-    // Filtra los componentes sobrantes para asegurarte de que solo contiene los campos válidos
-    const componentesSobrantesFiltrados = componentesSobrantes.map((componente) => ({
-      serialComponente: componente.serialComponente,
-      nombreComponente: componente.nombreComponente,
-    }));
 
     const ordenActualizada = await Orden.findById(id);
     if (!ordenActualizada) {
@@ -215,7 +210,8 @@ export const updateOrdenSobrantes = async (req, res) => {
     ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
     ordenActualizada.tareaRealizada = tareaRealizada;
     ordenActualizada.componentesAsignados = componentesAsignados;
-    ordenActualizada.componentesSobrantes = componentesSobrantesFiltrados;
+    ordenActualizada.componentesSobrantes = componentesSobrantes;
+    ordenActualizada.fechaCumplimiento = fechaCumplimiento; // Actualiza la fecha de cumplimiento
 
     await ordenActualizada.save();
 

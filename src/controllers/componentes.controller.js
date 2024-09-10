@@ -29,6 +29,7 @@ export const createComponente = async (req, res) => {
   const { serialComponente, nombreComponente, marcaComponente, maquina } = req.body;
 
   let documentoComponente = {};
+  let usuarioEncargado = null; // Inicializar el campo usuarioEncargado a null
 
   try {
     // Manejo del documento del componente
@@ -47,6 +48,7 @@ export const createComponente = async (req, res) => {
       marcaComponente,
       documentoComponente,
       maquina,
+      usuarioEncargado // Se incluirá el campo usuarioEncargado inicializado a null
     });
 
     const componenteGuardado = await nuevoComponente.save();
