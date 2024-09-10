@@ -88,6 +88,7 @@ export const createOrden = async (req, res) => {
         email: usuarioObj.email,
         cargo: usuarioObj.cargo
       },
+      idUsuario: usuarioObj._id, // Almacenar el ID del usuario en el campo idUsuario
       numeroOrden,
       tipoDeMantenimiento,
       componentesAsignados,

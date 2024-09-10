@@ -8,7 +8,6 @@ const router = Router();
 router.get("/ordenes", getOrdenes);
 
 // Obtener órdenes del usuario autenticado
-router.get("/ordenes", getOrdenesByUser);
 
 // Ruta para obtener una orden por ID
 router.get('/ordenes/:id', obtenerOrdenPorId);
