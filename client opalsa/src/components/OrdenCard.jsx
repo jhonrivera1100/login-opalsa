@@ -76,9 +76,7 @@ const OrdenCard = ({
           onMouseLeave={() => setShowTooltip(false)}
         >
           <FaRegUser className="h-5 w-5" />
-          <p>
-            {usuario.username ? truncatedName : "Desconocido"}
-          </p>
+          <p>{usuario.username ? truncatedName : "Desconocido"}</p>
           {showTooltip && usuario.username && (
             <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
               {usuario.username}

@@ -39,12 +39,14 @@ const NotificacionesAdmin = () => {
         ...recordatorio,
         type: "recordatorio",
         fecha: new Date(recordatorio.fechaRecordatorio),
+        descripcion: recordatorio.descripcion || "",
       }));
 
       const ordenes = ordenesResponse.data.map(orden => ({
         ...orden,
         type: "orden",
         fecha: new Date(orden.fechaOrden),
+        descripcionOrden: orden.descripcionOrden || "",
       }));
 
       // Asegúrate de que no haya duplicados en los datos combinados
@@ -122,7 +124,6 @@ const NotificacionesAdmin = () => {
       console.error("Error al eliminar item:", error);
     }
   };
-  
 
   const handleCheckboxChange = useCallback(
     debounce(async (id, visto) => {
@@ -258,16 +259,22 @@ const NotificacionesAdmin = () => {
         </Modal>
       )}
 
-      {/* Modal para aceptar orden */}
+      {/* Modal para las órdenes */}
       {modalOrdenVisible && selectedItem && (
-        <ModalOrden onClose={closeModalOrden} item={selectedItem} />
+        <ModalOrden
+          visible={modalOrdenVisible}
+          onClose={closeModalOrden}
+          orden={selectedItem}
+          handleSave={fetchData}
+        />
       )}
 
-      {/* Modal para manejar sobrantes */}
+      {/* Modal para sobrantes */}
       {showSobrantesModal && selectedItem && (
         <ModalSobrantes
-          item={selectedItem}
+          visible={showSobrantesModal}
           onClose={closeSobrantesModal}
+          item={selectedItem}
           onSave={handleSaveSobrantes}
         />
       )}
