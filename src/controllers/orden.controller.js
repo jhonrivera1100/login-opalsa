@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 import Orden from '../models/orden.model.js';
 import Maquina from '../models/maquina.model.js';
+import Componente from "../models/componente.model.js";
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 
@@ -112,6 +113,7 @@ export const updateOrdenAsignados = async (req, res) => {
     const { id } = req.params;
     const { estadoOrden = 'Orden en solicitud', elementoOrden = [], tareaRealizada = '', componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
+    // Actualiza la orden
     const ordenActualizada = await Orden.findByIdAndUpdate(
       id,
       { 
@@ -132,10 +134,21 @@ export const updateOrdenAsignados = async (req, res) => {
       return res.status(404).json({ message: 'Orden no encontrada' });
     }
 
+    // Itera sobre los componentes asignados para actualizar el usuario encargado
+    for (const componente of componentesAsignados) {
+      const componenteActual = await Componente.findOne({ serialComponente: componente.serialComponente });
+
+      if (componenteActual) {
+        // Actualiza el campo usuarioEncargado con el idUsuario de la orden
+        componenteActual.usuarioEncargado = ordenActualizada.idUsuario;
+        await componenteActual.save();
+      }
+    }
+
     res.status(200).json(ordenActualizada);
   } catch (error) {
-    console.error('Error al actualizar la orden:', error.message);
-    res.status(500).json({ message: 'Error al actualizar la orden', error: error.message });
+    console.error('Error al actualizar la orden y los componentes:', error.message);
+    res.status(500).json({ message: 'Error al actualizar la orden y los componentes', error: error.message });
   }
 };
 
