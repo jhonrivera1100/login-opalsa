@@ -218,15 +218,26 @@ export const updateOrdenSobrantes = async (req, res) => {
       return res.status(404).json({ message: 'Orden no encontrada' });
     }
 
+    // Actualiza la orden con los datos proporcionados
     ordenActualizada.estadoOrden = estadoOrden;
     ordenActualizada.elementoOrden = elementoOrden;
     ordenActualizada.elementoOrdenSobrantes = elementoOrdenSobrantes;
     ordenActualizada.tareaRealizada = tareaRealizada;
     ordenActualizada.componentesAsignados = componentesAsignados;
     ordenActualizada.componentesSobrantes = componentesSobrantes;
-    ordenActualizada.fechaCumplimiento = fechaCumplimiento; // Actualiza la fecha de cumplimiento
+    ordenActualizada.fechaCumplimiento = fechaCumplimiento;
 
+    // Guardar la orden antes de actualizar los componentes
     await ordenActualizada.save();
+
+    // Eliminar el usuarioEncargado de los componentes asignados
+    for (const componente of componentesAsignados) {
+      const componenteActual = await Componente.findOne({ serialComponente: componente.serialComponente });
+      if (componenteActual) {
+        componenteActual.usuarioEncargado = null;
+        await componenteActual.save();
+      }
+    }
 
     res.status(200).json(ordenActualizada);
   } catch (error) {
