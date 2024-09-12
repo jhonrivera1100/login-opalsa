@@ -69,7 +69,7 @@ export const createComponente = async (req, res) => {
 // Actualizar un componente por ID
 export const updateComponenteById = async (req, res) => {
   const { id } = req.params;
-  const { serialComponente, nombreComponente, marcaComponente, maquina: nuevaMaquina } = req.body;
+  const { serialComponente, nombreComponente, marcaComponente, maquina: nuevaMaquina, usuarioEncargado } = req.body;
 
   try {
     const componente = await Componente.findById(id);
@@ -117,6 +117,7 @@ export const updateComponenteById = async (req, res) => {
     componente.nombreComponente = nombreComponente || componente.nombreComponente;
     componente.marcaComponente = marcaComponente || componente.marcaComponente;
     componente.documentoComponente = documentoComponente;
+    componente.usuarioEncargado = usuarioEncargado || componente.usuarioEncargado; // Actualiza el usuario encargado
 
     const componenteActualizado = await componente.save();
 
