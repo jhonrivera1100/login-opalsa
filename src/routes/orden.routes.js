@@ -12,6 +12,9 @@ router.get("/ordenes", getOrdenes);
 // Ruta para obtener una orden por ID
 router.get('/ordenes/:id', obtenerOrdenPorId);
 
+// Obtener órdenes por usuario autenticado
+router.get("/ordenes/usuario", getOrdenesByUser);
+
 // Crear una nueva orden
 
 router.post("/ordenes", createOrden);

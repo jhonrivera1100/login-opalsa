@@ -8,6 +8,12 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
   const [usuario, setUsuario] = useState({});
   const [numeroOrden, setNumeroOrden] = useState('');
   const [fechaOrden, setFechaOrden] = useState('');
+  const[fechaCumplimiento, setFechaCumplimiento] = useState('');
+  const [elementoOrden, setElementosOrden] = useState([]);
+  const [componentesAsignados, setComponentsAsign] = useState([]);
+  const [tareaRealizada, setTareaRealizadas] = useState('');
+  const [componentesSobrantes, setComponenteSobran] = useState([]);
+  const [elementoOrdenSobrantes, setElementSobran] = useState([]);
 
   useEffect(() => {
     if (isOpen && orden) {
@@ -19,6 +25,12 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
           setUbicacionMaquina(response.data.maquina ? response.data.maquina.ubicacionMaquina : 'Desconocida');
           setUsuario(response.data.usuario);
           setNumeroOrden(response.data.numeroOrden);
+          setElementosOrden(response.data.elementoOrden || []);
+          setElementSobran(response.data.elementoOrdenSobrantes || []);
+          setComponentsAsign(response.data.componentesAsignados || []);
+          setComponenteSobran(response.data.componentesSobrantes || []);
+          setTareaRealizadas(response.data.tareaRealizada);
+          setFechaCumplimiento(response.data.fechaCumplimiento);
           setFechaOrden(new Date(response.data.fechaOrden).toLocaleDateString());
         } catch (err) {
           console.error('Error al obtener la orden:', err);
@@ -75,10 +87,88 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
             <p>{usuario.email || 'No disponible'}</p>
           </div>
           
-          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b ">
             <p className="text-gray-600">Cargo</p>
             <p>{usuario.cargo || 'No disponible'}</p>
           </div>
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b ">
+            <p className="text-gray-600">Tarea Reallizada</p>
+            <p>{tareaRealizada}</p>
+          </div>
+          <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+  <p className="text-gray-600">Fecha Cumplimiento</p>
+  <p>{new Date(new Date(fechaCumplimiento).getTime() + new Date(fechaCumplimiento).getTimezoneOffset() * 60000).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+</div>
+
+
+          <div className='flex justify-between border-b pr-[227px] hover:bg-gray-50 '>
+  {/* Elementos Asignados */}
+  <div className="md:space-y-0 space-y-1 p-4">
+    <p className="text-gray-600">Elementos Asignados</p>
+    <ul>
+      {elementoOrden.length > 0 ? (
+        elementoOrden.map((element, index) => (
+          <li key={index}>
+            {element.nombre || 'No hay Elemento'} - {element.cantidad || 'Cantidad no disponible'}
+          </li>
+        ))
+      ) : (
+        <li>No hay Elementos Asignados</li>
+      )}
+    </ul>
+  </div>
+
+  {/* Componentes Asignados */}
+  <div className="md:space-y-0 space-y-1 p-4">
+    <p className="text-gray-600">Componentes Asignados</p>
+    <ul>
+      {componentesAsignados.length > 0 ? (
+        componentesAsignados.map((comp, index) => (
+          <li key={index}>
+            {comp.nombreComponente || 'No hay nombre del componente'} - {comp.serialComponente || 'No hay serial'}
+          </li>
+        ))
+      ) : (
+        <li>No hay Componentes Asignados</li>
+      )}
+    </ul>
+  </div>
+</div>
+
+             <div className='flex justify-between border-b pr-[227px] hover:bg-gray-50 '>
+  {/* Elementos Sobrantes */}
+  <div className="md:space-y-0 space-y-1 p-4">
+    <p className="text-gray-600">Elementos Sobrantes</p>
+    <ul>
+      {elementoOrdenSobrantes.length > 0 ? (
+        elementoOrdenSobrantes.map((elementSobra, index) => (
+          <li key={index}>
+            {elementSobra.nombre || 'No hay Elemento'} - {elementSobra.cantidadSobrante || 'Cantidad no disponible'}
+          </li>
+        ))
+      ) : (
+        <li>No hay Elementos Sobrantes</li>
+      )}
+    </ul>
+  </div>
+
+  {/* Componentes Sobrantes */}
+  <div className="md:space-y-0 space-y-1 p-4">
+    <p className="text-gray-600">Componentes Sobrantes</p>
+    <ul>
+      {componentesSobrantes.length > 0 ? (
+        componentesSobrantes.map((compSobra, index) => (
+          <li key={index}>
+            {compSobra.nombreComponente || 'No hay nombre del componente'} - {compSobra.serialComponente || 'No hay serial'}
+          </li>
+        ))
+      ) : (
+        <li>No hay Componentes Sobrantes</li>
+      )}
+    </ul>
+  </div>
+</div>
+
         </form>
         <button className="mt-4 bg-teal-500 text-white px-4 py-2 rounded" onClick={onClose}>
           Cerrar

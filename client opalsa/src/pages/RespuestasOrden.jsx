@@ -21,6 +21,12 @@ const RespuestasOrden = () => {
 
   const { user, loading } = useAuth();
 
+
+
+  useEffect(() => {
+    console.log("Modal abierto:", showOrderModal);
+  }, [showOrderModal]); // Se ejecutará cada vez que showOrderModal cambie
+  
   useEffect(() => {
     if (!loading && user) {
       fetchOrdenes();
@@ -33,15 +39,15 @@ const RespuestasOrden = () => {
 
   const fetchOrdenes = async () => {
     try {
-      const response = await axios.get('/ordenes');
-      const ordenesFiltradas = response.data.filter(
-        (orden) => orden.usuario._id === user._id
-      );
-      setOrdenes(ordenesFiltradas);
+      const response = await axios.get('http://localhost:4000/api/ordenes');
+      console.log('Respuesta del servidor:', response.data); // Verifica la estructura de los datos
+      setOrdenes(response.data);
     } catch (error) {
-      console.error("Error al traer las órdenes:", error);
+      console.error('Error al traer las órdenes:', error);
     }
   };
+  
+  
 
   const formatDate = (date) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -60,17 +66,22 @@ const RespuestasOrden = () => {
         formatDate(orden.fechaOrden) === filterDate
       );
     }
+    console.log("Órdenes filtradas:", filtered); // Agregar esto
     setFilteredOrdenes(filtered);
   };
 
   const handleShowMore = (orden) => {
-    setSelectedOrden(orden); // Set the selected order to pass to the modal
-    setShowOrderModal(true); // Open the modal
+    console.log("Orden seleccionada:", orden);
+    setSelectedOrden(orden); // Establecer la orden seleccionada
+    setShowOrderModal(true); // Abrir el modal
   };
+  
+  
 
   const handleModalClose = () => {
-    setShowOrderModal(false); // Close the modal
+    setShowOrderModal(false); // Cierra el modal
   };
+  
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -132,25 +143,19 @@ const RespuestasOrden = () => {
                     Inspeccionar orden
                   </button>
                 </div>
-                <button
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleShowMore(orden)} // Open modal on click
-                >
-                  Ver Componentes
-                </button>
               </div>
             ))}
           </div>
         </div>
       </div>
-
       {showOrderModal && (
-        <ModalRespOrden
-          isOpen={showOrderModal}
-          onClose={handleModalClose}
-          orden={selectedOrden}
-        />
-      )}
+  <ModalRespOrden
+    isOpen={showOrderModal} // Cambia el nombre a isOpen
+    orden={selectedOrden}
+    onClose={handleModalClose}
+  />
+)}
+
     </div>
   );
 };
