@@ -22,19 +22,31 @@ export const getOrdenes = async (req, res) => {
 };
 
 // Obtener las órdenes de un usuario
-// Obtener las órdenes de un usuario
 export const getOrdenesByUser = async (req, res) => {
   try {
-    const userId = req.user._id; // Asegúrate de que req.user esté definido
-    const ordenes = await Orden.find({ idUsuario: userId }) // Usa idUsuario para filtrar
-      .populate('componentesAsignados') // Asegúrate de que estos campos estén en tu esquema de Orden
+    const { id } = req.params;
+    console.log("ID del usuario recibido:", id); // Verifica que recibes el ID correctamente
+
+    // Encuentra las órdenes asociadas al usuario
+    const ordenes = await Orden.find({ idUsuario: id }) // Usa el campo correcto para la búsqueda
+      .populate('elementoOrden') // Asume que necesitas estos campos basados en el ejemplo de getOrdenes
+      .populate('elementoOrdenSobrantes')
+      .populate('componentesAsignados')
       .populate('componentesSobrantes');
+
+    if (!ordenes.length) {
+      return res.status(404).json({ message: 'No se encontraron órdenes para este usuario.' });
+    }
+
     res.status(200).json(ordenes);
   } catch (error) {
-    console.error('Error al obtener órdenes por usuario:', error.message);
-    res.status(500).json({ message: 'Error al obtener órdenes por usuario', error: error.message });
+    console.error('Error al obtener las órdenes del usuario:', error.message);
+    res.status(500).json({ message: 'Error al obtener las órdenes del usuario', error: error.message });
   }
 };
+
+
+
 
 
 

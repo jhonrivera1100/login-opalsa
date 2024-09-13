@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BsFileEarmarkText } from "react-icons/bs";
 import { FaRegUser } from "react-icons/fa";
+import ModalRespOrden from "./modalRespOrden";
 
 const OrdenCard = ({
   item,
@@ -10,7 +11,6 @@ const OrdenCard = ({
   handleDeleteItem,
   handleOpenSobrantesModal,
 }) => {
-  // Verifica si item está definido y tiene las propiedades necesarias
   const {
     estadoOrden = "Estado desconocido",
     usuario = {},
@@ -19,7 +19,7 @@ const OrdenCard = ({
     componenteSobrantes = [],
     _id = "",
     aceptado = false,
-    fechaOrden = new Date(), // Usa la fecha actual si no está definida
+    fechaOrden = new Date(),
   } = item || {};
 
   const {
@@ -27,34 +27,41 @@ const OrdenCard = ({
     ubicacionMaquina = "Ubicación desconocida",
   } = maquina || {};
 
-  // Estado para mostrar el tooltip
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ordenSeleccionada, setOrdenSeleccionada] = useState(null);
 
-  // Define los colores de fondo para cada estado
   const getIconBackgroundColor = () => {
     switch (estadoOrden) {
       case "Orden en solicitud":
-        return "bg-yellow-500"; // Fondo amarillo
+        return "bg-yellow-500";
       case "Orden aprobada":
-        return "bg-blue-500"; // Fondo azul
+        return "bg-blue-500";
       case "Orden Finalizada":
-        return "bg-red-500"; // Fondo rojo
+        return "bg-red-500";
       default:
-        return "bg-gray-500"; // Fondo gris para estados desconocidos
+        return "bg-gray-500";
     }
   };
 
-  // Divide el nombre del usuario en palabras y devuelve los primeros dos nombres completos
   const getFirstTwoNames = (username) => {
     if (!username) return "";
     const names = username.split(" ");
-    return names.slice(0, 2).join(" "); // Devuelve los primeros dos nombres completos
+    return names.slice(0, 2).join(" ");
   };
 
-  // Obtiene los primeros dos nombres del usuario
   const fullName = getFirstTwoNames(usuario.username || "");
-  const maxLength = 15; // Ajusta el límite de caracteres si es necesario
+  const maxLength = 15;
   const truncatedName = fullName.length > maxLength ? `${fullName.substring(0, maxLength)}...` : fullName;
+
+  const openModal = () => {
+    setOrdenSeleccionada(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div
@@ -108,7 +115,7 @@ const OrdenCard = ({
           >
             <strong>Orden:</strong> <br />
             {descripcionOrden.length > 10
-              ? `${descripcionOrden.substring(0, 10)}...` // Cambiado a 10 para consistencia
+              ? `${descripcionOrden.substring(0, 10)}...`
               : descripcionOrden}
           </p>
           <p className="text-gray-600 mb-2">
@@ -119,7 +126,6 @@ const OrdenCard = ({
             {ubicacionMaquina}
           </p>
 
-          {/* Renderizado condicional de botones */}
           <div className="flex justify-center mt-2 space-x-2">
             {(estadoOrden === "Orden en solicitud" || estadoOrden === "Orden aprobada") && (
               <button
@@ -138,16 +144,32 @@ const OrdenCard = ({
               </button>
             )}
             {estadoOrden === "Orden Finalizada" && (
-              <button
-                className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
-                onClick={() => handleDeleteItem(_id, "orden")}
-              >
-                Eliminar
-              </button>
+              <div className="flex justify-between mt-2 space-x-2">
+                <button
+                  className="bg-sky-500 text-white py-1 px-4 rounded-md hover:bg-sky-700 transition-colors duration-300"
+                  onClick={openModal}
+                >
+                  Resumen
+                </button>
+                <button
+                  className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+                  onClick={() => handleDeleteItem(_id, "orden")}
+                >
+                  Eliminar
+                </button>
+              </div>
             )}
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <ModalRespOrden
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          orden={ordenSeleccionada}
+        />
+      )}
     </div>
   );
 };

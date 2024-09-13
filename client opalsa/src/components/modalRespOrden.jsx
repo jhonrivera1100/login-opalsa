@@ -97,8 +97,13 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
           </div>
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
   <p className="text-gray-600">Fecha Cumplimiento</p>
-  <p>{new Date(new Date(fechaCumplimiento).getTime() + new Date(fechaCumplimiento).getTimezoneOffset() * 60000).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+  <p>
+    {fechaCumplimiento 
+      ? new Date(new Date(fechaCumplimiento).getTime() + new Date(fechaCumplimiento).getTimezoneOffset() * 60000).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+      : "Aún no hay fecha"}
+  </p>
 </div>
+
 
 
           <div className='flex justify-between border-b pr-[227px] hover:bg-gray-50 '>

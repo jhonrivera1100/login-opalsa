@@ -11,6 +11,8 @@ const GenerarOrden = () => {
     const [tipoDeMantenimiento, setTipoDeMantenimiento] = useState([]); // Tipo de mantenimiento puede ser un array vacío inicialmente
     const [error, setError] = useState(null);
     const [maquinas, setMaquinas] = useState([]);
+    const [successMessage, setSuccessMessage] = useState(null);
+    
 
     const fechaOrden = new Date().toISOString().split('T')[0]; // Fecha actual en formato ISO
 
@@ -53,17 +55,25 @@ const GenerarOrden = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:4000/api/ordenes', {
+            await axios.post('http://localhost:4000/api/ordenes', {
                 descripcionOrden,
                 nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
                 marcaMaquina: maquinaSeleccionada.marcaMaquina,
                 ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
-                usuario: user.username, // Envía el username del usuario actual
+                usuario: user.username,
                 tipoDeMantenimiento,
-                componentesAsignados: [], // Enviar vacíos si no hay componentes asignados
-                componentesSobrantes: [], // Enviar vacíos si no hay componentes sobrantes
+                componentesAsignados: [],
+                componentesSobrantes: [],
             });
-            console.log('Orden creada:', response.data);
+
+            // Muestra el mensaje de éxito
+            setSuccessMessage('Orden enviada exitosamente.');
+
+            // Limpiar los campos del formulario
+            setDescripcionOrden('');
+            setMaquinaSeleccionada(null);
+            setTipoDeMantenimiento([]);
+            setError(null); // Limpiar error si lo había
         } catch (error) {
             console.error('Error al crear la orden:', error);
             setError('No se pudo crear la orden. Inténtalo de nuevo.');
@@ -143,6 +153,11 @@ const GenerarOrden = () => {
                             />
                         </div>
                     </div>
+                    {successMessage && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+                        {successMessage}
+                    </div>
+                )}
                     <div className="mt-4">
                         {error && <p className="text-red-500 text-xs italic">{error}</p>}
                         <button

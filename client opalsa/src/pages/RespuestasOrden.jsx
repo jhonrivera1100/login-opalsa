@@ -16,8 +16,6 @@ const RespuestasOrden = () => {
   const [showCompUserModal, setShowCompUserModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false); 
   const [selectedOrden, setSelectedOrden] = useState(null);
-  const [usuarioCompleto, setUsuarioCompleto] = useState("");
-  const [serialCompleto, setSerialCompleto] = useState("");
 
   const { user, loading } = useAuth();
 
