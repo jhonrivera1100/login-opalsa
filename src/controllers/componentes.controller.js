@@ -3,20 +3,22 @@ import Maquinas from "../models/maquina.model.js";
 import { uploadFile, deleteImage } from "../libs/cloudinary.js";
 import fs from 'fs-extra';
 
-// Obtener todos los componentes
+// Obtener todos los componentes con detalles del usuario encargado
 export const getComponentes = async (req, res) => {
   try {
-    const componentes = await Componente.find();
+    // Populate para traer los detalles del usuario encargado
+    const componentes = await Componente.find().populate('usuarioEncargado');
     res.json(componentes);
   } catch (error) {
     res.status(500).json({ message: 'Error al recuperar los componentes', error: error.message });
   }
 };
 
-// Obtener un componente por ID
+// Obtener un componente por ID con detalles del usuario encargado
 export const getComponenteById = async (req, res) => {
   try {
-    const componente = await Componente.findById(req.params.id);
+    // Populate para traer los detalles del usuario encargado
+    const componente = await Componente.findById(req.params.id).populate('usuarioEncargado');
     if (!componente) return res.status(404).json({ message: 'Componente no encontrado' });
     res.json(componente);
   } catch (error) {

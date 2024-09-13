@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 
 function ComponentesTable({
   sortedComponentes,
@@ -11,6 +11,9 @@ function ComponentesTable({
   handleDeleteComponente,
   abrirDocumento
 }) {
+  const [tooltipUser, setTooltipUser] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
   return (
     <div className="w-full flex flex-col max-h-[90vh] overflow-y-auto">
       {sortedComponentes.length === 0 ? (
@@ -52,6 +55,7 @@ function ComponentesTable({
             <tbody className="divide-y divide-gray-200">
               {sortedComponentes.map((componente) => {
                 const isAssigned = componente.usuarioEncargado !== null;
+
                 return (
                   <tr
                     key={componente._id}
@@ -175,7 +179,18 @@ function ComponentesTable({
                       ) : (
                         <div className="flex justify-end items-center gap-4">
                           {isAssigned ? (
-                            <span className="text-gray-500">🛈 Componente en uso</span>
+                            <span
+                              className="text-gray-500 cursor-pointer"
+                              onMouseEnter={() => {
+                                setTooltipUser(componente.usuarioEncargado);
+                                setTooltipVisible(true);
+                              }}
+                              onMouseLeave={() => {
+                                setTooltipVisible(false);
+                              }}
+                            >
+                              🛈 Componente en uso
+                            </span>
                           ) : (
                             <>
                               <button
@@ -230,6 +245,20 @@ function ComponentesTable({
               })}
             </tbody>
           </table>
+
+          {tooltipVisible && tooltipUser && (
+            <div
+              className="absolute bg-white border border-gray-300 p-4 rounded shadow-lg"
+              style={{ top: '50%', left: '70%', transform: 'translate(-50%, -80%)' }}
+            >
+              <h3 className="text-lg text-center font-semibold">Usuario a cargo</h3>
+              <p className="text-sm text-gray-600">Nombre: {tooltipUser.username}</p>
+              <p className="text-sm text-gray-600">Email: {tooltipUser.email}</p>
+              <p className="text-sm text-gray-600">Cédula: {tooltipUser.cedula}</p>
+              <p className="text-sm text-gray-600">Cargo: {tooltipUser.cargo}</p>
+              <p className="text-sm text-gray-600">Ciudad: {tooltipUser.ciudad}</p>
+            </div>
+          )}
         </>
       )}
     </div>
