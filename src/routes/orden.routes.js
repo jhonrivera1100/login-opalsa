@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authRequired } from '../middlewares/validateToken.js';
 import {getOrdenes, createOrden, deleteOrden, updateOrdenAsignados, getOrdenesByUser, obtenerOrdenPorId, updateAceptar, updateOrdenSobrantes} from "../controllers/orden.controller.js";
 
 const router = Router();
@@ -12,8 +13,9 @@ router.get("/ordenes", getOrdenes);
 // Ruta para obtener una orden por ID
 router.get('/ordenes/:id', obtenerOrdenPorId);
 
-// Obtener órdenes por usuario autenticado
-router.get('/ordenes/user/:id', getOrdenesByUser);
+// Ruta en Express para obtener órdenes por username
+// Cambia 'us' por un parámetro dinámico que represente el ID del usuario
+router.get('/ordenes', authRequired, getOrdenesByUser);
 
 
 // Crear una nueva orden
