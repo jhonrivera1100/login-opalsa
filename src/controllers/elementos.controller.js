@@ -15,6 +15,31 @@ export const traerElementos = async (req, res) => {
   }
 };
 
+export const cambiarUbicacionElemento = async (req, res) => {
+  const { nuevoCasinoId } = req.body; // Casino de destino
+
+  try {
+    const elemento = await Elementos.findById(req.params.id);
+    if (!elemento) {
+      return res.status(404).json({ message: "No se encuentra el elemento" });
+    }
+
+    // Actualizar la ubicación del elemento
+    elemento.ubicacionDeElemento = nuevoCasinoId;
+
+    const elementoActualizado = await elemento.save();
+    res.json({
+      message: "Ubicación del elemento actualizada con éxito",
+      elementoActualizado,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al cambiar la ubicación del elemento",
+      error: error.message,
+    });
+  }
+};
+
 // Obtener un elemento por su ID
 export const traerElemento = async (req, res) => {
   try {
@@ -93,6 +118,8 @@ export const crearElemento = async (req, res) => {
     });
   }
 };
+
+
 
 // Actualizar un elemento existente
 export const actualizarElemento = async (req, res) => {
