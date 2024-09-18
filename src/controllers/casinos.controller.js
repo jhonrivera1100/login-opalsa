@@ -31,55 +31,66 @@ export const getCasinoById = async (req, res) => {
 
 // Crear un nuevo casino
 export const createCasino = async (req, res) => {
-  const { nombreCasino, ciudadCasino, direccionCasino, maquinas } = req.body;
+  const { nombreCasino, ciudadCasino, direccionCasino } = req.body;
 
   let imgCasino = {};
-  let documentacionCasino = [];
-
-  // Manejo de la imagen de casino
-  if (req.files && req.files.imgCasino) {
-    const result = await uploadImage(req.files.imgCasino.tempFilePath);
-    await fs.remove(req.files.imgCasino.tempFilePath);
-    imgCasino = {
-      url: result.secure_url,
-      public_id: result.public_id,
-    };
-  }
-
-  // Manejo de los documentos de casino
-  if (req.files && req.files.documentacionCasino) {
-    if (Array.isArray(req.files.documentacionCasino)) {
-      for (let file of req.files.documentacionCasino) {
-        const result = await uploadFile(file.tempFilePath, "Documentos");
-        await fs.remove(file.tempFilePath);
-        documentacionCasino.push({
-          url: result.secure_url,
-          public_id: result.public_id,
-        });
-      }
-    } else {
-      const result = await uploadFile(
-        req.files.documentacionCasino.tempFilePath,
-        "Documentos"
-      );
-      await fs.remove(req.files.documentacionCasino.tempFilePath);
-      documentacionCasino.push({
-        url: result.secure_url,
-        public_id: result.public_id,
-      });
-    }
-  }
-
-  const newCasino = new Casino({
-    nombreCasino,
-    imgCasino,
-    ciudadCasino,
-    direccionCasino,
-    documentacionCasino,
-    maquinas,
-  });
+  let documentacionLegal = [];
+  let usoDeSuelos = [];
+  let colJuegos = [];
+  let otrosDocumentos = [];
 
   try {
+    // Manejo de la imagen de casino
+    if (req.files && req.files.imgCasino) {
+      const result = await uploadImage(req.files.imgCasino.tempFilePath);
+      await fs.remove(req.files.imgCasino.tempFilePath);
+      imgCasino = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
+
+    // Procesar los documentos con sus categorías
+    for (const [key, file] of Object.entries(req.files)) {
+      if (key !== "imgCasino") {
+        const category =
+          req.body[`documents[${key.split("[")[1]?.split("]")[0]}][category]`];
+
+        const result = await uploadFile(file.tempFilePath, category);
+        await fs.remove(file.tempFilePath);
+
+        const docInfo = { url: result.secure_url, public_id: result.public_id };
+
+        switch (category) {
+          case "documentacionLegal":
+            documentacionLegal.push(docInfo);
+            break;
+          case "usoDeSuelos":
+            usoDeSuelos.push(docInfo);
+            break;
+          case "colJuegos":
+            colJuegos.push(docInfo);
+            break;
+          case "otrosDocumentos":
+            otrosDocumentos.push(docInfo);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    const newCasino = new Casino({
+      nombreCasino,
+      imgCasino,
+      ciudadCasino,
+      direccionCasino,
+      documentacionLegal,
+      usoDeSuelos,
+      colJuegos,
+      otrosDocumentos,
+    });
+
     const casinoGuardado = await newCasino.save();
     res.json(casinoGuardado);
   } catch (error) {

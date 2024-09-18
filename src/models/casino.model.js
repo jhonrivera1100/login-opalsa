@@ -21,7 +21,25 @@ const casinoSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    documentacionCasino: [
+    documentacionLegal: [
+      {
+        url: String,
+        public_id: String,
+      }
+    ],
+    usoDeSuelos: [
+      {
+        url: String,
+        public_id: String,
+      }
+    ],
+    colJuegos: [
+      {
+        url: String,
+        public_id: String,
+      }
+    ],
+    otrosDocumentos: [
       {
         url: String,
         public_id: String,
