@@ -15,6 +15,8 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             ? "bg-green-500"
             : item.type === "movimiento"
             ? "bg-blue-500"
+            : item.type === "movimientoElemento"
+            ? "bg-orange-500"
             : "bg-yellow-500"
         } left-4 -top-6`}
       >
@@ -22,9 +24,11 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
           <FaTools className="h-8 w-8" />
         ) : item.type === "movimiento" ? (
           <MdAutoAwesomeMotion className="h-8 w-8" />
+        ) : item.type === "movimientoElemento" ? (
+          <MdAutoAwesomeMotion className="h-8 w-8" />
         ) : (
-          <div className="h-8 w-8 bg-yellow-500 rounded-full ">
-            <MdCasino className="h-8 w-8" />
+          <div className="h-8 w-8 bg-yellow-500 rounded-full">
+            <MdAutoAwesomeMotion className="h-8 w-8" />
           </div>
         )}
       </div>
@@ -34,6 +38,8 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             ? "Mantenimiento"
             : item.type === "movimiento"
             ? "Movimiento de Componente"
+            : item.type === "movimientoElemento"
+            ? "Movimiento de Elemento"
             : "Movimiento de Máquina"}
         </p>
         {item.type === "mantenimiento" ? (
@@ -128,6 +134,37 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
                 Serial Máquina Final
               </p>
               <p className="text-sm text-gray-500">{item.newMaquinaSerial}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">
+                Fecha de Transferencia
+              </p>
+              <p className="text-sm text-gray-500">
+                {item.fecha.toLocaleDateString()}
+              </p>
+            </div>
+          </>
+        ) : item.type === "movimientoElemento" ? (
+          <>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Nombre Elemento</p>
+              <p className="text-sm text-gray-500">{item.nombreElemento}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Codigo Elemento</p>
+              <p className="text-sm text-gray-500">{item.codigoElemento}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">
+                Ubicacion  Inicial
+              </p>
+              <p className="text-sm text-gray-500">{item.oldUbicacionNombre}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">
+              Ubicacion Final
+              </p>
+              <p className="text-sm text-gray-500">{item.newUbicacionNombre}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">

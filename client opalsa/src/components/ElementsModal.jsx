@@ -74,8 +74,8 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
     setIsTransferModalOpen(true);
   };
 
-  const handleTransfer = (elementoId, casinoDestino) => {
-    transferElemento(elementoId, casinoDestino);
+  const handleTransfer = (elementoId, selectedCasino) => {
+    transferElemento(elementoId, selectedCasino);
   };
 
   return (
@@ -300,13 +300,13 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
 
       {/* Modal de transferencia */}
       {elementToTransfer && (
-        <TransferModal
-          isOpen={isTransferModalOpen}
-          onRequestClose={() => setIsTransferModalOpen(false)}
-          onTransfer={handleTransfer}
-          elemento={elementToTransfer}
-        />
-      )}
+  <TransferModal
+    isOpen={isTransferModalOpen}
+    onClose={() => setIsTransferModalOpen(false)}
+    elemento={elementToTransfer}
+  />
+)}
+
     </>
   );
 };

@@ -28,13 +28,16 @@ const Historial = () => {
         const moviMaquinasResponse = await axios.get(
           "http://localhost:4000/api/moviMaquinas"
         );
+        const movimientoElementosResponse = await axios.get(
+          "http://localhost:4000/api/movimientos-elementos"
+        ); 
 
         const mantenimientosWithDetails = await Promise.all(
           mantenimientosResponse.data.map(async (mantenimiento) => {
             if (mantenimiento.nroSerieMaquina) {
               try {
                 const machineResponse = await axios.get(
-                  `http://localhost:4000/api/maquinas/${mantenimiento.nroSerieMaquina}`
+                  `http://localhost:4000/api/maquinas/${maquinas.nroSerieMaquina}`
                 );
                 return {
                   ...mantenimiento,
@@ -76,10 +79,20 @@ const Historial = () => {
           })
         );
 
+        // Agregar movimientos de elementos
+    const movimientoElementosWithDetails = movimientoElementosResponse.data.map(
+      (movimientoElemento) => ({
+        ...movimientoElemento,
+        type: "movimientoElemento",
+        fecha: new Date(movimientoElemento.fechaTransferenciaElm),
+      })
+    );
+
         const combinedItems = [
           ...mantenimientosWithDetails,
           ...movimientosWithDetails,
           ...moviMaquinasWithDetails,
+          ...movimientoElementosWithDetails,
         ];
 
         combinedItems.sort((a, b) => b.fecha - a.fecha);
@@ -102,6 +115,8 @@ const Historial = () => {
         await axios.delete(`http://localhost:4000/api/movimientos/${id}`);
       } else if (type === "moviMaquina") {
         await axios.delete(`http://localhost:4000/api/moviMaquinas/${id}`);
+      } else if (type === "movimientoElemento") {
+        await axios.delete(`http://localhost:4000/api/movimientos-elementos/${id}`);
       }
       setItems(items.filter((item) => item._id !== id));
       setFilteredItems(filteredItems.filter((item) => item._id !== id));
@@ -137,6 +152,10 @@ const Historial = () => {
         } else if (filter === "moviMaquina") {
           filtered = filtered.filter((item) =>
             item.serialMaquina.toLowerCase().includes(query)
+          );
+        } else if (filter === "movimientoElemento") {
+          filtered = filtered.filter((item) =>
+            item.serialElemento.toLowerCase().includes(query)
           );
         }
       }
@@ -259,6 +278,17 @@ const Historial = () => {
           >
             Movimientos de Máquinas
           </button>
+          <button
+  className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${
+    filter === "movimientoElemento"
+      ? "bg-orange-500 text-white"
+      : "bg-gray-200"
+  }`}
+  onClick={() => setFilter("movimientoElemento")}
+>
+  Movimientos de Elementos
+</button>
+
         </div>
         <div className="flex justify-center mb-9 pt-7">
           <input

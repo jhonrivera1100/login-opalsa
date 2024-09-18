@@ -4,11 +4,11 @@ import Casinos from '../models/casino.model.js'; // Asumiendo que tienes un mode
 
 export const getMovimientosM = async (req, res) => {
   try {
-    const movimientos = await MovimientosM.find()
+    const movimientosMaquina = await MovimientosM.find()
       .populate('maquinaId')
       .populate('oldCasinoId')
       .populate('newCasinoId');
-    res.status(200).json(movimientos);
+    res.status(200).json(movimientosMaquina);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al obtener los movimientos' });

@@ -1,108 +1,128 @@
 import React, { useEffect, useState } from "react";
-import Modal from "react-modal";
-import { getCasinosRequest } from "../api/casinos"; // Asegúrate de que esta ruta sea correcta
-import { useElementos } from "../context/ElementosContext"; // Asegúrate de que esta ruta sea correcta
-import { cambiarUbicacionElementoRequest } from "../api/elementos";
+import axios from "../api/axios";
+import { updateElementosRequest } from "../api/elementos";
+import { getCasinosRequest } from "../api/casinos";
 
-const TransferModal = ({ isOpen, onRequestClose, elemento }) => {
-  const [casinoDestino, setCasinoDestino] = useState("");
-  const [casinos, setCasinos] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { cambiarUbicacionElemento } = useElementos(); // Usa el hook para acceder a la función del contexto
+const TransferModal = ({ onClose, elemento }) => {
+  const [selectedCasino, setSelectedCasino] = useState("");
+  const [casinos, setCasinos] = useState([]); // Almacena todos los casinos para búsquedas internas
+  const [casinosForSelect, setCasinosForSelect] = useState([]); // Almacena casinos para el selector, excluyendo el actual
 
   useEffect(() => {
-    if (isOpen) {
-      const fetchCasinos = async () => {
-        try {
-          const response = await getCasinosRequest();
-          setCasinos(response.data);
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Error al obtener los casinos:", error);
-          setIsLoading(false);
-        }
-      };
-      fetchCasinos();
-    }
-  }, [isOpen]);
+    fetchCasinos();
+  }, [elemento]); // Agregar elemento como dependencia para recargar cuando cambie
 
-  const handleTransfer = () => {
-    if (casinoDestino) {
-      cambiarUbicacionElementoRequest(elemento._id, casinoDestino); // Llama a la función del contexto
-      setCasinoDestino("");
-      onRequestClose();
-    } else {
-      alert("Selecciona un casino de destino");
+  const fetchCasinos = async () => {
+    if (!elemento) {
+      console.error("Elemento no está definido");
+      return;
+    }
+    try {
+      const response = await getCasinosRequest();
+      setCasinos(response.data); // Almacenar todos los casinos
+      const filteredCasinos = response.data.filter(
+        (casino) => casino._id !== elemento.ubicacionDeElemento
+      );
+      setCasinosForSelect(filteredCasinos); // Configurar los casinos para el selector
+    } catch (error) {
+      console.error("Error fetching casinos:", error);
     }
   };
 
+  const handleTransfer = async () => {
+    console.log("Ubicación actual del elemento:", elemento.ubicacionDeElemento);
+    console.log("Casino seleccionado para la transferencia:", selectedCasino);
+  
+    try {
+      // Prepara el objeto de movimiento con los datos correctos
+      const movimientoElm = {
+        elementoId: elemento._id,
+        oldUbicacionNombre: casinos.find(c => c._id === elemento.ubicacionDeElemento)?.nombreCasino || "",
+        newUbicacionNombre: casinos.find(c => c._id === selectedCasino)?.nombreCasino || "",
+        nombreElemento: elemento.nombreElemento,
+        codigoElemento: elemento.codigoElemento,
+      };
+  
+      console.log("Datos del movimiento enviados al backend:", movimientoElm);
+
+      const updatedElemento = { ...elemento, ubicacionDeElemento: selectedCasino };
+
+      // Envía la solicitud de actualización al backend
+    await updateElementosRequest(updatedElemento);
+    console.log("Elemento transferido a:", selectedCasino);
+
+
+      // Envía la solicitud al backend
+      await axios.post("/movimientos-elementos", movimientoElm);
+      console.log("Historial de movimientos guardado");
+  
+      if (typeof onClose === 'function') {
+        onClose(); // Cierra el modal
+      }
+  
+      window.location.reload(); // Recarga la página para ver los cambios
+    } catch (error) {
+      console.error("Error al transferir el elemento:", error);
+    }
+  };
+  
+  
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      contentLabel="Transferir Elemento"
-      className="fixed inset-0 flex items-center justify-center z-50"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-    >
-      <div className="relative bg-white p-4 rounded-lg w-full max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
+      <div className="relative bg-white shadow-xl rounded-lg p-6">
         <button
-          onClick={onRequestClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-0 right-0 m-4 text-gray-600 hover:text-gray-900"
+          onClick={onClose}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth="1.5"
             stroke="currentColor"
-            className="w-6 h-6"
+            className="h-6 w-6"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
+              strokeWidth="2"
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
         </button>
-        <h2 className="text-2xl text-center text-slate-500 font-bold mb-4">
-          Transferir Elemento
-        </h2>
-        <div className="w-full mb-4">
-          <label className="block mb-2 text-sm text-gray-600">Casino de destino:</label>
 
-          {isLoading ? (
-            <p>Cargando casinos...</p>
-          ) : (
-            <select
-              value={casinoDestino}
-              onChange={(e) => setCasinoDestino(e.target.value)}
-              className="w-full border-b-2 focus:outline-none focus:border-blue-600 p-2"
-            >
-              <option value="">Selecciona un casino</option>
-              {casinos.map((casino) => (
-                <option key={casino._id} value={casino._id}>
-                  {casino.nombreCasino} {/* Asegúrate de que este sea el nombre del campo correcto */}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={onRequestClose}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        <h2 className="text-xl font-semibold mb-4">
+          Transferir Elemento a otro casino
+        </h2>
+
+        <div className="flex items-center mb-4">
+          <label className="mr-2">Seleccionar casino:</label>
+          <select
+            value={selectedCasino}
+            onChange={(e) => setSelectedCasino(e.target.value)}
+            className="border rounded-md p-2"
           >
-            Cancelar
-          </button>
+            <option value="">Seleccionar...</option>
+            {casinosForSelect.map((casino) => (
+              <option key={casino._id} value={casino._id}>
+                {casino.nombreCasino}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex justify-end">
           <button
             onClick={handleTransfer}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            disabled={!selectedCasino}
+            className={`bg-green-500 text-white px-3 py-1 rounded ${
+              !selectedCasino && "opacity-50 cursor-not-allowed"
+            }`}
           >
             Transferir
           </button>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };
 

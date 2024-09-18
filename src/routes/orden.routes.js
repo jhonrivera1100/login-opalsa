@@ -13,8 +13,7 @@ router.get("/ordenes", getOrdenes);
 // Ruta para obtener una orden por ID
 router.get('/ordenes/:id', obtenerOrdenPorId);
 
-// Ruta en Express para obtener órdenes por username
-// Cambia 'us' por un parámetro dinámico que represente el ID del usuario
+//filtrar ordenes solo para que aparezcan las del usuario que las creo
 router.get('/ordenes', authRequired, getOrdenesByUser);
 
 

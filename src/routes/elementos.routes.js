@@ -7,7 +7,6 @@ import {
   eliminarElemento,
   actualizarElemento,
   traerElementosPorCasino,
-  cambiarUbicacionElemento // Asegúrate de implementar este método en tu controlador
 } from "../controllers/elementos.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createElementoSchema } from "../schemas/elementos.schema.js";
@@ -17,13 +16,7 @@ const router = Router();
 // Rutas para elementos
 router.get("/elemento", authRequired, traerElementos);
 router.get("/elemento/:id", authRequired, traerElemento);
-router.put("/elementos/:id/cambiar-ubicacion", cambiarUbicacionElemento);
-router.post(
-  "/elemento",
-  authRequired,
-  validateSchema(createElementoSchema),
-  crearElemento
-);
+router.post("/elemento",authRequired,validateSchema(createElementoSchema),crearElemento);
 router.delete("/elemento/:id", authRequired, eliminarElemento);
 router.put("/elemento/:id", authRequired, actualizarElemento);
 

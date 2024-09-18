@@ -6,8 +6,6 @@ import {
   updateElementosRequest,
   deleteElementosRequest,
   getElementosByCasinoRequest,
-  cambiarUbicacionElementoRequest
-   // nueva función para obtener elementos por casino
 } from "../api/elementos";
 
 const ElementosContext = createContext();
@@ -40,21 +38,6 @@ export function ElementosProvider({ children }) {
       console.error("Error al obtener los elementos del casino:", error);
     }
   };
-  const cambiarUbicacionElemento = async (elementoId, nuevoCasinoId) => {
-    try {
-      const res = await cambiarUbicacionElementoRequest(elementoId, nuevoCasinoId);
-      setElementos(
-        elementos.map((elemento) =>
-          elemento._id === res.data.elementoActualizado._id
-            ? res.data.elementoActualizado
-            : elemento
-        )
-      );
-      console.log("Ubicación actualizada con éxito", res.data);
-    } catch (error) {
-      console.error("Error al cambiar la ubicación del elemento:", error);
-    }
-  };
 
   const createElemento = async (elementoData) => {
     try {
@@ -62,19 +45,6 @@ export function ElementosProvider({ children }) {
       setElementos([...elementos, res.data]);
     } catch (error) {
       console.error("Error al crear el elemento:", error);
-    }
-  };
-
-  const updateElemento = async (elementoData) => {
-    try {
-      const res = await updateElementosRequest(elementoData);
-      setElementos(
-        elementos.map((elemento) =>
-          elemento._id === res.data._id ? res.data : elemento
-        )
-      );
-    } catch (error) {
-      console.error("Error al actualizar el elemento:", error);
     }
   };
 
@@ -94,9 +64,7 @@ export function ElementosProvider({ children }) {
         getElementos,
         getElementosByCasino,
         createElemento,
-        updateElemento,
         deleteElemento,
-        cambiarUbicacionElementoRequest,
       }}
     >
       {children}
