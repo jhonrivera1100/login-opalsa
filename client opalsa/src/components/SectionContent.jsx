@@ -77,10 +77,9 @@ const SectionContent = ({
   const paginatedCasinos = casinos
     .filter(
       (casino) =>
-        casino.nombreCasino
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) &&
-        (cityFilter === "" || casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
+        casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (cityFilter === "" ||
+          casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
     )
     .slice(startIndexCasinos, endIndexCasinos);
 
@@ -141,9 +140,7 @@ const SectionContent = ({
               key={casino._id}
               casino={casino}
               onVerMas={() => setSelectedCasino(casino)}
-              onVerDocumentos={() =>
-                handleVerDocumentos(casino.documentacionCasino)
-              }
+              onVerDocumentos={() => handleVerDocumentos(casino)} // Pasa el objeto completo del casino
             />
           ))}
       </div>

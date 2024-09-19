@@ -5,7 +5,7 @@ import fs from "fs-extra";
 // Obtener todos los casinos
 export const getAllCasinos = async (req, res) => {
   try {
-    const casinos = await Casino.find().populate("maquinas");
+    const casinos = await Casino.find().populate("maquinas elementos");
     res.json(casinos);
   } catch (error) {
     res.status(500).json({

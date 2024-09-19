@@ -47,6 +47,7 @@ function SeccionesHome() {
     setCurrentPageMaquinas(1);
     setCurrentPageCasinos(1);
   };
+  
 
   const handleFilterChange = (e) => {
     setSelectedBrand(e.target.value);
@@ -88,10 +89,33 @@ function SeccionesHome() {
     window.open(url, "_blank");
   };
 
-  const handleVerDocumentos = (documentacion) => {
-    setDocumentos(documentacion);
-    setIsDocumentosModalOpen(true);
+  const handleVerDocumentos = (casino) => {
+    console.log(casino); // Asegúrate de que el objeto tenga la estructura correcta
+    if (casino) {
+      const documentos = {
+        documentacionLegal: casino.documentacionLegal || [],
+        usoDeSuelos: casino.usoDeSuelos || [],
+        colJuegos: casino.colJuegos || [],
+        otrosDocumentos: casino.otrosDocumentos || []
+      };
+      
+      // Mostrar un mensaje si todos los documentos están vacíos
+      if (
+        documentos.documentacionLegal.length === 0 &&
+        documentos.usoDeSuelos.length === 0 &&
+        documentos.colJuegos.length === 0 &&
+        documentos.otrosDocumentos.length === 0
+      ) {
+        console.log("No hay documentos disponibles para este casino.");
+      } else {
+        setDocumentos(documentos);
+        setIsDocumentosModalOpen(true);
+      }
+    } else {
+      console.error("El casino no está definido o no contiene datos.");
+    }
   };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
