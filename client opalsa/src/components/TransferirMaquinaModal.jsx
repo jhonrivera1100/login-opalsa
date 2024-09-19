@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
 import axios from "../api/axios";
 import { getMaquinaRequest, updateMaquinasRequest } from "../api/maquinas";
 import { getCasinosRequest } from "../api/casinos";
@@ -21,7 +22,6 @@ function TransferirMaquinaModal({ maquina, onClose }) {
       setCasinos(filteredCasinos);
     } catch (error) {
       console.error("Error fetching casinos:", error);
-      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
     }
   };
 
@@ -31,7 +31,7 @@ function TransferirMaquinaModal({ maquina, onClose }) {
       const updatedMaquina = { ...maquina, ubicacionMaquina: selectedCasino };
       await updateMaquinasRequest(updatedMaquina);
       console.log("Máquina transferida a:", selectedCasino);
-  
+
       // Datos del movimiento
       const movimiento = {
         maquinaId: maquina._id,
@@ -42,28 +42,31 @@ function TransferirMaquinaModal({ maquina, onClose }) {
         marcaMaquina: maquina.marcaMaquina,
         serialMaquina: maquina.nroSerieMaquina,
       };
-  
-      // Log del objeto del movimiento de máquina
+
       console.log("Datos del movimiento de máquina:", movimiento);
-  
+
       // Registro en el historial
       await axios.post("/moviMaquinas", movimiento);
-  
       console.log("Historial de movimientos guardado");
-  
-      onClose(); // Cerrar el modal después de transferir
-      window.location.reload(); // Recargar la página
+
+      onClose(); // Cierra el modal después de transferir
+      window.location.reload(); // Recarga la página
     } catch (error) {
       console.error("Error al transferir la máquina:", error);
-      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
     }
   };
 
+  // Mapea las opciones para el select de react-select
+  const options = casinos.map((casino) => ({
+    value: casino.nombreCasino,
+    label: casino.nombreCasino,
+  }));
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="relative bg-white shadow-xl rounded-lg p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-70 backdrop-blur-sm">
+      <div className="relative bg-white shadow-2xl rounded-lg p-8 w-[400px] transform transition-all ease-out duration-300 scale-100 hover:scale-105">
         <button
-          className="absolute top-0 right-0 m-4 text-gray-600 hover:text-gray-900"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition duration-200"
           onClick={onClose}
         >
           <svg
@@ -82,32 +85,33 @@ function TransferirMaquinaModal({ maquina, onClose }) {
           </svg>
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">
-          Transferir máquina a otro casino
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+          Transferir Máquina
         </h2>
 
-        <div className="flex items-center mb-4">
-          <label className="mr-2">Seleccionar casino:</label>
-          <select
-            value={selectedCasino}
-            onChange={(e) => setSelectedCasino(e.target.value)}
-            className="border rounded-md p-2"
-          >
-            <option value="">Seleccionar...</option>
-            {casinos.map((casino) => (
-              <option key={casino._id} value={casino.nombreCasino}>
-                {casino.nombreCasino}
-              </option>
-            ))}
-          </select>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Seleccionar Casino:
+          </label>
+          <Select
+            value={options.find((option) => option.value === selectedCasino)}
+            onChange={(selectedOption) => setSelectedCasino(selectedOption.value)}
+            options={options}
+            placeholder="Seleccionar Casino..."
+            isSearchable={true} // Habilita la búsqueda
+            className="w-full"
+            classNamePrefix="react-select"
+          />
         </div>
 
         <div className="flex justify-end">
           <button
             onClick={handleTransferir}
             disabled={!selectedCasino}
-            className={`bg-green-500 text-white px-3 py-1 rounded ${
-              !selectedCasino && "opacity-50 cursor-not-allowed"
+            className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
+              selectedCasino
+                ? "bg-blue-600 hover:bg-blue-700 transition duration-200"
+                : "bg-gray-300 cursor-not-allowed"
             }`}
           >
             Transferir

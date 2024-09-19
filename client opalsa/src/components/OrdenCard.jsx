@@ -5,7 +5,6 @@ import ModalRespOrden from "./modalRespOrden";
 
 const OrdenCard = ({
   item,
-  handleCheckboxAceptar,
   handleDescriptionClick,
   handleAcceptOrder,
   handleDeleteItem,
@@ -16,7 +15,7 @@ const OrdenCard = ({
     usuario = {},
     descripcionOrden = "Descripción desconocida",
     maquina = {},
-    componenteSobrantes = [],
+    componenteSobrantes = [], 
     _id = "",
     aceptado = false,
     fechaOrden = new Date(),
@@ -127,15 +126,25 @@ const OrdenCard = ({
           </p>
 
           <div className="flex justify-center mt-2 space-x-2">
-            {(estadoOrden === "Orden en solicitud" || estadoOrden === "Orden aprobada") && (
+            {(estadoOrden === "Orden en solicitud" ) && (
               <button
                 className="bg-green-500 text-white py-1 px-4 rounded-md hover:bg-green-700 transition-colors duration-300"
                 onClick={() => handleAcceptOrder(item)}
               >
-                Inspeccionar orden
+                Aprobar orden
               </button>
             )}
             {estadoOrden === "Orden aprobada" && (
+              
+              <button
+              className="bg-green-500 text-white py-1 px-4 rounded-md hover:bg-green-700 transition-colors duration-300"
+              onClick={() => openModal(item)}
+            >
+              Inspeccionar orden
+            </button>
+            )}
+            {estadoOrden === "Orden aprobada" && (
+              
               <button
                 onClick={() => handleOpenSobrantesModal(item)}
                 className="bg-sky-500 rounded-md py-1 px-4 text-white hover:bg-sky-700 transition-colors duration-300"

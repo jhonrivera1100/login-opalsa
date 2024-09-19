@@ -8,7 +8,7 @@ import TransferModal from "./TransferModal"; // Importa el nuevo modal
 Modal.setAppElement("#root");
 
 const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
-  const { getElementosByCasino, elementos, updateElemento, deleteElemento, transferElemento } = useElementos();
+  const { getElementosByCasino, elementos, updateElemento, deleteElemento } = useElementos();
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
@@ -74,8 +74,8 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
     setIsTransferModalOpen(true);
   };
 
-  const handleTransfer = (elementoId, selectedCasino) => {
-    transferElemento(elementoId, selectedCasino);
+  const handleCloseTransferModal = () => {
+    setIsTransferModalOpen(false); // Cierra el modal
   };
 
   return (
@@ -299,14 +299,12 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
       </Modal>
 
       {/* Modal de transferencia */}
-      {elementToTransfer && (
-  <TransferModal
-    isOpen={isTransferModalOpen}
-    onClose={() => setIsTransferModalOpen(false)}
-    elemento={elementToTransfer}
-  />
-)}
-
+      {isTransferModalOpen && elementToTransfer && (
+        <TransferModal
+          onClose={handleCloseTransferModal}
+          elemento={elementToTransfer}
+        />
+      )}
     </>
   );
 };

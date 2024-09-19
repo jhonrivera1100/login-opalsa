@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Select from "react-select"; // Importa react-select
 import axios from "../api/axios";
 import { updateElementosRequest } from "../api/elementos";
 import { getCasinosRequest } from "../api/casinos";
@@ -34,7 +35,6 @@ const TransferModal = ({ onClose, elemento }) => {
     console.log("Casino seleccionado para la transferencia:", selectedCasino);
   
     try {
-      // Prepara el objeto de movimiento con los datos correctos
       const movimientoElm = {
         elementoId: elemento._id,
         oldUbicacionNombre: casinos.find(c => c._id === elemento.ubicacionDeElemento)?.nombreCasino || "",
@@ -42,36 +42,41 @@ const TransferModal = ({ onClose, elemento }) => {
         nombreElemento: elemento.nombreElemento,
         codigoElemento: elemento.codigoElemento,
       };
-  
+
       console.log("Datos del movimiento enviados al backend:", movimientoElm);
 
       const updatedElemento = { ...elemento, ubicacionDeElemento: selectedCasino };
 
-      // Envía la solicitud de actualización al backend
-    await updateElementosRequest(updatedElemento);
-    console.log("Elemento transferido a:", selectedCasino);
+      await updateElementosRequest(updatedElemento);
+      console.log("Elemento transferido a:", selectedCasino);
 
-
-      // Envía la solicitud al backend
       await axios.post("/movimientos-elementos", movimientoElm);
       console.log("Historial de movimientos guardado");
-  
+
       if (typeof onClose === 'function') {
         onClose(); // Cierra el modal
+      } else {
+        console.error('onClose no es una función');
       }
-  
+
+      // Elimina o comenta esta línea si está causando problemas con el cierre del modal
       window.location.reload(); // Recarga la página para ver los cambios
     } catch (error) {
       console.error("Error al transferir el elemento:", error);
     }
   };
-  
-  
+
+  // Mapea las opciones para el select de react-select
+  const options = casinosForSelect.map((casino) => ({
+    value: casino._id,
+    label: casino.nombreCasino,
+  }));
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
-      <div className="relative bg-white shadow-xl rounded-lg p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-70 backdrop-blur-sm">
+      <div className="relative bg-white shadow-2xl rounded-lg p-8 w-[400px] transform transition-all ease-out duration-300 scale-100 hover:scale-105">
         <button
-          className="absolute top-0 right-0 m-4 text-gray-600 hover:text-gray-900"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition duration-200"
           onClick={onClose}
         >
           <svg
@@ -90,32 +95,33 @@ const TransferModal = ({ onClose, elemento }) => {
           </svg>
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">
-          Transferir Elemento a otro casino
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+          Transferir Elemento
         </h2>
 
-        <div className="flex items-center mb-4">
-          <label className="mr-2">Seleccionar casino:</label>
-          <select
-            value={selectedCasino}
-            onChange={(e) => setSelectedCasino(e.target.value)}
-            className="border rounded-md p-2"
-          >
-            <option value="">Seleccionar...</option>
-            {casinosForSelect.map((casino) => (
-              <option key={casino._id} value={casino._id}>
-                {casino.nombreCasino}
-              </option>
-            ))}
-          </select>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Seleccionar Casino:
+          </label>
+          <Select
+            value={options.find((option) => option.value === selectedCasino)}
+            onChange={(selectedOption) => setSelectedCasino(selectedOption.value)}
+            options={options}
+            placeholder="Seleccionar Casino..."
+            isSearchable={true} // Habilita la búsqueda
+            className="w-full"
+            classNamePrefix="react-select"
+          />
         </div>
 
         <div className="flex justify-end">
           <button
             onClick={handleTransfer}
             disabled={!selectedCasino}
-            className={`bg-green-500 text-white px-3 py-1 rounded ${
-              !selectedCasino && "opacity-50 cursor-not-allowed"
+            className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
+              selectedCasino
+                ? "bg-green-600 hover:bg-green-700 transition duration-200"
+                : "bg-gray-300 cursor-not-allowed"
             }`}
           >
             Transferir

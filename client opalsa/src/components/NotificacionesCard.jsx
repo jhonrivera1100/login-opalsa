@@ -52,10 +52,10 @@ const NotificacionesCard = ({
         />
         <label className="text-gray-600">Visto</label>
       </div>
-      <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-yellow-500 left-4 -top-4">
+      <div className="text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl bg-orange-500 left-4 -top-4">
         <GoDiscussionClosed className="w-8 h-8"/>
       </div>
-      <div className="mt-8">
+      <div>
         <p className="text-xl font-semibold mb-2">Notificación</p>
         <div className="flex items-center space-x-2 text-gray-400 text-sm mb-3">
           <FaRegUser className="h-5 w-5"/>
@@ -81,9 +81,9 @@ const NotificacionesCard = ({
           className="text-gray-600 mb-2 cursor-pointer"
           onClick={() => handleDescriptionClick(recordatorio.descripcion)} // Abre el modal con la descripción completa
         >
-          <strong>Descripción:</strong> {recordatorio.descripcion.length > 10 ? `${recordatorio.descripcion.substring(0, 8)}...` : recordatorio.descripcion}
+          <strong>Descripción:</strong> {recordatorio.descripcion.length > 10 ? `${recordatorio.descripcion.substring(0, 40)}...` : recordatorio.descripcion}
         </p>
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between mt-[60px]">
           <button
             className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition duration-300"
             onClick={() => handleDelete(recordatorio._id, "recordatorio")}
