@@ -1,12 +1,18 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Asegúrate de importar FontAwesomeIcon
 import { faMapMarkerAlt, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
 
 function CasinoCard({ casino, onVerMas, onVerDocumentos }) {
   const handleVerDocumentos = () => {
-    onVerDocumentos(casino.documentacionCasino);
+    console.log(casino); // Revisa aquí que los datos estén disponibles y correctos
+    onVerDocumentos({
+      documentacionLegal: casino.documentacionLegal || [],
+      usoDeSuelos: casino.usoDeSuelos || [],
+      colJuegos: casino.colJuegos || [],
+      otrosDocumentos: casino.otrosDocumentos || [],
+    });
   };
-
+  
   return (
     <div className="w-full sm:w-72 max-w-sm bg-white border border-gray-200 my-1 rounded-lg shadow-lg transition-transform duration-300 hover:-translate-y-2">
       <div className="relative">
