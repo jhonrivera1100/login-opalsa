@@ -5,12 +5,7 @@ import { faMapMarkerAlt, faMapMarkedAlt } from '@fortawesome/free-solid-svg-icon
 function CasinoCard({ casino, onVerMas, onVerDocumentos }) {
   const handleVerDocumentos = () => {
     console.log(casino); // Revisa aquí que los datos estén disponibles y correctos
-    onVerDocumentos({
-      documentacionLegal: casino.documentacionLegal || [],
-      usoDeSuelos: casino.usoDeSuelos || [],
-      colJuegos: casino.colJuegos || [],
-      otrosDocumentos: casino.otrosDocumentos || [],
-    });
+    onVerDocumentos(casino);
   };
   
   return (
