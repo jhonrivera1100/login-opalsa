@@ -65,3 +65,19 @@ export const deleteUsers = async (req, res) => {
       res.status(500).json({ message: 'Error al actualizar el rol', error });
     }
   };
+
+  // Agregar esta función en tu controlador de usuarios
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener el usuario', error });
+  }
+};
