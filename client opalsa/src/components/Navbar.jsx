@@ -70,34 +70,13 @@ function Navbar() {
   const renderLink = (to, icon, label) => (
     <Link to={to} className={getLinkClass(to)}>
       <div className={getLineClass(to)}></div>
-      <div className={getIconBgClass(to)}>
-        {icon}
-      </div>
+      <div className={getIconBgClass(to)}>{icon}</div>
       {isHovered && (
         <span className="ml-2 text-gray-700 group-hover:text-blue-800">
           {label}
         </span>
       )}
     </Link>
-  );
-
-  const adminLinks = (
-    <>
-      {renderLink("/GestionMaquinas", <FaCog className={getIconClass("/GestionMaquinas")} />, "Gestión")}
-      {renderLink("/Historial", <FaHistory className={getIconClass("/Historial")} />, "Historial")}
-      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
-      {renderLink("/admin", <FaUserShield className={getIconClass("/admin")} />, "Administrador")}
-    </>
-  );
-
-  const userLinks = (
-    <>
-      {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
-      {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
-      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden")}
-    </>
   );
 
   return (
@@ -111,27 +90,77 @@ function Navbar() {
       <nav
         className={`fixed top-0 left-0 h-full z-40 transition-transform duration-300 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 bg-slate-200 font-semibold text-zinc-900 md:w-30`}
+        } md:translate-x-0 bg-slate-200 font-semibold text-zinc-900 md:w-30 font-poppins`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex flex-col h-full">
           <div className="bg-blue-950 text-white py-12 px-4 flex flex-col justify-center items-center">
             {isHovered ? (
-              <span className="text-base font-bold mb-2">OPALSA</span>
+              <span className="text-base font-bold mb-2">OPALSA ®️</span>
             ) : (
-              <span
-                className={`text-base font-bold ${
-                  isHovered ? "" : "justify-center"
-                } mb-2`}
-              >
-                |
-              </span>
+              <span className="text-base font-bold mb-2">OPALSA</span>
             )}
           </div>
           <div className="flex flex-col flex-grow p-4 space-y-2">
-            {role === "admin" ? adminLinks : userLinks}
-            <div className="flex-grow"></div>
+            {role === "admin" ? (
+              <>
+                {renderLink(
+                  "/GestionMaquinas",
+                  <FaCog className={getIconClass("/GestionMaquinas")} />,
+                  "Gestión"
+                )}
+                {renderLink(
+                  "/Historial",
+                  <FaHistory className={getIconClass("/Historial")} />,
+                  "Historial"
+                )}
+                {renderLink(
+                  "/RegistroMantenimiento",
+                  <FaTools
+                    className={getIconClass("/RegistroMantenimiento")}
+                  />,
+                  "Reportes"
+                )}
+                {renderLink(
+                  "/profile",
+                  <FaUser className={getIconClass("/profile")} />,
+                  "Perfil"
+                )}
+                {renderLink(
+                  "/admin",
+                  <FaUserShield className={getIconClass("/admin")} />,
+                  "Administrador"
+                )}
+              </>
+            ) : (
+              <>
+                {renderLink(
+                  "/",
+                  <FaHome className={getIconClass("/")} />,
+                  "Inicio"
+                )}
+                {renderLink(
+                  "/RegistroMantenimiento",
+                  <FaTools
+                    className={getIconClass("/RegistroMantenimiento")}
+                  />,
+                  "Reportes"
+                )}
+                {renderLink(
+                  "/profile",
+                  <FaUser className={getIconClass("/profile")} />,
+                  "Perfil"
+                )}
+                {renderLink(
+                  "/RespuestasOrden",
+                  <AiFillContainer
+                    className={getIconClass("/RespuestasOrden")}
+                  />,
+                  "Respuestas de Orden"
+                )}
+              </>
+            )}
             <div
               onClick={logout}
               className="group flex items-center text-base transition duration-300 ease-in-out transform hover:bg-white hover:text-blue-800 p-2 rounded-tr-3xl rounded-br-3xl relative cursor-pointer"

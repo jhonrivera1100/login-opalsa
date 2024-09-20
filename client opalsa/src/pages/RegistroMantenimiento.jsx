@@ -22,7 +22,7 @@ const RegistroMantenimiento = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 font-poppins"> {/* Aplicamos la fuente Poppins */}
       <Navbar />
       <header className="flex items-center justify-center py-4">
         <h1 className="text-2xl md:text-3xl font-bold text-center">

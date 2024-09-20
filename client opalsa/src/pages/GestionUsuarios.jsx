@@ -62,7 +62,7 @@ function GestionUsuarios() {
   );
 
   return (
-    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen'>
+    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'> {/* Se añadió font-poppins */}
       <Sidebar />
       <div className='lg:col-span-3 xl:col-span-5 p-4 lg:p-8'>
         <div className='mb-4 flex flex-col lg:flex-row lg:justify-between'>

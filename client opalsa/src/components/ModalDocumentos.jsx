@@ -132,7 +132,7 @@ function ModalDocumentos({ isOpen, onClose, documentos, casinoId }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-70 backdrop-blur-sm">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full overflow-hidden">
         <h2 className="text-2xl font-bold text-center bg-blue-800 text-white py-4">
           Documentación del Casino

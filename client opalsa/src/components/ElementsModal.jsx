@@ -84,8 +84,8 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
         isOpen={isOpen}
         onRequestClose={onRequestClose}
         contentLabel="Elementos Modal"
-        className="fixed inset-0 flex items-center justify-center z-50"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+        className="fixed inset-0 flex items-center justify-center z-50 font-poppins"
+       overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
       >
         <div className="relative bg-white p-4 rounded-lg w-full max-w-6xl h-3/4 overflow-y-auto">
           <button

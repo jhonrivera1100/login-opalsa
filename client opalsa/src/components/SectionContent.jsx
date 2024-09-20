@@ -41,7 +41,7 @@ const SectionContent = ({
     });
 
     return (
-      <div>
+      <div className="font-poppins">
         <CasinoDetail
           selectedCasino={selectedCasino}
           filteredMaquinas={filteredMaquinas}
@@ -84,7 +84,7 @@ const SectionContent = ({
     .slice(startIndexCasinos, endIndexCasinos);
 
   return (
-    <div className="mx-auto bg-gray-100 w-11/12 md:w-10/12 h-144 overflow-auto p-4">
+    <div className="font-poppins mx-auto bg-gray-100 w-11/12 md:w-10/12 h-144 overflow-auto p-4">
       {section === "Maquinas" && (
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
