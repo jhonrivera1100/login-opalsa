@@ -22,6 +22,6 @@ router.post(
   createCasino
 );
 router.delete("/casinos/:id", authRequired, deleteCasino);
-router.put("/casinos", authRequired, updateCasino);
+router.put("/casinos/:id", authRequired, updateCasino);
 
 export default router;

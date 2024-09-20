@@ -109,6 +109,7 @@ function SeccionesHome() {
         console.log("No hay documentos disponibles para este casino.");
       } else {
         setDocumentos(documentos);
+        setSelectedCasino(casino); // Guardamos el casino seleccionado
         setIsDocumentosModalOpen(true);
       }
     } else {
@@ -194,6 +195,7 @@ function SeccionesHome() {
         isOpen={isDocumentosModalOpen}
         onClose={closeDocumentosModal}
         documentos={documentos}
+        casinoId={selectedCasino ? selectedCasino._id : null}
       />
     </div>
   );
