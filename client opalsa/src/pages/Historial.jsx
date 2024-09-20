@@ -233,15 +233,6 @@ const Historial = () => {
       {" "}
       {/* Aplicamos la fuente 'Poppins' */}
       <Navbar />
-      <header className="flex items-center justify-center py-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-center">
-          MANTENIMIENTOS
-          <span className="text-sidebar-100 drop-shadow-xl">
-            {" "}
-            Y MOVIMIENTOS
-          </span>
-        </h1>
-      </header>
       <div className="max-w-7xl mx-auto mt-5 p-6 pl-[75px]">
         <div className="flex flex-wrap justify-center mb-4 space-x-2 space-y-2 md:space-y-0">
           <button
