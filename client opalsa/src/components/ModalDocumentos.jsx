@@ -21,7 +21,7 @@ function ModalDocumentos({ isOpen, onClose, documentos, casinoId }) {
     otrosDocumentos: false,
   });
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Garantiza que el modal no se renderice hasta que se solicite abrir
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -101,10 +101,12 @@ function ModalDocumentos({ isOpen, onClose, documentos, casinoId }) {
             className="ml-2"
           />
         </h3>
-        {openSections[titulo] && listaDocumentos.length > 0 && (
+        {openSections[titulo] &&
+        listaDocumentos &&
+        listaDocumentos.length > 0 ? (
           <ul className="space-y-2 pl-4">
             {listaDocumentos.map((doc, index) => (
-              <li key={doc._id} className="flex items-center">
+              <li key={index} className="flex items-center">
                 <FontAwesomeIcon
                   icon={faFileAlt}
                   className="text-blue-500 mr-2"
@@ -120,9 +122,10 @@ function ModalDocumentos({ isOpen, onClose, documentos, casinoId }) {
               </li>
             ))}
           </ul>
-        )}
-        {openSections[titulo] && listaDocumentos.length === 0 && (
-          <p className="text-gray-700">No hay documentos en {titulo}.</p>
+        ) : (
+          openSections[titulo] && (
+            <p className="text-gray-700">No hay documentos en {titulo}.</p>
+          )
         )}
       </div>
     );
@@ -135,13 +138,17 @@ function ModalDocumentos({ isOpen, onClose, documentos, casinoId }) {
           Documentación del Casino
         </h2>
         <div className="p-6 space-y-4">
+          {/* Mostrar documentos existentes o mensajes si no hay documentos */}
           {renderDocumentos(
             "Documentación Legal",
-            documentos.documentacionLegal
+            documentos.documentacionLegal || []
           )}
-          {renderDocumentos("Uso de Suelos", documentos.usoDeSuelos)}
-          {renderDocumentos("ColJuegos", documentos.colJuegos)}
-          {renderDocumentos("Otros Documentos", documentos.otrosDocumentos)}
+          {renderDocumentos("Uso de Suelos", documentos.usoDeSuelos || [])}
+          {renderDocumentos("ColJuegos", documentos.colJuegos || [])}
+          {renderDocumentos(
+            "Otros Documentos",
+            documentos.otrosDocumentos || []
+          )}
 
           {/* Campos dinámicos para subir nuevos documentos */}
           <div className="space-y-4">
