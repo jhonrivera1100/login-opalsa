@@ -5,7 +5,10 @@ import TransferirComponenteModal from "./TransferirComponenteModal";
 import TransferirMaquinaModal from "./TransferirMaquinaModal";
 import ComponentesTable from "./ComponentesTable";
 import CardMaquinaModal from "./CardMaquinaModal";
-import { deleteComponentesRequest, updateComponentesRequest } from "../api/componentes";
+import {
+  deleteComponentesRequest,
+  updateComponentesRequest,
+} from "../api/componentes";
 import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas";
 
 function ModalMaquina({ maquina, onClose }) {
@@ -18,8 +21,7 @@ function ModalMaquina({ maquina, onClose }) {
     useState(false);
   const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
   const [editComponentId, setEditComponentId] = useState(null);
-const [editedComponent, setEditedComponent] = useState({});
-
+  const [editedComponent, setEditedComponent] = useState({});
 
   useEffect(() => {
     getComponentes();
@@ -49,19 +51,19 @@ const [editedComponent, setEditedComponent] = useState({});
 
   const toggleEstadoMaquina = async () => {
     const nuevoEstado = estadoMaquina === "activo" ? "inactivo" : "activo";
-
     try {
-      await updateMaquinasRequest({ ...maquina, estadoMaquina: nuevoEstado });
+      await updateMaquinasRequest(maquina._id, { estadoMaquina: nuevoEstado });
       setEstadoMaquina(nuevoEstado);
     } catch (error) {
       console.error("Error al cambiar el estado de la máquina:", error);
     }
   };
+
   const handleEditClick = (componente) => {
     setEditComponentId(componente._id);
     setEditedComponent(componente);
   };
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedComponent((prev) => ({
@@ -69,21 +71,20 @@ const [editedComponent, setEditedComponent] = useState({});
       [name]: value,
     }));
   };
-  
+
   const handleSaveClick = async () => {
     try {
       await updateComponentesRequest(editedComponent);
       getComponentes();
-      setEditComponentId(null); // Reset edit mode
+      setEditComponentId(null);
     } catch (error) {
       console.error("Error al actualizar el componente:", error);
     }
   };
-  
+
   const handleCancelClick = () => {
-    setEditComponentId(null); // Reset edit mode
+    setEditComponentId(null);
   };
-  
 
   const handleEliminarMaquina = async () => {
     const confirmDelete = window.confirm(
@@ -93,7 +94,7 @@ const [editedComponent, setEditedComponent] = useState({});
       try {
         await deleteMaquinasRequest(maquina._id);
         onClose();
-        window.location.reload(); // Recargar la página
+        window.location.reload();
       } catch (error) {
         console.error("Error al eliminar la máquina:", error);
       }
@@ -103,6 +104,18 @@ const [editedComponent, setEditedComponent] = useState({});
   const abrirDocumento = (url) => {
     window.open(url, "_blank");
   };
+
+  const updateMaquina = async (editedMaquina) => {
+    console.log("ID de la máquina:", maquina._id); // Esto debería mostrar un valor definido, no undefined
+    try {
+        await updateMaquinasRequest(maquina._id, editedMaquina);
+        onClose();
+        window.location.reload();
+    } catch (error) {
+        console.error("Error updating machine:", error);
+    }
+};
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
@@ -133,6 +146,7 @@ const [editedComponent, setEditedComponent] = useState({});
           toggleEstadoMaquina={toggleEstadoMaquina}
           handleEliminarMaquina={handleEliminarMaquina}
           setShowTransferirMaquinaModal={setShowTransferirMaquinaModal}
+          updateMaquina={updateMaquina}
         />
 
         <div className="w-full flex flex-col pl-4 max-h-[90vh] overflow-y-auto">
@@ -144,28 +158,26 @@ const [editedComponent, setEditedComponent] = useState({});
               <span className="text-gray-500 text-lg text-center">
                 Esta máquina aún no tiene componentes.
               </span>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={() => setShowAgregarModal(true)}
-                  className="bg-blue-500 text-white px-2 py-2 rounded"
-                >
-                  Agregar Componente
-                </button>
-              </div>
+              <button
+                onClick={() => setShowAgregarModal(true)}
+                className="bg-blue-500 text-white px-2 py-2 rounded"
+              >
+                Agregar Componente
+              </button>
             </div>
           ) : (
             <>
-                <ComponentesTable
-      sortedComponentes={sortedComponentes}
-      editComponentId={editComponentId}
-      editedComponent={editedComponent}
-      handleEditClick={handleEditClick}
-      handleInputChange={handleInputChange}
-      handleSaveClick={handleSaveClick}
-      handleCancelClick={handleCancelClick}
-      handleDeleteComponente={handleDeleteComponente}
-      abrirDocumento={abrirDocumento}
-    />
+              <ComponentesTable
+                sortedComponentes={sortedComponentes}
+                editComponentId={editComponentId}
+                editedComponent={editedComponent}
+                handleEditClick={handleEditClick}
+                handleInputChange={handleInputChange}
+                handleSaveClick={handleSaveClick}
+                handleCancelClick={handleCancelClick}
+                handleDeleteComponente={handleDeleteComponente}
+                abrirDocumento={abrirDocumento}
+              />
 
               <div className="flex justify-center space-x-4 mt-4">
                 <button
@@ -201,7 +213,6 @@ const [editedComponent, setEditedComponent] = useState({});
         />
       )}
 
-      {/* Renderizar el modal de transferencia de máquina si showTransferirMaquinaModal es true */}
       {showTransferirMaquinaModal && (
         <TransferirMaquinaModal
           maquina={maquina}
