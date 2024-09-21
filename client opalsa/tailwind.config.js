@@ -21,6 +21,9 @@ export default {
         'casino-background': "url('https://res.cloudinary.com/dtqiwgbbp/image/upload/v1721338474/Maquinas/jix8shzajboqxs85gjpw.jpg')",
       },
     },
+    fontFamily: {
+      poppins: ['Poppins', 'sans-serif'],
+    },
   },
   plugins: [],
 };

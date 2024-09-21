@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import Perfil from '../components/perfil'; // Importa el componente Perfil
 function ProfilePage() {
   return (
-    <div style={{ backgroundColor: "#FFFFFF" }}>
+    <div className="font-poppins">
       <Navbar /> {/* Componente Navbar */}
       <Perfil /> {/* Componente Perfil */}
     </div>

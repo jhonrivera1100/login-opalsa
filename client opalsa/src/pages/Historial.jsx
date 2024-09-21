@@ -30,7 +30,7 @@ const Historial = () => {
         );
         const movimientoElementosResponse = await axios.get(
           "http://localhost:4000/api/movimientos-elementos"
-        ); 
+        );
 
         const mantenimientosWithDetails = await Promise.all(
           mantenimientosResponse.data.map(async (mantenimiento) => {
@@ -79,14 +79,12 @@ const Historial = () => {
           })
         );
 
-        // Agregar movimientos de elementos
-    const movimientoElementosWithDetails = movimientoElementosResponse.data.map(
-      (movimientoElemento) => ({
-        ...movimientoElemento,
-        type: "movimientoElemento",
-        fecha: new Date(movimientoElemento.fechaTransferenciaElm),
-      })
-    );
+        const movimientoElementosWithDetails =
+          movimientoElementosResponse.data.map((movimientoElemento) => ({
+            ...movimientoElemento,
+            type: "movimientoElemento",
+            fecha: new Date(movimientoElemento.fechaTransferenciaElm),
+          }));
 
         const combinedItems = [
           ...mantenimientosWithDetails,
@@ -116,7 +114,9 @@ const Historial = () => {
       } else if (type === "moviMaquina") {
         await axios.delete(`http://localhost:4000/api/moviMaquinas/${id}`);
       } else if (type === "movimientoElemento") {
-        await axios.delete(`http://localhost:4000/api/movimientos-elementos/${id}`);
+        await axios.delete(
+          `http://localhost:4000/api/movimientos-elementos/${id}`
+        );
       }
       setItems(items.filter((item) => item._id !== id));
       setFilteredItems(filteredItems.filter((item) => item._id !== id));
@@ -229,17 +229,10 @@ const Historial = () => {
   };
 
   return (
-    <div>
-      <Navbar /> {/* Componente Navbar */}
-      <header className="flex items-center justify-center py-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-center">
-          MANTENIMIENTOS
-          <span className="text-sidebar-100 drop-shadow-xl">
-            {" "}
-            Y MOVIMIENTOS
-          </span>
-        </h1>
-      </header>
+    <div className="font-poppins">
+      {" "}
+      {/* Aplicamos la fuente 'Poppins' */}
+      <Navbar />
       <div className="max-w-7xl mx-auto mt-5 p-6 pl-[75px]">
         <div className="flex flex-wrap justify-center mb-4 space-x-2 space-y-2 md:space-y-0">
           <button
@@ -279,16 +272,15 @@ const Historial = () => {
             Movimientos de Máquinas
           </button>
           <button
-  className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${
-    filter === "movimientoElemento"
-      ? "bg-orange-500 text-white"
-      : "bg-gray-200"
-  }`}
-  onClick={() => setFilter("movimientoElemento")}
->
-  Movimientos de Elementos
-</button>
-
+            className={`w-full sm:w-auto mx-2 px-4 py-2 rounded ${
+              filter === "movimientoElemento"
+                ? "bg-orange-500 text-white"
+                : "bg-gray-200"
+            }`}
+            onClick={() => setFilter("movimientoElemento")}
+          >
+            Movimientos de Elementos
+          </button>
         </div>
         <div className="flex justify-center mb-9 pt-7">
           <input

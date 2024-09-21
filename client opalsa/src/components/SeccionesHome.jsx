@@ -119,7 +119,7 @@ function SeccionesHome() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col font-poppins">
       <div className="flex items-center justify-center py-3 bg-gray-100 mt-4">
         <div className="flex flex-wrap justify-center w-full">
           <div className="flex space-x-4 ml-4 md:ml-20">

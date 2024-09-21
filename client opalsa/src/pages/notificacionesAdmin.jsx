@@ -65,40 +65,38 @@ const NotificacionesAdmin = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Filtrar los elementos según el término de búsqueda
-// Filtrar los elementos según el término de búsqueda
-const filteredItems = combinedItems.filter((item) => {
-  const term = searchTerm.toLowerCase();
-  const matchDescription =
-    (item.descripcion && item.descripcion.toLowerCase().includes(term)) ||
-    (item.descripcionOrden &&
-      item.descripcionOrden.toLowerCase().includes(term));
-  const matchMaquinaSerial =
-    item.type === "orden" &&
-    item.maquina.nroSerieMaquina &&
-    item.maquina.nroSerieMaquina.toLowerCase().includes(term);
-  const matchUbicacion =
-    item.type === "orden" &&
-    item.maquina.ubicacionMaquina &&
-    item.maquina.ubicacionMaquina.toLowerCase().includes(term);
+  const filteredItems = combinedItems.filter((item) => {
+    const term = searchTerm.toLowerCase();
+    const matchDescription =
+      (item.descripcion && item.descripcion.toLowerCase().includes(term)) ||
+      (item.descripcionOrden &&
+        item.descripcionOrden.toLowerCase().includes(term));
+    const matchMaquinaSerial =
+      item.type === "orden" &&
+      item.maquina.nroSerieMaquina &&
+      item.maquina.nroSerieMaquina.toLowerCase().includes(term);
+    const matchUbicacion =
+      item.type === "orden" &&
+      item.maquina.ubicacionMaquina &&
+      item.maquina.ubicacionMaquina.toLowerCase().includes(term);
     const matchUsuario =
-    item.type === "orden" &&
-    item.usuario &&
-    item.usuario.username &&
-    item.usuario.username.toLowerCase().includes(term);
+      item.type === "orden" &&
+      item.usuario &&
+      item.usuario.username &&
+      item.usuario.username.toLowerCase().includes(term);
 
-  return matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario;
-});
+    return (
+      matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario
+    );
+  });
 
-
-  // Filtrar según el estado seleccionado
   const filteredByState = filteredItems.filter((item) => {
-    if (filter === "all") return true; // Mostrar todos los items
+    if (filter === "all") return true;
     if (item.type === "orden" && filter !== "notificaciones") {
-      return item.estadoOrden === filter; // Filtrar órdenes por estado
+      return item.estadoOrden === filter;
     }
     if (filter === "notificaciones" && item.type === "recordatorio") {
-      return true; // Mostrar solo notificaciones
+      return true;
     }
     return false;
   });
@@ -178,7 +176,9 @@ const filteredItems = combinedItems.filter((item) => {
         });
         setCombinedItems((prevItems) =>
           prevItems.map((item) =>
-            item._id === id ? { ...item, aceptado: response.data.aceptado } : item
+            item._id === id
+              ? { ...item, aceptado: response.data.aceptado }
+              : item
           )
         );
       } catch (error) {
@@ -208,7 +208,9 @@ const filteredItems = combinedItems.filter((item) => {
   };
 
   return (
-    <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen">
+    <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins">
+      {" "}
+      {/* Se añadió font-poppins */}
       <Sidebar />
       <div className="lg:col-span-3 xl:col-span-5 p-4 lg:p-8">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between">
@@ -305,7 +307,6 @@ const filteredItems = combinedItems.filter((item) => {
           </div>
         </div>
       </div>
-
       {modalVisible && selectedItem && (
         <Modal onClose={closeModal}>
           <div className="p-4">
@@ -327,7 +328,6 @@ const filteredItems = combinedItems.filter((item) => {
           </div>
         </Modal>
       )}
-
       {modalOrdenVisible && selectedItem && (
         <ModalOrden
           visible={modalOrdenVisible}
@@ -336,7 +336,6 @@ const filteredItems = combinedItems.filter((item) => {
           handleSave={fetchData}
         />
       )}
-
       {showSobrantesModal && selectedItem && (
         <ModalSobrantes
           visible={showSobrantesModal}

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { FaUsers } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import axios from "../api/axios";
-import { useState, useEffect } from 'react';
 
 function AppAdmin() {
   const [recordatorios, setRecordatorios] = useState([]);
@@ -54,7 +54,7 @@ function AppAdmin() {
   };
 
   return (
-    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen'>
+    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'> {/* Se añadió font-poppins */}
       <Sidebar/>
       <main className='lg:col-span-3 xl:col-span-5 bg-gray-100 p-4 md:p-8'>
         <div className='flex justify-center pt-5'>
