@@ -15,24 +15,22 @@ const RespuestasOrden = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) {
-      fetchOrdenes();
-    }
+    const fetchOrdenes = async () => {
+      if (!loading && user) {
+        try {
+          const response = await axios.get(`/ordenes`);
+          const ordenesFiltradas = response.data.filter(
+            (orden) => orden.idUsuario === user._id
+          );
+          setOrdenes(ordenesFiltradas);
+        } catch (error) {
+          console.error("Error al traer las órdenes:", error);
+        }
+      }
+    };
+    
+    fetchOrdenes();
   }, [user, loading]);
-
-  const fetchOrdenes = async () => {
-    try {
-      const response = await axios.get(`/ordenes`);
-      const ordenesFiltradas = response.data.filter(
-        (orden) => orden.idUsuario === user._id
-      );
-      setOrdenes(ordenesFiltradas);
-    } catch (error) {
-      console.error("Error al traer las órdenes:", error);
-    }
-  };
-  
-  
 
   useEffect(() => {
     filterOrdenes();

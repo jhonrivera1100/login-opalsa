@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaCog,
   FaHistory,
@@ -20,6 +20,7 @@ function Navbar() {
   const [role, setRole] = useState(null);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate(); // Usamos el hook useNavigate
 
   useEffect(() => {
     if (user) {
@@ -67,18 +68,25 @@ function Navbar() {
     }`;
   };
 
-  const renderLink = (to, icon, label) => (
-    <Link to={to} className={getLinkClass(to)}>
+  const handleNavigate = (path) => {
+    navigate(path);
+    window.location.reload(); // Forzamos una recarga de la página cuando navegamos a "Perfil"
+  };
+
+  const renderLink = (to, icon, label, isReload = false) => (
+    <div
+      onClick={() => (isReload ? handleNavigate(to) : navigate(to))}
+      className={getLinkClass(to)}
+      style={{ cursor: "pointer" }}
+    >
       <div className={getLineClass(to)}></div>
-      <div className={getIconBgClass(to)}>
-        {icon}
-      </div>
+      <div className={getIconBgClass(to)}>{icon}</div>
       {isHovered && (
         <span className="ml-2 text-gray-700 group-hover:text-blue-800">
           {label}
         </span>
       )}
-    </Link>
+    </div>
   );
 
   const adminLinks = (
@@ -86,7 +94,7 @@ function Navbar() {
       {renderLink("/GestionMaquinas", <FaCog className={getIconClass("/GestionMaquinas")} />, "Gestión")}
       {renderLink("/Historial", <FaHistory className={getIconClass("/Historial")} />, "Historial")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil", true)} {/* Forzar recarga en perfil */}
       {renderLink("/admin", <FaUserShield className={getIconClass("/admin")} />, "Administrador")}
     </>
   );
@@ -95,8 +103,8 @@ function Navbar() {
     <>
       {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
-      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden")}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil", true)} {/* Forzar recarga en perfil */}
+      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden", true)} {/* Forzar recarga */}
     </>
   );
 

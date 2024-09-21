@@ -9,7 +9,10 @@ import CasinoDetail from "../components/CasinoDetail";
 import ModalDocumentos from "../components/ModalDocumentos";
 import SectionContent from "./SectionContent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMapMarkerAlt, faMapMarkedAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMapMarkerAlt,
+  faMapMarkedAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
@@ -47,7 +50,6 @@ function SeccionesHome() {
     setCurrentPageMaquinas(1);
     setCurrentPageCasinos(1);
   };
-  
 
   const handleFilterChange = (e) => {
     setSelectedBrand(e.target.value);
@@ -96,27 +98,17 @@ function SeccionesHome() {
         documentacionLegal: casino.documentacionLegal || [],
         usoDeSuelos: casino.usoDeSuelos || [],
         colJuegos: casino.colJuegos || [],
-        otrosDocumentos: casino.otrosDocumentos || []
+        otrosDocumentos: casino.otrosDocumentos || [],
       };
-      
-      // Mostrar un mensaje si todos los documentos están vacíos
-      if (
-        documentos.documentacionLegal.length === 0 &&
-        documentos.usoDeSuelos.length === 0 &&
-        documentos.colJuegos.length === 0 &&
-        documentos.otrosDocumentos.length === 0
-      ) {
-        console.log("No hay documentos disponibles para este casino.");
-      } else {
-        setDocumentos(documentos);
-        setSelectedCasino(casino); // Guardamos el casino seleccionado
-        setIsDocumentosModalOpen(true);
-      }
+
+      // Aunque no haya documentos, abre el modal de todas formas
+      setDocumentos(documentos);
+      setSelectedCasino(casino); // Guardamos el casino seleccionado
+      setIsDocumentosModalOpen(true);
     } else {
       console.error("El casino no está definido o no contiene datos.");
     }
   };
-  
 
   const closeModal = () => {
     setIsModalOpen(false);

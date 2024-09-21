@@ -66,18 +66,19 @@ export const deleteUsers = async (req, res) => {
     }
   };
 
-  // Agregar esta función en tu controlador de usuarios
+// Controlador de obtención de usuario por ID
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
-    
+    const user = await User.findById(id); // Asegúrate de que el modelo User esté importado
+
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    res.status(200).json(user);
+    res.status(200).json(user); // Devuelve el usuario encontrado
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener el usuario', error });
   }
 };
+
