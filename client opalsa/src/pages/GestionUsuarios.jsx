@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaRegUser } from 'react-icons/fa'; // Añadido el ícono
 import HeaderUsuarios from '../components/HeaderUsuarios';
 import { FiSearch } from 'react-icons/fi';
 
 function GestionUsuarios() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showFullEmail, setShowFullEmail] = useState(false);
-  const [tooltipId, setTooltipId] = useState(null);
+  const [tooltipId, setTooltipId] = useState(null); // Para controlar qué tooltip está activo
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -33,11 +32,6 @@ function GestionUsuarios() {
     }
   };
 
-  const handleToggleEmail = (tooltipId) => {
-    setShowFullEmail(!showFullEmail);
-    setTooltipId(tooltipId); // Actualiza el estado con el ID del tooltip
-  };
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -46,7 +40,6 @@ function GestionUsuarios() {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     try {
       await axios.put(`http://localhost:4000/api/users/${userId}/role`, { role: newRole });
-      // Recargar la página
       window.location.reload();
     } catch (error) {
       console.error('Error al actualizar el rol:', error);
@@ -62,7 +55,7 @@ function GestionUsuarios() {
   );
 
   return (
-    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'> {/* Se añadió font-poppins */}
+    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'>
       <Sidebar />
       <div className='lg:col-span-3 xl:col-span-5 p-4 lg:p-8'>
         <div className='mb-4 flex flex-col lg:flex-row lg:justify-between'>
@@ -80,51 +73,74 @@ function GestionUsuarios() {
             </div>
           </div>
         </div>
-        <div className=''>
-          <div className='overflow-x-auto pt-14'>
-            <div className='min-w-full'>
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 text-left pl-5'>
-                <div className='font-semibold'>Nombre</div>
-                <div className='font-semibold'>Cédula</div>
-                <div className='font-semibold'>Ciudad</div>
-                <div className='font-semibold'>Correo Electronico</div>
-                <div className='font-semibold lg:pl-8'>Cargo</div>
-                <div className='font-semibold lg:pl-8'>Rol</div>
-                <div className='font-semibold'>Eliminar</div>
-              </div>
-              <div className='overflow-y-auto max-h-[650px]'>
-                {filteredUsers.map(user => (
-                  <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">{user.cedula}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">{user.ciudad}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 overflow-hidden truncate" onClick={handleToggleEmail} title={user.email}>{user.email}</p>
-                    </div>
-                    <div className='lg:pl-8'>
-                      <p className="text-gray-600">{user.cargo}</p>
-                    </div>
-                    <div className='lg:pl-3'>
-                      <button
-                        onClick={() => handleRoleChange(user._id, user.role)}
-                        className={`w-[105px] py-2 text-white rounded-lg transition duration-300 ${getRoleButtonClasses(user.role)}`}>
-                        {user.role}
-                      </button>
-                    </div>
-                    <div className='flex justify-center lg:justify-start px-8'>
-                      <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
-                        <FaTrashAlt />
-                      </button>
-                    </div>
+        <div className='overflow-x-auto pt-14'>
+          <div className='min-w-full'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 text-left pl-5'>
+              <div className='font-semibold'>Nombre</div>
+              <div className='font-semibold'>Cédula</div>
+              <div className='font-semibold'>Ciudad</div>
+              <div className='font-semibold'>Correo Electronico</div>
+              <div className='font-semibold lg:pl-8'>Cargo</div>
+              <div className='font-semibold lg:pl-8'>Rol</div>
+              <div className='font-semibold'>Eliminar</div>
+            </div>
+            <div className='overflow-y-auto max-h-[650px]'>
+              {filteredUsers.map(user => (
+                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-center p-4 drop-shadow-xl'>
+                  
+                  {/* Nombre con tooltip */}
+                  <div
+                    className="relative flex space-x-2 text-gray-400 text-sm"
+                    onMouseEnter={() => setTooltipId(user._id)} // Mostrar tooltip solo para este usuario
+                    onMouseLeave={() => setTooltipId(null)} // Ocultar tooltip
+                  >
+                    <FaRegUser className="h-5 w-5" />
+                    <p>{user.username.length > 8 ? user.username.slice(0, 8) + '...' : user.username}</p>
+                    {tooltipId === user._id && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.username} {/* Mostrar el nombre completo */}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                  
+                  <div>
+                    <p className="text-gray-600">{user.cedula}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">{user.ciudad}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 overflow-hidden truncate">{user.email}</p>
+                  </div>
+                  
+                  {/* Cargo con tooltip */}
+                  <div
+                    className="relative flex space-x-2 text-gray-400 text-sm lg:pl-8"
+                    onMouseEnter={() => setTooltipId(user._id + '-cargo')} // Tooltip único para cargo
+                    onMouseLeave={() => setTooltipId(null)}
+                  >
+                    <p>{user.cargo.length > 8 ? user.cargo.slice(0, 8) + '...' : user.cargo}</p>
+                    {tooltipId === user._id + '-cargo' && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.cargo} {/* Mostrar el cargo completo */}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className='lg:pl-3'>
+                    <button
+                      onClick={() => handleRoleChange(user._id, user.role)}
+                      className={`w-[105px] py-2 text-white rounded-lg transition duration-300 ${getRoleButtonClasses(user.role)}`}>
+                      {user.role}
+                    </button>
+                  </div>
+                  <div className='flex justify-center lg:justify-start px-8'>
+                    <button onClick={() => handleDelete(user._id)} className="text-red-500 hover:text-red-700">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

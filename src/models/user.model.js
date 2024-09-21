@@ -19,16 +19,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  cedulaUser: {
+  cedula: {
     type: Number,
     required: true,
     unique: true
   },
-  cargoUser: {
+  cargo: {
     type: String,
     required: true
   },
-  ciudadUser: {
+  ciudad: {
     type: String,
     required: true,
   },

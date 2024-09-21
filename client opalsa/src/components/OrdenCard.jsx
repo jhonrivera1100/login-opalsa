@@ -133,6 +133,16 @@ const OrdenCard = ({
               >
                 Aprobar orden
               </button>
+              
+            )}
+            {(estadoOrden === "Orden en solicitud" ) && (
+              <button
+              className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+              onClick={() => handleDeleteItem(_id, "orden")}
+            >
+              Descartar Orden
+            </button>
+              
             )}
             {estadoOrden === "Orden aprobada" && (
               

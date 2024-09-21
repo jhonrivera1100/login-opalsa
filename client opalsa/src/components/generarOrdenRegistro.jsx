@@ -48,37 +48,34 @@ const GenerarOrden = () => {
     // Maneja el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!maquinaSeleccionada) {
-            setError('Debes seleccionar una máquina.');
-            return;
-        }
-
+      
+        const nuevaOrden = {
+          descripcionOrden,
+          nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
+          marcaMaquina: maquinaSeleccionada.marcaMaquina,
+          ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
+          usuario: user.username,
+          tipoDeMantenimiento,
+          componentesAsignados: [],
+          componentesSobrantes: [],
+        };
+      
+        console.log('Datos a enviar al servidor:', nuevaOrden); // Verifica los datos
+      
         try {
-            await axios.post('http://localhost:4000/api/ordenes', {
-                descripcionOrden,
-                nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
-                marcaMaquina: maquinaSeleccionada.marcaMaquina,
-                ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
-                usuario: user.username,
-                tipoDeMantenimiento,
-                componentesAsignados: [],
-                componentesSobrantes: [],
-            });
-
-            // Muestra el mensaje de éxito
-            setSuccessMessage('Orden enviada exitosamente.');
-
-            // Limpiar los campos del formulario
-            setDescripcionOrden('');
-            setMaquinaSeleccionada(null);
-            setTipoDeMantenimiento([]);
-            setError(null); // Limpiar error si lo había
+          await axios.post('http://localhost:4000/api/ordenes', nuevaOrden);
+          setSuccessMessage('Orden enviada exitosamente.');
+          setDescripcionOrden('');
+          setMaquinaSeleccionada(null);
+          setTipoDeMantenimiento([]);
+          setError(null);
         } catch (error) {
-            console.error('Error al crear la orden:', error);
-            setError('No se pudo crear la orden. Inténtalo de nuevo.');
+          console.error('Error al crear la orden:', error);
+          setError('No se pudo crear la orden. Inténtalo de nuevo.');
         }
-    };
+      };
+      
+      
 
     // Opciones para el selector de máquinas
     const maquinaOptions = maquinas.map(maquina => ({

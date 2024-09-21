@@ -13,7 +13,7 @@ function Sidebar() {
   const { logout, user } = useAuth();
 
   return (
-    <div className={`bg-sidebar-900 h-full fixed lg:static w-[80%] md:w-[40%] lg:w-full transition-all z-50 duration-500 shadow-lg ${showMenu ? "left-0" : "-left-full"}`}>
+    <div className={`bg-sidebar-900 h-[95vh] fixed lg:static w-[80%] md:w-[40%] lg:w-full transition-all z-50 duration-500 shadow-lg ${showMenu ? "left-0" : "-left-full"}`}>
       {/* PERFIL */}
       <div className='p-4 pt-8 '>
         {user && (
@@ -27,7 +27,7 @@ function Sidebar() {
 
       {/* MENU */}
       <div className='pt-4'>
-      <div className='bg-slate-200 font-semibold text-zinc-900 p-5 pt-[10px] rounded-tr-[100px] h-[90vh] flex flex-col justify-between gap-6'>
+      <div className='bg-slate-200 font-semibold text-zinc-900 p-5 pt-[10px] rounded-tr-[100px] h-[95vh] flex flex-col justify-between gap-6'>
         <nav className='flex flex-col gap-12   pt-14'>
           <Link to="/admin" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <RiHome4Line /> Home

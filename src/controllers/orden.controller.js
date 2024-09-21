@@ -62,7 +62,13 @@ export const obtenerOrdenPorId = async (req, res) => {
 // Crear una nueva orden
 export const createOrden = async (req, res) => {
   try {
+    console.log('Datos recibidos:', req.body);  // Para verificar los datos que llegan desde el frontend
+
     const { descripcionOrden, nroSerieMaquina, marcaMaquina, ubicacionMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
+
+    if (!descripcionOrden || !nroSerieMaquina || !ubicacionMaquina || !usuario) {
+      return res.status(400).json({ message: 'Faltan campos requeridos' });
+    }
 
     const fechaOrden = new Date();
     const numeroOrden = uuidv4();
@@ -70,8 +76,11 @@ export const createOrden = async (req, res) => {
     // Verificar que el usuario exista
     const usuarioObj = await User.findOne({ username: usuario });
     if (!usuarioObj) {
+      console.log('Usuario no encontrado');
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
+
+    console.log('Usuario encontrado:', usuarioObj); // Para verificar si se encuentra el usuario
 
     // Guardar los detalles de la máquina directamente desde la solicitud
     const maquinaInfo = {
@@ -80,10 +89,12 @@ export const createOrden = async (req, res) => {
       ubicacionMaquina
     };
 
+    console.log('Información de la máquina:', maquinaInfo); // Para verificar la máquina
+
     const nuevaOrden = new Orden({
       fechaOrden,
       descripcionOrden,
-      maquina: maquinaInfo, // Almacenamos directamente la información de la máquina
+      maquina: maquinaInfo,
       usuario: {
         username: usuarioObj.username,
         email: usuarioObj.email,
@@ -99,13 +110,16 @@ export const createOrden = async (req, res) => {
       fechaCumplimiento: null
     });
 
+    console.log('Orden a guardar:', nuevaOrden); // Verifica si la orden se está creando correctamente
+
     await nuevaOrden.save();
     res.status(201).json(nuevaOrden);
   } catch (error) {
-    console.error('Error al crear la orden:', error.message);
+    console.error('Error al crear la orden:', error.message); // Mostrar el mensaje de error
     res.status(500).json({ message: 'Error al crear la orden', error: error.message });
   }
 };
+
 
 // Actualizar una orden (tarea realizada y elementos)
 export const updateOrdenAsignados = async (req, res) => {
