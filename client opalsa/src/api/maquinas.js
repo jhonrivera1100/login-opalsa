@@ -9,5 +9,13 @@ export const createMaquinasRequest = (formData) => {
       },
     });
   };
-export const updateMaquinasRequest = (maquinas) => axios.put(`/maquina/${maquinas._id}`, maquinas)
+// En tu archivo maquinas.js o donde tengas las llamadas API
+export const updateMaquinasRequest = (id, maquinaData) => {
+  return axios.put(`/maquina/${id}`, maquinaData, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
 export const deleteMaquinasRequest = (id) => axios.delete(`/maquina/${id}`)
