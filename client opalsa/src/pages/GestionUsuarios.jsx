@@ -95,7 +95,7 @@ function GestionUsuarios() {
                     onMouseLeave={() => setTooltipId(null)} // Ocultar tooltip
                   >
                     <FaRegUser className="h-5 w-5" />
-                    <p>{user.username.length > 8 ? user.username.slice(0, 8) + '...' : user.username}</p>
+                    <p>{user.username.length > 8 ? user.username.slice(0, 15) + '...' : user.username}</p>
                     {tooltipId === user._id && (
                       <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
                         {user.username} {/* Mostrar el nombre completo */}
@@ -116,7 +116,7 @@ function GestionUsuarios() {
                     onMouseEnter={() => setTooltipId(user._id + '-email')} // Tooltip único para correo
                     onMouseLeave={() => setTooltipId(null)}
                   >
-                    <p>{user.email.length > 8 ? user.email.slice(0, 8) + '...' : user.email}</p>
+                    <p>{user.email.length > 8 ? user.email.slice(0, 20) + '...' : user.email}</p>
                     {tooltipId === user._id + '-email' && (
                       <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
                         {user.email} {/* Mostrar el correo completo */}
