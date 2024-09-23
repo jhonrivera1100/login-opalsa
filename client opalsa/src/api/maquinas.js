@@ -13,7 +13,7 @@ export const createMaquinasRequest = (formData) => {
 export const updateMaquinasRequest = (id, maquinaData) => {
   return axios.put(`/maquina/${id}`, maquinaData, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
