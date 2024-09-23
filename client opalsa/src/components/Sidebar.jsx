@@ -36,7 +36,7 @@ function Sidebar() {
             <LuUsers /> Gestion Usuarios
           </Link>
           <Link to="/notifi" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
-            <IoNotificationsOutline /> Notificaciones
+            <IoNotificationsOutline /> Notificaciones y Ordenes
           </Link>
           <Link to="/GestionMaquinas" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <CgEreader /> Aplicacion

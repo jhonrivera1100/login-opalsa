@@ -79,7 +79,7 @@ function GestionUsuarios() {
               <div className='font-semibold'>Nombre</div>
               <div className='font-semibold'>Cédula</div>
               <div className='font-semibold'>Ciudad</div>
-              <div className='font-semibold'>Correo Electronico</div>
+              <div className='font-semibold'>Correo Electrónico</div>
               <div className='font-semibold lg:pl-8'>Cargo</div>
               <div className='font-semibold lg:pl-8'>Rol</div>
               <div className='font-semibold'>Eliminar</div>
@@ -109,8 +109,19 @@ function GestionUsuarios() {
                   <div>
                     <p className="text-gray-600">{user.ciudad}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-600 overflow-hidden truncate">{user.email}</p>
+
+                  {/* Correo con tooltip */}
+                  <div
+                    className="relative flex space-x-2 text-gray-400 text-sm"
+                    onMouseEnter={() => setTooltipId(user._id + '-email')} // Tooltip único para correo
+                    onMouseLeave={() => setTooltipId(null)}
+                  >
+                    <p>{user.email.length > 8 ? user.email.slice(0, 8) + '...' : user.email}</p>
+                    {tooltipId === user._id + '-email' && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.email} {/* Mostrar el correo completo */}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Cargo con tooltip */}
