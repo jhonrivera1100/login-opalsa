@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import axios from "../api/axios";
-import { getMaquinaRequest, updateMaquinasRequest } from "../api/maquinas";
+import { updateMaquinasRequest } from "../api/maquinas";
 import { getCasinosRequest } from "../api/casinos";
 
 function TransferirMaquinaModal({ maquina, onClose }) {
   const [selectedCasino, setSelectedCasino] = useState(""); // Estado para el casino seleccionado
   const [casinos, setCasinos] = useState([]);
 
+  // Cargar los casinos disponibles cuando el componente se monta
   useEffect(() => {
     fetchCasinos();
   }, []);
 
+  // Función para obtener los casinos y filtrar el casino actual de la máquina
   const fetchCasinos = async () => {
     try {
       const response = await getCasinosRequest();
@@ -25,14 +27,15 @@ function TransferirMaquinaModal({ maquina, onClose }) {
     }
   };
 
+  // Función para manejar la transferencia de la máquina
   const handleTransferir = async () => {
     try {
       // Actualiza la ubicación de la máquina en el backend
       const updatedMaquina = { ...maquina, ubicacionMaquina: selectedCasino };
-      await updateMaquinasRequest(updatedMaquina);
+      await updateMaquinasRequest(maquina._id, updatedMaquina); // Asegúrate de pasar el ID correctamente
       console.log("Máquina transferida a:", selectedCasino);
 
-      // Datos del movimiento
+      // Datos del movimiento que serán guardados en el historial
       const movimiento = {
         maquinaId: maquina._id,
         oldCasinoId: maquina.ubicacionMaquina,
@@ -45,18 +48,18 @@ function TransferirMaquinaModal({ maquina, onClose }) {
 
       console.log("Datos del movimiento de máquina:", movimiento);
 
-      // Registro en el historial
+      // Registro en el historial de movimientos
       await axios.post("/moviMaquinas", movimiento);
       console.log("Historial de movimientos guardado");
 
       onClose(); // Cierra el modal después de transferir
-      window.location.reload(); // Recarga la página
+      window.location.reload(); // Recarga la página para reflejar los cambios
     } catch (error) {
       console.error("Error al transferir la máquina:", error);
     }
   };
 
-  // Mapea las opciones para el select de react-select
+  // Opciones para el componente Select (React-Select)
   const options = casinos.map((casino) => ({
     value: casino.nombreCasino,
     label: casino.nombreCasino,
@@ -95,7 +98,9 @@ function TransferirMaquinaModal({ maquina, onClose }) {
           </label>
           <Select
             value={options.find((option) => option.value === selectedCasino)}
-            onChange={(selectedOption) => setSelectedCasino(selectedOption.value)}
+            onChange={(selectedOption) =>
+              setSelectedCasino(selectedOption.value)
+            }
             options={options}
             placeholder="Seleccionar Casino..."
             isSearchable={true} // Habilita la búsqueda

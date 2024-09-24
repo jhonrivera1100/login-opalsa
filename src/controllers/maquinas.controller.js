@@ -1,7 +1,9 @@
 import Maquinas from "../models/maquina.model.js";
 import { uploadImage, uploadFile, deleteImage } from "../libs/cloudinary.js";
 import fs from "fs-extra";
+import mongoose from "mongoose"; // Asegúrate de importar mongoose para validar ObjectId
 
+// Traer todas las máquinas
 export const traerMaquinas = async (req, res) => {
   try {
     const maquinas = await Maquinas.find();
@@ -14,13 +16,21 @@ export const traerMaquinas = async (req, res) => {
   }
 };
 
+// Traer una máquina por su ID
 export const traerMaquina = async (req, res) => {
+  // Validar si el ID es un ObjectId válido
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID de máquina no válido" });
+  }
+
   const maquina = await Maquinas.findById(req.params.id);
   if (!maquina)
     return res.status(404).json({ message: "No se encuentra la máquina" });
+
   res.json(maquina);
 };
 
+// Crear una nueva máquina
 export const crearMaquina = async (req, res) => {
   const {
     nroSerieMaquina,
@@ -30,7 +40,7 @@ export const crearMaquina = async (req, res) => {
     juegoMaquina,
     estadoMaquina,
     descripcionMaquina,
-    ubicacionMaquina,
+    ubicacionMaquina, // Asegúrate de que esto sea siempre una cadena
     fechaInstalacionMaquina,
     proveedorMaquina,
   } = req.body;
@@ -38,6 +48,7 @@ export const crearMaquina = async (req, res) => {
   let imgMaquina = {};
   let documentoMaquina = { url: "", public_id: "" }; // Inicializar con valores vacíos
 
+  // Subida de imagen de la máquina
   if (req.files && req.files.imgMaquina) {
     const result = await uploadImage(req.files.imgMaquina.tempFilePath);
     await fs.remove(req.files.imgMaquina.tempFilePath);
@@ -47,7 +58,7 @@ export const crearMaquina = async (req, res) => {
     };
   }
 
-  // Manejo del documento de la máquina
+  // Subida de documento de la máquina
   if (req.files && req.files.documentoMaquina) {
     const result = await uploadFile(
       req.files.documentoMaquina.tempFilePath,
@@ -68,12 +79,12 @@ export const crearMaquina = async (req, res) => {
     juegoMaquina,
     estadoMaquina,
     imgMaquina,
-    documentoMaquina, // Asegurarse de incluir el campo documentoMaquina
+    documentoMaquina,
     descripcionMaquina,
-    ubicacionMaquina,
+    ubicacionMaquina, // Se espera que sea una cadena
     fechaInstalacionMaquina,
     proveedorMaquina,
-    user: req.user.id, // Asegúrate de que req.user.id está disponible
+    user: req.user.id, // Asegúrate de que req.user.id esté disponible
   });
 
   try {
@@ -87,6 +98,7 @@ export const crearMaquina = async (req, res) => {
   }
 };
 
+// Actualizar una máquina existente
 export const actualizarMaquina = async (req, res) => {
   const {
     nroSerieMaquina,
@@ -96,10 +108,15 @@ export const actualizarMaquina = async (req, res) => {
     juegoMaquina,
     estadoMaquina,
     descripcionMaquina,
-    ubicacionMaquina,
+    ubicacionMaquina, // Este campo será actualizado en la transferencia
     fechaInstalacionMaquina,
     proveedorMaquina,
   } = req.body;
+
+  // Validar si el ID es un ObjectId válido
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID de máquina no válido" });
+  }
 
   let updatedFields = {
     nroSerieMaquina,
@@ -109,16 +126,15 @@ export const actualizarMaquina = async (req, res) => {
     juegoMaquina,
     estadoMaquina,
     descripcionMaquina,
-    ubicacionMaquina,
+    ubicacionMaquina, // Se espera que sea una cadena con el nombre del casino
     fechaInstalacionMaquina,
     proveedorMaquina,
   };
 
   const maquina = await Maquinas.findById(req.params.id);
 
-  // Si no existe el campo documentoMaquina, se inicializa con valores vacíos
-  if (!maquina.documentoMaquina) {
-    updatedFields.documentoMaquina = { url: "", public_id: "" };
+  if (!maquina) {
+    return res.status(404).json({ message: "No se encuentra la máquina" });
   }
 
   // Manejo de la imagen de la máquina
@@ -158,8 +174,6 @@ export const actualizarMaquina = async (req, res) => {
       updatedFields,
       { new: true }
     );
-    if (!updatedMaquina)
-      return res.status(404).json({ message: "No se encuentra la máquina" });
     res.json(updatedMaquina);
   } catch (error) {
     res.status(500).json({
@@ -169,7 +183,13 @@ export const actualizarMaquina = async (req, res) => {
   }
 };
 
+// Eliminar una máquina
 export const eliminarMaquina = async (req, res) => {
+  // Validar si el ID es un ObjectId válido
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID de máquina no válido" });
+  }
+
   try {
     const maquina = await Maquinas.findByIdAndDelete(req.params.id);
     if (!maquina)
