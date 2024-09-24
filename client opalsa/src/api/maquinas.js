@@ -1,21 +1,28 @@
 import axios from './axios';
 
-export const getMaquinasRequest = () => axios.get('/maquina')
-export const getMaquinaRequest = (id) => axios.get(`/maquina/${id}`)
+// Obtener todas las máquinas
+export const getMaquinasRequest = () => axios.get('/maquina');
+
+// Obtener una máquina por su ID
+export const getMaquinaRequest = (id) => axios.get(`/maquina/${id}`);
+
+// Crear una nueva máquina con datos en formato multipart (para enviar imágenes y otros archivos)
 export const createMaquinasRequest = (formData) => {
     return axios.post('/maquina', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-  };
-// En tu archivo maquinas.js o donde tengas las llamadas API
+};
+
+// Actualizar una máquina (el ID se pasa de manera correcta en la URL)
 export const updateMaquinasRequest = (id, maquinaData) => {
   return axios.put(`/maquina/${id}`, maquinaData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'multipart/form-data',  // Si estás enviando archivos, asegúrate de usar multipart/form-data
     },
   });
 };
 
-export const deleteMaquinasRequest = (id) => axios.delete(`/maquina/${id}`)
+// Eliminar una máquina por su ID
+export const deleteMaquinasRequest = (id) => axios.delete(`/maquina/${id}`);

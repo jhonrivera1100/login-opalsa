@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMaquinas } from "../context/MaquinasContext";
 import { getCasinosRequest } from "../api/casinos";
+import Select from "react-select";
 
 function FormMaquina({ onClose }) {
   const { register, handleSubmit, reset } = useForm();
@@ -22,6 +23,7 @@ function FormMaquina({ onClose }) {
     documentoMaquina: null,
   });
 
+  // Fetching casinos
   useEffect(() => {
     const fetchCasinos = async () => {
       try {
@@ -42,12 +44,10 @@ function FormMaquina({ onClose }) {
     });
   };
 
-  const handleSelectChange = (event) => {
-    const selectedCasinoId = event.target.value;
-    const selectedCasino = casinos.find((casino) => casino._id === selectedCasinoId);
+  const handleSelectChange = (selectedOption) => {
     setFormData({
       ...formData,
-      ubicacionMaquina: selectedCasino ? selectedCasino.nombreCasino : "",
+      ubicacionMaquina: selectedOption ? selectedOption.value : "",
     });
   };
 
@@ -58,7 +58,7 @@ function FormMaquina({ onClose }) {
         formDataToSend.append(key, formData[key]);
       });
       await createMaquina(formDataToSend);
-      window.location.reload(); // Recarga la página
+      window.location.reload(); // Recargar la página
     } catch (error) {
       console.error("Error creating machine:", error);
     }
@@ -82,6 +82,11 @@ function FormMaquina({ onClose }) {
     });
   };
 
+  const casinoOptions = casinos.map((casino) => ({
+    value: casino.nombreCasino,
+    label: casino.nombreCasino,
+  }));
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
       <div>
@@ -96,10 +101,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="nroSerieMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="nroSerieMaquina" className="text-black font-bold block mb-1">
           Número de Serie:
         </label>
         <input
@@ -113,10 +115,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="modeloMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="modeloMaquina" className="text-black font-bold block mb-1">
           Modelo de la Máquina:
         </label>
         <input
@@ -130,10 +129,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="marcaMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="marcaMaquina" className="text-black font-bold block mb-1">
           Marca de la Máquina:
         </label>
         <input
@@ -147,10 +143,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="softwareMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="softwareMaquina" className="text-black font-bold block mb-1">
           Software de la Máquina:
         </label>
         <input
@@ -177,29 +170,21 @@ function FormMaquina({ onClose }) {
           className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
         />
       </div>
-      <div>
-        <label
-          htmlFor="estadoMaquina"
-          className="text-black font-bold block mb-1"
-        >
-          Estado de la Máquina:
+      {/* Usando react-select para Ubicación de la Máquina */}
+      <div className="mt-4">
+        <label htmlFor="ubicacionMaquina" className="text-black font-bold block mb-1">
+          Ubicación de la Máquina:
         </label>
-        <select
-          name="estadoMaquina"
-          value={formData.estadoMaquina}
-          {...register("estadoMaquina")}
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        >
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
+        <Select
+          value={casinoOptions.find((option) => option.value === formData.ubicacionMaquina)}
+          onChange={handleSelectChange}
+          options={casinoOptions}
+          className="w-full text-gray-900  rounded-lg focus:outline-none "
+          placeholder="Selecciona una ubicación"
+        />
       </div>
       <div>
-        <label
-          htmlFor="descripcionMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="descripcionMaquina" className="text-black font-bold block mb-1">
           Descripción de la Máquina:
         </label>
         <textarea
@@ -212,28 +197,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label htmlFor="ubicacionMaquina" className="text-black font-bold block mb-1">
-          Ubicación de la Máquina:
-        </label>
-        <select
-          name="ubicacionMaquina"
-          value={formData.ubicacionMaquina}
-          onChange={handleSelectChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        >
-          <option value="">Selecciona una ubicación</option>
-          {casinos.map((casino) => (
-            <option key={casino._id} value={casino._id}>
-              {casino.nombreCasino}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label
-          htmlFor="fechaInstalacionMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="fechaInstalacionMaquina" className="text-black font-bold block mb-1">
           Fecha de Instalación:
         </label>
         <input
@@ -246,10 +210,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="proveedorMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="proveedorMaquina" className="text-black font-bold block mb-1">
           Proveedor de la Máquina:
         </label>
         <input
@@ -263,10 +224,7 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label
-          htmlFor="documentoMaquina"
-          className="text-black font-bold block mb-1"
-        >
+        <label htmlFor="documentoMaquina" className="text-black font-bold block mb-1">
           Documento de la Máquina:
         </label>
         <input

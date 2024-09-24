@@ -74,26 +74,6 @@ const UpdateProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Cédula</label>
-            <input
-              type="text"
-              name="cedula"
-              value={formData.cedula}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
           <div className="flex justify-end">
             <button
               type="button"
