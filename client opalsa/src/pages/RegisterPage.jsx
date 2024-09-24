@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import backgroundImage from '../assets/images/background login.jpg';
 
 function RegisterPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -30,7 +31,10 @@ function RegisterPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+    <div
+    className="min-h-screen bg-cover bg-center flex flex-col justify-center sm:py-12"
+    style={{ backgroundImage: `url(${backgroundImage})` }} // Aquí usamos la imagen importada
+  >
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-300 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
@@ -113,15 +117,15 @@ function RegisterPage() {
                   </div>
                   <div className="relative">
                     <input
-  autoComplete="off"
-  id="cedula"
-  name="cedula"
-  type="number"
-  inputMode="numeric"
-  className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 appearance-none"
-  placeholder="Cédula"
-  {...register("cedula", { required: true })}
-/>
+                      autoComplete="off"
+                      id="cedula"
+                      name="cedula"
+                      type="number"
+                      inputMode="numeric"
+                      className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 appearance-none"
+                      placeholder="Cédula"
+                      {...register("cedula", { required: true })}
+                    />
                     <label
                       htmlFor="cedula"
                       className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm"

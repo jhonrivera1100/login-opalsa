@@ -23,10 +23,12 @@ function ModalMaquina({ maquina, onClose }) {
   const [editComponentId, setEditComponentId] = useState(null);
   const [editedComponent, setEditedComponent] = useState({});
 
+  // Cargar componentes cuando el modal se monta
   useEffect(() => {
     getComponentes();
   }, []);
 
+  // Filtrar y ordenar los componentes pertenecientes a la máquina
   const sortedComponentes = componentes
     .filter((componente) => componente.maquina === maquina._id)
     .sort((a, b) => a.nombreComponente.localeCompare(b.nombreComponente));
@@ -106,16 +108,14 @@ function ModalMaquina({ maquina, onClose }) {
   };
 
   const updateMaquina = async (editedMaquina) => {
-    console.log("ID de la máquina:", maquina._id); // Esto debería mostrar un valor definido, no undefined
     try {
-        await updateMaquinasRequest(maquina._id, editedMaquina);
-        onClose();
-        window.location.reload();
+      await updateMaquinasRequest(maquina._id, editedMaquina);
+      onClose();
+      window.location.reload();
     } catch (error) {
-        console.error("Error updating machine:", error);
+      console.error("Error actualizando la máquina:", error);
     }
-};
-
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">

@@ -7,7 +7,7 @@ import { IoNotificationsOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { AiOutlineMenu } from "react-icons/ai";
 import { VscClose } from "react-icons/vsc";
-import { CgEreader } from "react-icons/cg";
+import { TfiHarddrives } from "react-icons/tfi";
 function Sidebar() {
   const [showMenu, setShowMenu] = useState(false);
   const { logout, user } = useAuth();
@@ -39,7 +39,7 @@ function Sidebar() {
             <IoNotificationsOutline /> Notificaciones y Ordenes
           </Link>
           <Link to="/GestionMaquinas" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
-            <CgEreader /> Aplicacion
+            <TfiHarddrives /> Aplicacion
           </Link>
           <Link to="/login" onClick={logout} className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <FiLogOut /> Logout
