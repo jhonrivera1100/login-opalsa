@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 function CardMaquinaModal({
   maquina,
   estadoMaquina,
@@ -21,7 +22,7 @@ function CardMaquinaModal({
     fechaInstalacionMaquina: maquina.fechaInstalacionMaquina,
     proveedorMaquina: maquina.proveedorMaquina,
   });
-  const [documentoMaquina, setDocumentoMaquina] = useState(null); // Estado para manejar el archivo del documento
+  const [documentoMaquina, setDocumentoMaquina] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +30,7 @@ function CardMaquinaModal({
   };
 
   const handleFileChange = (e) => {
-    setDocumentoMaquina(e.target.files[0]); // Guarda el archivo del documento seleccionado
+    setDocumentoMaquina(e.target.files[0]);
   };
 
   const handleSaveEdits = () => {
@@ -38,7 +39,6 @@ function CardMaquinaModal({
       formData.append(key, editedMaquina[key]);
     });
 
-    // Solo agregar el documento si se ha seleccionado uno y no existía previamente
     if (documentoMaquina) {
       formData.append("documentoMaquina", documentoMaquina);
     }
@@ -51,7 +51,7 @@ function CardMaquinaModal({
     <div className="w-4/12 max-h-[90vh] pr-4">
       <div className="max-w-sm rounded-lg py-2 overflow-hidden transition-transform duration-300 cursor-pointer mx-2 transform hover:-translate-y-1">
         <img
-          src={maquina.imgMaquina?.url || "/placeholder.png"} // Fallback si no hay imagen
+          src={maquina.imgMaquina?.url || "/placeholder.png"}
           alt="Imagen de la máquina"
           className="w-full h-[400px] object-cover object-center rounded-lg shadow-lg hover:shadow-xl"
         />
@@ -97,22 +97,10 @@ function CardMaquinaModal({
                 maquina.marcaMaquina
               )}
             </h4>
-            <div className="mt-1">
-            <span className="text-teal-600 text-md font-semibold">
-                Ubicacion:
-              </span>{" "}
+            <div className="mt-1 flex items-center">
+              <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-gray-600" />
               <span className="text-gray-600 text-sm">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={maquina.ubicacionMaquina}
-                    name="ubicacionMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.ubicacionMaquina
-                )}
+                {maquina.ubicacionMaquina}
               </span>
             </div>
             <div className="mt-2">
@@ -224,7 +212,6 @@ function CardMaquinaModal({
               </span>
             </div>
 
-            {/* Mostrar campo de archivo solo si no hay documento asociado */}
             {editMode && !maquina.documentoMaquina?.url && (
               <div className="mt-4">
                 <label
@@ -242,7 +229,7 @@ function CardMaquinaModal({
               </div>
             )}
 
-            <div className="mt-4 flex justify-between">
+            <div className="mt-4 flex flex-col space-y-2">
               {editMode ? (
                 <>
                   <button
