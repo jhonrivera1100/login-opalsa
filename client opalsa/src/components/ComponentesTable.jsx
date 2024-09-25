@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from "react";
 
 function ComponentesTable({
   sortedComponentes,
@@ -9,13 +9,22 @@ function ComponentesTable({
   handleSaveClick,
   handleCancelClick,
   handleDeleteComponente,
-  abrirDocumento
+  abrirDocumento,
 }) {
   const [tooltipUser, setTooltipUser] = useState(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState(null); // Estado para manejar la vista previa de la imagen
+
+  const handleMouseEnter = (imgUrl) => {
+    setZoomedImage(imgUrl); // Establece la imagen ampliada al pasar el mouse
+  };
+
+  const handleMouseLeave = () => {
+    setZoomedImage(null); // Quita la imagen ampliada cuando se quita el mouse
+  };
 
   return (
-    <div className="w-full flex flex-col max-h-[90vh] overflow-y-auto">
+    <div className="w-full flex flex-col max-h-[90vh] overflow-y-auto relative">
       {sortedComponentes.length === 0 ? (
         <div className="flex flex-col items-center mt-4 space-y-4">
           <span className="text-gray-500 text-lg text-center">
@@ -35,6 +44,9 @@ function ComponentesTable({
           <table className="min-w-full bg-white divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
             <thead className="bg-white">
               <tr>
+                <th className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/6">
+                  Imagen
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider w-1/4">
                   Nombre
                 </th>
@@ -59,8 +71,29 @@ function ComponentesTable({
                 return (
                   <tr
                     key={componente._id}
-                    className={`group ${isAssigned ? 'bg-yellow-50' : 'hover:bg-gray-50'}`}
+                    className={`group ${
+                      isAssigned ? "bg-yellow-50" : "hover:bg-gray-50"
+                    }`}
                   >
+                    {/* Nueva columna para la imagen */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {componente.imagenComponente?.url ? (
+                        <img
+                          src={componente.imagenComponente.url}
+                          alt={componente.nombreComponente}
+                          className="w-12 h-12 object-cover rounded cursor-pointer transform transition duration-200 hover:scale-125"
+                          onMouseEnter={() =>
+                            handleMouseEnter(componente.imagenComponente.url)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-500">
+                          No Disponible
+                        </span>
+                      )}
+                    </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editComponentId === componente._id ? (
                         <input
@@ -137,7 +170,9 @@ function ComponentesTable({
                         <div className="flex gap-4">
                           <button
                             onClick={handleSaveClick}
-                            className={`text-green-600 hover:text-green-900 ${isAssigned ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-green-600 hover:text-green-900 ${
+                              isAssigned ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                             disabled={isAssigned}
                           >
                             <svg
@@ -157,7 +192,9 @@ function ComponentesTable({
                           </button>
                           <button
                             onClick={handleCancelClick}
-                            className={`text-gray-600 hover:text-gray-900 ${isAssigned ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-gray-600 hover:text-gray-900 ${
+                              isAssigned ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                             disabled={isAssigned}
                           >
                             <svg
@@ -249,14 +286,41 @@ function ComponentesTable({
           {tooltipVisible && tooltipUser && (
             <div
               className="absolute bg-white border border-gray-300 p-4 rounded shadow-lg"
-              style={{ top: '50%', left: '70%', transform: 'translate(-50%, -80%)' }}
+              style={{
+                top: "50%",
+                left: "70%",
+                transform: "translate(-50%, -80%)",
+              }}
             >
-              <h3 className="text-lg text-center font-semibold">Usuario a cargo</h3>
-              <p className="text-sm text-gray-600">Nombre: {tooltipUser.username}</p>
-              <p className="text-sm text-gray-600">Email: {tooltipUser.email}</p>
-              <p className="text-sm text-gray-600">Cédula: {tooltipUser.cedula}</p>
-              <p className="text-sm text-gray-600">Cargo: {tooltipUser.cargo}</p>
-              <p className="text-sm text-gray-600">Ciudad: {tooltipUser.ciudad}</p>
+              <h3 className="text-lg text-center font-semibold">
+                Usuario a cargo
+              </h3>
+              <p className="text-sm text-gray-600">
+                Nombre: {tooltipUser.username}
+              </p>
+              <p className="text-sm text-gray-600">
+                Email: {tooltipUser.email}
+              </p>
+              <p className="text-sm text-gray-600">
+                Cédula: {tooltipUser.cedula}
+              </p>
+              <p className="text-sm text-gray-600">
+                Cargo: {tooltipUser.cargo}
+              </p>
+              <p className="text-sm text-gray-600">
+                Ciudad: {tooltipUser.ciudad}
+              </p>
+            </div>
+          )}
+
+          {/* Mostrar la vista previa de la imagen */}
+          {zoomedImage && (
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-75 p-2 rounded-lg">
+              <img
+                src={zoomedImage}
+                alt="Vista Previa"
+                className="max-w-xs max-h-xs object-contain"
+              />
             </div>
           )}
         </>

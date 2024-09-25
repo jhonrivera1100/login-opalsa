@@ -151,7 +151,7 @@ function ModalMaquina({ maquina, onClose }) {
 
         <div className="w-full flex flex-col pl-4 max-h-[90vh] overflow-y-auto">
           <h1 className="text-xl text-slate-500 text-center py-3 font-bold mb-4">
-            Componentes de la máquina
+            Componentes en {maquina.marcaMaquina} {maquina.modeloMaquina}
           </h1>
           {sortedComponentes.length === 0 ? (
             <div className="flex flex-col items-center mt-4 space-y-4">
