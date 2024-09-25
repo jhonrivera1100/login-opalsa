@@ -209,8 +209,6 @@ const NotificacionesAdmin = () => {
 
   return (
     <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins">
-      {" "}
-      {/* Se añadió font-poppins */}
       <Sidebar />
       <div className="lg:col-span-3 xl:col-span-5 p-4 lg:p-8">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between">
@@ -228,7 +226,7 @@ const NotificacionesAdmin = () => {
             </div>
           </div>
         </div>
-        <div className="mb-4 flex justify-center pt-10">
+        <div className="mb-4 flex flex-wrap justify-center gap-4 pt-4 lg:pt-10">
           <button
             className={`px-4 py-2 rounded-lg ${
               filter === "all" ? "bg-green-600 text-white" : "bg-gray-300"
@@ -238,7 +236,7 @@ const NotificacionesAdmin = () => {
             Todos
           </button>
           <button
-            className={`px-4 py-2 ml-2 rounded-lg ${
+            className={`px-4 py-2 rounded-lg ${
               filter === "Orden en solicitud"
                 ? "bg-yellow-600 text-white"
                 : "bg-gray-300"
@@ -248,7 +246,7 @@ const NotificacionesAdmin = () => {
             Ordenes Solicitadas
           </button>
           <button
-            className={`px-4 py-2 ml-2 rounded-lg ${
+            className={`px-4 py-2 rounded-lg ${
               filter === "Orden aprobada"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-300"
@@ -258,7 +256,7 @@ const NotificacionesAdmin = () => {
             Ordenes Aprobadas
           </button>
           <button
-            className={`px-4 py-2 ml-2 rounded-lg ${
+            className={`px-4 py-2 rounded-lg ${
               filter === "Orden Finalizada"
                 ? "bg-red-600 text-white"
                 : "bg-gray-300"
@@ -268,7 +266,7 @@ const NotificacionesAdmin = () => {
             Ordenes Finalizadas
           </button>
           <button
-            className={`px-4 py-2 ml-2 rounded-lg ${
+            className={`px-4 py-2 rounded-lg ${
               filter === "notificaciones"
                 ? "bg-orange-600 text-white"
                 : "bg-gray-300"

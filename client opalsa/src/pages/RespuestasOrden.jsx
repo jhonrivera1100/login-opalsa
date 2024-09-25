@@ -28,7 +28,7 @@ const RespuestasOrden = () => {
         }
       }
     };
-    
+
     fetchOrdenes();
   }, [user, loading]);
 
@@ -75,23 +75,26 @@ const RespuestasOrden = () => {
       <div className="mb-4 flex flex-col lg:flex-row lg:justify-center">
         <HeaderRespuestas />
       </div>
-      <div className="w-full pt-4 pl-[100px]">
-        <div className="mb-4 flex gap-4 flex justify-center pr-[00px]">
+      <div className="w-full pt-4 lg:pl-[50px]">
+        {/* Inputs para buscar y filtrar */}
+        <div className="mb-4 flex flex-col sm:flex-row gap-4 justify-center">
           <input
             type="text"
             placeholder="Buscar por número de orden"
-            className="px-4 py-2 border rounded-lg w-[400px]"
+            className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <input
             type="text"
             placeholder="dd/mm/aaaa"
-            className="px-4 py-2 border rounded-lg"
+            className="px-4 py-2 border rounded-lg w-full sm:w-[150px] md:w-[200px]"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           />
         </div>
+
+        {/* Contenedor de las órdenes */}
         <div className="h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredOrdenes.length === 0 ? (
@@ -100,8 +103,10 @@ const RespuestasOrden = () => {
               filteredOrdenes.map((orden) => (
                 <div
                   key={orden._id}
-                  className={`w-[300px] rounded-xl p-6 text-center shadow-xl h-[400px] ${
-                    orden.estadoOrden === "Orden aprobada" ? "bg-green-200" : "bg-white"
+                  className={`w-full sm:w-[300px] rounded-xl p-6 text-center shadow-xl h-[400px] ${
+                    orden.estadoOrden === "Orden aprobada"
+                      ? "bg-green-200"
+                      : "bg-white"
                   }`}
                 >
                   <div className="mx-auto flex h-16 w-16 -translate-y-3 transform items-center justify-center rounded-full bg-teal-400 shadow-lg shadow-teal-500/40">
@@ -118,10 +123,18 @@ const RespuestasOrden = () => {
                     </svg>
                   </div>
                   <div className="mt-4">
-                    <h4 className="text-xl font-semibold text-gray-800">Numero de orden {orden.numeroOrden}</h4>
-                    <p className="mt-1 text-gray-600">Estado: {orden.estadoOrden}</p>
-                    <p className="mt-1 text-gray-600">Fecha: {formatDate(orden.fechaOrden)}</p>
-                    <p className="mt-1 text-gray-600">Usuario: {orden.usuario.username}</p>
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      Numero de orden {orden.numeroOrden}
+                    </h4>
+                    <p className="mt-1 text-gray-600">
+                      Estado: {orden.estadoOrden}
+                    </p>
+                    <p className="mt-1 text-gray-600">
+                      Fecha: {formatDate(orden.fechaOrden)}
+                    </p>
+                    <p className="mt-1 text-gray-600">
+                      Usuario: {orden.usuario.username}
+                    </p>
                     <button
                       className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                       onClick={() => handleShowMore(orden)}
