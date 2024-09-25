@@ -17,6 +17,10 @@ const componenteSchema = new mongoose.Schema({
     required: false,
     trim: true,
   },
+  imagenComponente: { // Agregamos el campo para la imagen
+    url: String,
+    public_id: String,
+  },
   documentoComponente: {
     url: String,
     public_id: String,

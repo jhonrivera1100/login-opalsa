@@ -39,7 +39,6 @@ export const crearMaquina = async (req, res) => {
     softwareMaquina,
     juegoMaquina,
     estadoMaquina,
-    descripcionMaquina,
     ubicacionMaquina, // Asegúrate de que esto sea siempre una cadena
     fechaInstalacionMaquina,
     proveedorMaquina,
@@ -80,7 +79,6 @@ export const crearMaquina = async (req, res) => {
     estadoMaquina,
     imgMaquina,
     documentoMaquina,
-    descripcionMaquina,
     ubicacionMaquina, // Se espera que sea una cadena
     fechaInstalacionMaquina,
     proveedorMaquina,
@@ -107,7 +105,6 @@ export const actualizarMaquina = async (req, res) => {
     softwareMaquina,
     juegoMaquina,
     estadoMaquina,
-    descripcionMaquina,
     ubicacionMaquina, // Este campo será actualizado en la transferencia
     fechaInstalacionMaquina,
     proveedorMaquina,
@@ -125,7 +122,6 @@ export const actualizarMaquina = async (req, res) => {
     softwareMaquina,
     juegoMaquina,
     estadoMaquina,
-    descripcionMaquina,
     ubicacionMaquina, // Se espera que sea una cadena con el nombre del casino
     fechaInstalacionMaquina,
     proveedorMaquina,

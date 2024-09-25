@@ -40,10 +40,6 @@ const maquinaSchema = new mongoose.Schema(
       url: String,
       public_id: String,
     },
-    descripcionMaquina: {
-      type: String,
-      trim: true,
-    },
     ubicacionMaquina: {
       type: String,
       required: true,

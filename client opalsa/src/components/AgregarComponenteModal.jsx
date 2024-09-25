@@ -8,7 +8,8 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
     serialComponente: "",
     nombreComponente: "",
     marcaComponente: "",
-    documentoComponente: null, // Inicialmente null para el archivo
+    documentoComponente: null,
+    imagenComponente: null, // Nuevo estado para la imagen
     maquina: maquinaId,
   });
 
@@ -16,7 +17,12 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
     if (e.target.name === "documentoComponente") {
       setFormData({
         ...formData,
-        documentoComponente: e.target.files[0], // Guardar el archivo seleccionado
+        documentoComponente: e.target.files[0],
+      });
+    } else if (e.target.name === "imagenComponente") { // Manejar la imagen
+      setFormData({
+        ...formData,
+        imagenComponente: e.target.files[0],
       });
     } else {
       setFormData({
@@ -33,14 +39,16 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
     formDataToSend.append("nombreComponente", formData.nombreComponente);
     formDataToSend.append("marcaComponente", formData.marcaComponente);
     formDataToSend.append("maquina", formData.maquina);
-    formDataToSend.append("documentoComponente", formData.documentoComponente); // Agregar el archivo al FormData
+    formDataToSend.append("documentoComponente", formData.documentoComponente);
+    formDataToSend.append("imagenComponente", formData.imagenComponente); // Agregar la imagen al FormData
 
     await createComponente(formDataToSend);
     setFormData({
       serialComponente: "",
       nombreComponente: "",
       marcaComponente: "",
-      documentoComponente: null, // Reiniciar el archivo después de enviar
+      documentoComponente: null,
+      imagenComponente: null, // Reiniciar el campo de imagen
       maquina: maquinaId,
     });
     onClose();
@@ -58,7 +66,7 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombreComponente">Nombre del Componente</label>
             <input type="text" name="nombreComponente" id="nombreComponente" value={formData.nombreComponente} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
-          </div>
+            </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="marcaComponente">Marca del Componente</label>
             <input type="text" name="marcaComponente" id="marcaComponente" value={formData.marcaComponente} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
@@ -66,6 +74,10 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="documentoComponente">Documento del Componente</label>
             <input type="file" name="documentoComponente" id="documentoComponente" onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+          </div>
+          <div className="mb-4"> {/* Nuevo campo para la imagen del componente */}
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="imagenComponente">Imagen del Componente</label>
+            <input type="file" name="imagenComponente" id="imagenComponente" onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
           </div>
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="bg-red-500 text-white px-4 py-2 rounded mr-2">Cancelar</button>
