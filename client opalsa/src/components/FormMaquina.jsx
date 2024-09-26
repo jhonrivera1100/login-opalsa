@@ -37,10 +37,21 @@ function FormMaquina({ onClose }) {
 
   const handleInputChange = (event, isFile = false) => {
     const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: isFile ? event.target.files[0] : value,
-    });
+
+    if (name === "precioMaquina") {
+      const numericValue = value.replace(/\D/g, ""); // Eliminar cualquier caracter no numérico
+      if (numericValue.length <= 11) { // Limitar a 11 dígitos
+        setFormData({
+          ...formData,
+          [name]: formatPrice(numericValue),
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: isFile ? event.target.files[0] : value,
+      });
+    }
   };
 
   const handleSelectChange = (selectedOption) => {
@@ -78,6 +89,17 @@ function FormMaquina({ onClose }) {
       proveedorMaquina: "",
       documentoMaquina: null,
     });
+  };
+
+  // Función para formatear el precio en COP
+  const formatPrice = (value) => {
+    const numberFormat = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    return numberFormat.format(value);
   };
 
   const casinoOptions = casinos.map((casino) => ({
@@ -141,8 +163,8 @@ function FormMaquina({ onClose }) {
         />
       </div>
       <div>
-        <label htmlFor="softwareMaquina" className="text-black font-bold block mb-1">
-          Precio de la Máquina:
+        <label htmlFor="precioMaquina" className="text-black font-bold block mb-1">
+          Precio de la Máquina (COP):
         </label>
         <input
           type="text"
