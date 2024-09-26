@@ -119,21 +119,21 @@ function Navbar() {
       <nav
         className={`fixed top-0 left-0 h-full z-40 transition-transform duration-300 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 bg-slate-200 font-semibold text-zinc-900 md:w-30`}
+        } md:translate-x-0 bg-slate-200 font-semibold font-poppins text-zinc-900 md:w-30`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="flex flex-col h-full">
           <div className="bg-blue-950 text-white py-12 px-4 flex flex-col justify-center items-center">
             {isHovered ? (
-              <span className="text-base font-bold mb-2">OPALSA</span>
+              <span className="text-base font-bold mb-2">OPALSA SAS</span>
             ) : (
               <span
                 className={`text-base font-bold ${
                   isHovered ? "" : "justify-center"
                 } mb-2`}
               >
-                |
+                OPALSA
               </span>
             )}
           </div>

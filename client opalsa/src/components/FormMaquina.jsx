@@ -5,9 +5,17 @@ import { getCasinosRequest } from "../api/casinos";
 import Select from "react-select";
 
 function FormMaquina({ onClose }) {
-  const { register, handleSubmit, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm(); // Usamos `errors` para la validación
   const { createMaquina } = useMaquinas();
   const [casinos, setCasinos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Spinner de carga
+  const [isSuccess, setIsSuccess] = useState(false); // Estado para el éxito
+  const [error, setError] = useState(null); // Estado para el error
   const [formData, setFormData] = useState({
     imgMaquina: null,
     nroSerieMaquina: "",
@@ -50,16 +58,31 @@ function FormMaquina({ onClose }) {
     });
   };
 
+  // Función para enviar los datos
   const onSubmit = async () => {
+    setIsLoading(true); // Activamos el spinner
+    setIsSuccess(false); // Reseteamos el estado de éxito
+    setError(null); // Reseteamos el estado de error
+
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach((key) => {
         formDataToSend.append(key, formData[key]);
       });
-      await createMaquina(formDataToSend);
-      window.location.reload(); // Recargar la página
+
+      // Intentamos crear la máquina
+      const response = await createMaquina(formDataToSend);
+
+      // Si la creación fue exitosa, asumimos que el backend responde correctamente
+      setIsSuccess(true); // Mostramos mensaje de éxito
+      setError(null); // Aseguramos que no hay error
     } catch (error) {
-      console.error("Error creating machine:", error);
+      // Si hubo un error (fallo en la conexión o fallo en la creación en el backend)
+      setError("Error al crear la máquina. Por favor, intente nuevamente.");
+      setIsSuccess(false); // Nos aseguramos de que no haya éxito
+      console.error("Error creando máquina:", error);
+    } finally {
+      setIsLoading(false); // Desactivamos el spinner
     }
   };
 
@@ -86,150 +109,264 @@ function FormMaquina({ onClose }) {
   }));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
-      <div>
-        <label htmlFor="imgMaquina" className="text-black font-bold block mb-1">
-          Imagen de la Máquina:
-        </label>
-        <input
-          type="file"
-          name="imgMaquina"
-          onChange={(e) => handleInputChange(e, true)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="nroSerieMaquina" className="text-black font-bold block mb-1">
-          Número de Serie:
-        </label>
-        <input
-          type="text"
-          name="nroSerieMaquina"
-          value={formData.nroSerieMaquina}
-          {...register("nroSerieMaquina")}
-          placeholder="Número de Serie"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="modeloMaquina" className="text-black font-bold block mb-1">
-          Modelo de la Máquina:
-        </label>
-        <input
-          type="text"
-          name="modeloMaquina"
-          value={formData.modeloMaquina}
-          {...register("modeloMaquina")}
-          placeholder="Modelo de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="marcaMaquina" className="text-black font-bold block mb-1">
-          Marca de la Máquina:
-        </label>
-        <input
-          type="text"
-          name="marcaMaquina"
-          value={formData.marcaMaquina}
-          {...register("marcaMaquina")}
-          placeholder="Marca de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="softwareMaquina" className="text-black font-bold block mb-1">
-          Precio de la Máquina:
-        </label>
-        <input
-          type="text"
-          name="precioMaquina"
-          value={formData.precioMaquina}
-          {...register("precioMaquina")}
-          placeholder="Precio de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="juegoMaquina" className="text-black font-bold block mb-1">
-          Juego de la Máquina:
-        </label>
-        <input
-          type="text"
-          name="juegoMaquina"
-          value={formData.juegoMaquina}
-          {...register("juegoMaquina")}
-          placeholder="Juego de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      {/* Usando react-select para Ubicación de la Máquina */}
-      <div className="mt-4">
-        <label htmlFor="ubicacionMaquina" className="text-black font-bold block mb-1">
-          Ubicación de la Máquina:
-        </label>
-        <Select
-          value={casinoOptions.find((option) => option.value === formData.ubicacionMaquina)}
-          onChange={handleSelectChange}
-          options={casinoOptions}
-          className="w-full text-gray-900  rounded-lg focus:outline-none "
-          placeholder="Selecciona una ubicación"
-        />
-      </div>
+    <>
+      {/* Loader Spinner */}
+      {isLoading && (
+        <div className="absolute inset-0 flex justify-center items-center bg-gray-100 bg-opacity-75 z-50">
+          <div className="relative flex justify-center items-center">
+            <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-28 w-28"
+              alt="Loader"
+            />
+          </div>
+        </div>
+      )}
 
-      <div>
-        <label htmlFor="fechaInstalacionMaquina" className="text-black font-bold block mb-1">
-          Fecha de Instalación:
-        </label>
-        <input
-          type="date"
-          name="fechaInstalacionMaquina"
-          value={formData.fechaInstalacionMaquina}
-          {...register("fechaInstalacionMaquina")}
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="proveedorMaquina" className="text-black font-bold block mb-1">
-          Proveedor de la Máquina:
-        </label>
-        <input
-          type="text"
-          name="proveedorMaquina"
-          value={formData.proveedorMaquina}
-          {...register("proveedorMaquina")}
-          placeholder="Proveedor de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="documentoMaquina" className="text-black font-bold block mb-1">
-          Documento de la Máquina:
-        </label>
-        <input
-          type="file"
-          name="documentoMaquina"
-          onChange={(e) => handleInputChange(e, true)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div className="col-span-2">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        >
-          Guardar Máquina
-        </button>
-      </div>
-    </form>
+      {/* Mensaje de éxito */}
+      {isSuccess && (
+        <div className="text-green-500 font-bold">
+          Máquina creada exitosamente.
+        </div>
+      )}
+
+      {/* Mensaje de error */}
+      {error && <div className="text-red-500 font-bold">{error}</div>}
+
+      {/* Formulario */}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid grid-cols-2 gap-6 relative"
+      >
+        <div>
+          <label
+            htmlFor="imgMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Imagen de la Máquina:
+          </label>
+          <input
+            type="file"
+            name="imgMaquina"
+            {...register("imgMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            onChange={(e) => handleInputChange(e, true)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.imgMaquina && (
+            <p className="text-red-500">{errors.imgMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="nroSerieMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Número de Serie:
+          </label>
+          <input
+            type="text"
+            name="nroSerieMaquina"
+            {...register("nroSerieMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.nroSerieMaquina}
+            placeholder="Número de Serie"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.nroSerieMaquina && (
+            <p className="text-red-500">{errors.nroSerieMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="modeloMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Modelo de la Máquina:
+          </label>
+          <input
+            type="text"
+            name="modeloMaquina"
+            {...register("modeloMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.modeloMaquina}
+            placeholder="Modelo de la Máquina"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.modeloMaquina && (
+            <p className="text-red-500">{errors.modeloMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="marcaMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Marca de la Máquina:
+          </label>
+          <input
+            type="text"
+            name="marcaMaquina"
+            {...register("marcaMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.marcaMaquina}
+            placeholder="Marca de la Máquina"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.marcaMaquina && (
+            <p className="text-red-500">{errors.marcaMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="precioMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Precio de la Máquina:
+          </label>
+          <input
+            type="text"
+            name="precioMaquina"
+            {...register("precioMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.precioMaquina}
+            placeholder="Precio de la Máquina"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.precioMaquina && (
+            <p className="text-red-500">{errors.precioMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="juegoMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Juego de la Máquina:
+          </label>
+          <input
+            type="text"
+            name="juegoMaquina"
+            {...register("juegoMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.juegoMaquina}
+            placeholder="Juego de la Máquina"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.juegoMaquina && (
+            <p className="text-red-500">{errors.juegoMaquina.message}</p>
+          )}
+        </div>
+        <div className="mt-4">
+          <label
+            htmlFor="ubicacionMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Ubicación de la Máquina:
+          </label>
+          <Select
+            value={casinoOptions.find(
+              (option) => option.value === formData.ubicacionMaquina
+            )}
+            onChange={handleSelectChange}
+            options={casinoOptions}
+            className="w-full text-gray-900 rounded-lg focus:outline-none"
+            placeholder="Selecciona una ubicación"
+          />
+          {errors.ubicacionMaquina && (
+            <p className="text-red-500">Este campo es obligatorio</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="fechaInstalacionMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Fecha de Instalación:
+          </label>
+          <input
+            type="date"
+            name="fechaInstalacionMaquina"
+            {...register("fechaInstalacionMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.fechaInstalacionMaquina}
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.fechaInstalacionMaquina && (
+            <p className="text-red-500">
+              {errors.fechaInstalacionMaquina.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="proveedorMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Proveedor de la Máquina:
+          </label>
+          <input
+            type="text"
+            name="proveedorMaquina"
+            {...register("proveedorMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            value={formData.proveedorMaquina}
+            placeholder="Proveedor de la Máquina"
+            onChange={handleInputChange}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.proveedorMaquina && (
+            <p className="text-red-500">{errors.proveedorMaquina.message}</p>
+          )}
+        </div>
+        <div>
+          <label
+            htmlFor="documentoMaquina"
+            className="text-black font-bold block mb-1"
+          >
+            Documento de la Máquina:
+          </label>
+          <input
+            type="file"
+            name="documentoMaquina"
+            {...register("documentoMaquina", {
+              required: "Este campo es obligatorio",
+            })}
+            onChange={(e) => handleInputChange(e, true)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+          {errors.documentoMaquina && (
+            <p className="text-red-500">{errors.documentoMaquina.message}</p>
+          )}
+        </div>
+        <div className="col-span-2">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+            disabled={isLoading} // Deshabilitar el botón mientras se está cargando
+          >
+            Guardar Máquina
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 
 export default FormMaquina;
+

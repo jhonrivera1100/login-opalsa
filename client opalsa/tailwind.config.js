@@ -24,6 +24,10 @@ export default {
     fontFamily: {
       poppins: ['Poppins', 'sans-serif'],
     },
+    darkMode: 'class',
+  theme: {
+    extend: {}
+  },
   },
   plugins: [],
 };
