@@ -45,10 +45,20 @@ function FormMaquina({ onClose }) {
 
   const handleInputChange = (event, isFile = false) => {
     const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: isFile ? event.target.files[0] : value,
-    });
+    if (name === "precioMaquina") {
+      const numericValue = value.replace(/\D/g, ""); // Eliminar cualquier caracter no numérico
+      if (numericValue.length <= 11) { // Limitar a 11 dígitos
+        setFormData({
+          ...formData,
+          [name]: formatPrice(numericValue),
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: isFile ? event.target.files[0] : value,
+      });
+    }
   };
 
   const handleSelectChange = (selectedOption) => {
@@ -73,11 +83,10 @@ function FormMaquina({ onClose }) {
       // Intentamos crear la máquina
       const response = await createMaquina(formDataToSend);
 
-      // Si la creación fue exitosa, asumimos que el backend responde correctamente
+      // Si la creación fue exitosa
       setIsSuccess(true); // Mostramos mensaje de éxito
       setError(null); // Aseguramos que no hay error
     } catch (error) {
-      // Si hubo un error (fallo en la conexión o fallo en la creación en el backend)
       setError("Error al crear la máquina. Por favor, intente nuevamente.");
       setIsSuccess(false); // Nos aseguramos de que no haya éxito
       console.error("Error creando máquina:", error);
@@ -103,10 +112,22 @@ function FormMaquina({ onClose }) {
     });
   };
 
+  // Formateo de precio en COP
+  const formatPrice = (value) => {
+    const numberFormat = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    return numberFormat.format(value);
+  };
+
   const casinoOptions = casinos.map((casino) => ({
     value: casino.nombreCasino,
     label: casino.nombreCasino,
   }));
+
 
   return (
     <>
@@ -225,27 +246,26 @@ function FormMaquina({ onClose }) {
             <p className="text-red-500">{errors.marcaMaquina.message}</p>
           )}
         </div>
-        <div>
-          <label
-            htmlFor="precioMaquina"
-            className="text-black font-bold block mb-1"
-          >
-            Precio de la Máquina:
+         <div>
+          <label htmlFor="precioMaquina" className="text-black font-bold block mb-1">
+            Precio de la Máquina (COP):
           </label>
           <input
-            type="number"
+            type="text"
             name="precioMaquina"
+            value={formData.precioMaquina}
             {...register("precioMaquina", {
               required: "Este campo es obligatorio",
+              maxLength: {
+                value: 16,
+                message: "El precio no puede tener más de 11 dígitos.",
+              },
             })}
-            value={formData.precioMaquina}
             placeholder="Precio de la Máquina"
             onChange={handleInputChange}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
-          {errors.precioMaquina && (
-            <p className="text-red-500">{errors.precioMaquina.message}</p>
-          )}
+          {errors.precioMaquina && <p className="text-red-500">{errors.precioMaquina.message}</p>}
         </div>
         <div>
           <label
