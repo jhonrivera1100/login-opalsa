@@ -3,7 +3,7 @@ import {
   getElementosRequest,
   getElementoRequest,
   createElementosRequest,
-  updateElementosRequest,
+  updateElementosRequest, // Asegúrate de que esto está correctamente importado
   deleteElementosRequest,
   getElementosByCasinoRequest,
 } from "../api/elementos";
@@ -48,6 +48,15 @@ export function ElementosProvider({ children }) {
     }
   };
 
+  const updateElemento = async (elemento) => {
+    try {
+      const res = await updateElementosRequest(elemento);
+      setElementos(elementos.map(el => el._id === elemento._id ? res.data : el));
+    } catch (error) {
+      console.error("Error al actualizar el elemento:", error);
+    }
+  };
+
   const deleteElemento = async (id) => {
     try {
       await deleteElementosRequest(id);
@@ -64,6 +73,7 @@ export function ElementosProvider({ children }) {
         getElementos,
         getElementosByCasino,
         createElemento,
+        updateElemento, // Asegúrate de exponer la función aquí
         deleteElemento,
       }}
     >

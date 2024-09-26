@@ -4,12 +4,14 @@ import { useElementos } from "../context/ElementosContext";
 import { getCasinosRequest } from "../api/casinos";
 
 function FormElemento({ closeModal }) {
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const { createElemento } = useElementos();
   const [casinos, setCasinos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner de carga
+
   const [formData, setFormData] = useState({
     nombreElemento: "",
-    codigoElemento: "", // Nuevo campo
+    codigoElemento: "",
     marcaElemento: "",
     tipoElemento: "",
     ubicacionDeElemento: "",
@@ -38,26 +40,29 @@ function FormElemento({ closeModal }) {
   };
 
   const onSubmit = async (data) => {
+    setIsLoading(true); // Activamos el spinner de carga
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("nombreElemento", data.nombreElemento);
-      formDataToSend.append("codigoElemento", data.codigoElemento); // Nuevo campo
+      formDataToSend.append("codigoElemento", data.codigoElemento);
       formDataToSend.append("marcaElemento", data.marcaElemento);
       formDataToSend.append("tipoElemento", data.tipoElemento);
       formDataToSend.append("ubicacionDeElemento", data.ubicacionDeElemento);
 
-      if (data.imgElemento[0]) {
+      if (data.imgElemento) {
         formDataToSend.append("imgElemento", data.imgElemento[0]);
       }
-      if (data.documentacionElemento[0]) {
+      if (data.documentacionElemento) {
         formDataToSend.append("documentacionElemento", data.documentacionElemento[0]);
       }
 
       await createElemento(formDataToSend);
-      reset(); // Reset the form fields after successful submission
-      closeModal(); // Close the modal after submitting
+      closeModal(); // Cerrar modal tras el envío exitoso
     } catch (error) {
       console.error("Error creating element:", error);
+    } finally {
+      setIsLoading(false); // Desactivamos el spinner de carga
+      reset(); // Resetear el formulario
     }
   };
 
@@ -65,7 +70,7 @@ function FormElemento({ closeModal }) {
     reset();
     setFormData({
       nombreElemento: "",
-      codigoElemento: "", // Nuevo campo
+      codigoElemento: "",
       marcaElemento: "",
       tipoElemento: "",
       ubicacionDeElemento: "",
@@ -75,110 +80,132 @@ function FormElemento({ closeModal }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
-      <div>
-        <label htmlFor="nombreElemento" className="text-black font-bold block mb-1">
-          Nombre del Elemento:
-        </label>
-        <input
-          type="text"
-          name="nombreElemento"
-          {...register("nombreElemento", { required: true })}
-          placeholder="Nombre del Elemento"
-          onChange={(e) => handleInputChange(e)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="codigoElemento" className="text-black font-bold block mb-1">
-          Código del Elemento:
-        </label>
-        <input
-          type="text"
-          name="codigoElemento"
-          {...register("codigoElemento", { required: true })} // Nuevo campo
-          placeholder="Código del Elemento"
-          onChange={(e) => handleInputChange(e)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="marcaElemento" className="text-black font-bold block mb-1">
-          Marca del Elemento:
-        </label>
-        <input
-          type="text"
-          name="marcaElemento"
-          {...register("marcaElemento", { required: true })}
-          placeholder="Marca del Elemento"
-          onChange={(e) => handleInputChange(e)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="tipoElemento" className="text-black font-bold block mb-1">
-          Tipo del Elemento:
-        </label>
-        <input
-          type="text"
-          name="tipoElemento"
-          {...register("tipoElemento", { required: true })}
-          placeholder="Tipo del Elemento"
-          onChange={(e) => handleInputChange(e)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="ubicacionDeElemento" className="text-black font-bold block mb-1">
-          Ubicación del Elemento:
-        </label>
-        <select
-          name="ubicacionDeElemento"
-          {...register("ubicacionDeElemento", { required: true })}
-          onChange={(e) => handleInputChange(e)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        >
-          <option value="">Selecciona una ubicación</option>
-          {casinos.map((casino) => (
-            <option key={casino._id} value={casino._id}>
-              {casino.nombreCasino}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label htmlFor="imgElemento" className="text-black font-bold block mb-1">
-          Imagen del Elemento:
-        </label>
-        <input
-          type="file"
-          name="imgElemento"
-          {...register("imgElemento")}
-          onChange={(e) => handleInputChange(e, true)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div>
-        <label htmlFor="documentacionElemento" className="text-black font-bold block mb-1">
-          Documentación del Elemento:
-        </label>
-        <input
-          type="file"
-          name="documentacionElemento"
-          {...register("documentacionElemento")}
-          onChange={(e) => handleInputChange(e, true)}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
-      <div className="col-span-2">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        >
-          Guardar Elemento
-        </button>
-      </div>
-    </form>
+    <>
+      {isLoading && ( // Spinner de carga
+        <div className="absolute inset-0 flex justify-center items-center bg-gray-100 bg-opacity-75 z-50">
+          <div className="relative flex justify-center items-center">
+            <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-28 w-28"
+              alt="Loader"
+            />
+          </div>
+        </div>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+        <div>
+          <label htmlFor="nombreElemento" className="text-black font-bold block mb-1">
+            Nombre del Elemento:
+          </label>
+          <input
+            type="text"
+            name="nombreElemento"
+            {...register("nombreElemento", { required: true })}
+            placeholder="Nombre del Elemento"
+            onChange={(e) => handleInputChange(e)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="codigoElemento" className="text-black font-bold block mb-1">
+            Código del Elemento:
+          </label>
+          <input
+            type="text"
+            name="codigoElemento"
+            {...register("codigoElemento", { required: true })}
+            placeholder="Código del Elemento"
+            onChange={(e) => handleInputChange(e)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="marcaElemento" className="text-black font-bold block mb-1">
+            Marca del Elemento:
+          </label>
+          <input
+            type="text"
+            name="marcaElemento"
+            {...register("marcaElemento", { required: true })}
+            placeholder="Marca del Elemento"
+            onChange={(e) => handleInputChange(e)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="tipoElemento" className="text-black font-bold block mb-1">
+            Tipo del Elemento:
+          </label>
+          <input
+            type="text"
+            name="tipoElemento"
+            {...register("tipoElemento", { required: true })}
+            placeholder="Tipo del Elemento"
+            onChange={(e) => handleInputChange(e)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="ubicacionDeElemento" className="text-black font-bold block mb-1">
+            Ubicación del Elemento:
+          </label>
+          <select
+            name="ubicacionDeElemento"
+            {...register("ubicacionDeElemento", { required: true })}
+            onChange={(e) => handleInputChange(e)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          >
+            <option value="">Selecciona una ubicación</option>
+            {casinos.map((casino) => (
+              <option key={casino._id} value={casino._id}>
+                {casino.nombreCasino}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="imgElemento" className="text-black font-bold block mb-1">
+            Imagen del Elemento:
+          </label>
+          <input
+            type="file"
+            name="imgElemento"
+            {...register("imgElemento")}
+            onChange={(e) => handleInputChange(e, true)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div>
+          <label htmlFor="documentacionElemento" className="text-black font-bold block mb-1">
+            Documentación del Elemento:
+          </label>
+          <input
+            type="file"
+            name="documentacionElemento"
+            {...register("documentacionElemento")}
+            onChange={(e) => handleInputChange(e, true)}
+            className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
+          />
+        </div>
+        <div className="col-span-2">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+            disabled={isLoading} // Botón desactivado durante la carga
+          >
+            Guardar Elemento
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="bg-gray-500 text-white py-2 px-4 ml-4 rounded-md hover:bg-gray-600"
+          >
+            Resetear Formulario
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 
