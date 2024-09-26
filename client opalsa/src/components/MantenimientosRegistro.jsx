@@ -12,7 +12,7 @@ const MantenimientoRegistro = () => {
   const [descripcion, setDescripcion] = useState('');
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null); // Estado para el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState(null);
   const [maquinas, setMaquinas] = useState([]);
   const [mantenimientos, setMantenimientos] = useState([]);
 
@@ -20,7 +20,6 @@ const MantenimientoRegistro = () => {
     const fetchMaquinas = async () => {
       try {
         const response = await getMaquinasRequest();
-        console.log('Maquinas recibidas:', response.data);
         setMaquinas(response.data);
       } catch (err) {
         console.error('Error al obtener las máquinas:', err);
@@ -51,7 +50,7 @@ const MantenimientoRegistro = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
     formData.append('tipoMantenimiento', tipoMantenimiento);
     formData.append('fechaMantenimiento', fechaMantenimiento);
@@ -69,10 +68,10 @@ const MantenimientoRegistro = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       setMantenimientos([...mantenimientos, response.data]);
-      setSuccessMessage('Mantenimiento registrado exitosamente'); // Establecer mensaje de éxito
-      setError(null); // Limpiar error
+      setSuccessMessage('Mantenimiento registrado exitosamente');
+      setError(null);
       setTipoMantenimiento('');
       setFechaMantenimiento('');
       setDescripcion('');
@@ -83,7 +82,7 @@ const MantenimientoRegistro = () => {
     } catch (error) {
       console.error('Error al crear mantenimiento:', error);
       setError('Error al crear mantenimiento. Inténtalo de nuevo.');
-      setSuccessMessage(null); // Limpiar mensaje de éxito en caso de error
+      setSuccessMessage(null);
     }
   };
 
@@ -100,58 +99,76 @@ const MantenimientoRegistro = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 mt-5">
-            <Select
-              value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
-              onChange={handleSerieChange}
-              options={maquinaOptions}
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Número de Serie"
-            />
-            <input
-              type="text"
-              value={nombreMaquina}
-              readOnly
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Marca de la Máquina"
-            />
-            <input
-              type="text"
-              value={ubicacionMaquina}
-              readOnly
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Ubicación de la Máquina"
-            />
-            <input
-              type="text"
-              value={tipoMantenimiento}
-              onChange={(e) => setTipoMantenimiento(e.target.value)}
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Tipo de Mantenimiento"
-            />
-            <input
-              type="date"
-              value={fechaMantenimiento}
-              onChange={(e) => setFechaMantenimiento(e.target.value)}
-              className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-            />
+            <div>
+              <label className="block font-bold mb-2">Número de Serie</label>
+              <Select
+                value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
+                onChange={handleSerieChange}
+                options={maquinaOptions}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Seleccione Número de Serie"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-2">Marca de la Máquina</label>
+              <input
+                type="text"
+                value={nombreMaquina}
+                readOnly
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Marca de la Máquina"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-2">Ubicación de la Máquina</label>
+              <input
+                type="text"
+                value={ubicacionMaquina}
+                readOnly
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Ubicación de la Máquina"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-2">Tipo de Mantenimiento</label>
+              <input
+                type="text"
+                value={tipoMantenimiento}
+                onChange={(e) => setTipoMantenimiento(e.target.value)}
+                maxLength={50} // Limite de caracteres
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Tipo de Mantenimiento (máx. 50 caracteres)"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-2">Fecha de Mantenimiento</label>
+              <input
+                type="date"
+                value={fechaMantenimiento}
+                onChange={(e) => setFechaMantenimiento(e.target.value)}
+                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+              />
+            </div>
           </div>
           <div className="mt-4">
+            <label className="block font-bold mb-2">Descripción</label>
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
+              maxLength={1000} // Limite de caracteres
               className="w-full h-32 bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-              placeholder="Descripción"
+              placeholder="Descripción del Mantenimiento (máx. 1000 caracteres)"
             ></textarea>
-          </div>                
+          </div>
           <div className="mt-4">
+            <label className="block font-bold mb-2">Archivo Adjunto</label>
             <input
-              type="file"         
+              type="file"
               onChange={(e) => setArchivo(e.target.files[0])}
               className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
             />
           </div>
           
-          {/* Mostrar la alerta de éxito si successMessage existe */}
           <div className='mt-5'>
             {successMessage && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
@@ -159,7 +176,6 @@ const MantenimientoRegistro = () => {
               </div>
             )}
 
-            {/* Mostrar la alerta de error si error existe */}
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
                 {error}
@@ -172,7 +188,7 @@ const MantenimientoRegistro = () => {
               type="submit"
               className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
             >
-            Enviar
+              Enviar
             </button>
           </div>
         </form>

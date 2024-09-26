@@ -12,7 +12,6 @@ const GenerarOrden = () => {
     const [error, setError] = useState(null);
     const [maquinas, setMaquinas] = useState([]);
     const [successMessage, setSuccessMessage] = useState(null);
-    
 
     const fechaOrden = new Date().toISOString().split('T')[0]; // Fecha actual en formato ISO
 
@@ -48,34 +47,36 @@ const GenerarOrden = () => {
     // Maneja el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-      
-        const nuevaOrden = {
-          descripcionOrden,
-          nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
-          marcaMaquina: maquinaSeleccionada.marcaMaquina,
-          ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
-          usuario: user.username,
-          tipoDeMantenimiento,
-          componentesAsignados: [],
-          componentesSobrantes: [],
-        };
-      
-        console.log('Datos a enviar al servidor:', nuevaOrden); // Verifica los datos
-      
-        try {
-          await axios.post('http://localhost:4000/api/ordenes', nuevaOrden);
-          setSuccessMessage('Orden enviada exitosamente.');
-          setDescripcionOrden('');
-          setMaquinaSeleccionada(null);
-          setTipoDeMantenimiento([]);
-          setError(null);
-        } catch (error) {
-          console.error('Error al crear la orden:', error);
-          setError('No se pudo crear la orden. Inténtalo de nuevo.');
+
+        // Validaciones
+        if (!descripcionOrden || !maquinaSeleccionada || tipoDeMantenimiento.length === 0) {
+            setError('Todos los campos son obligatorios.');
+            return; // Detener la ejecución si falta algún campo
         }
-      };
-      
-      
+
+        const nuevaOrden = {
+            descripcionOrden,
+            nroSerieMaquina: maquinaSeleccionada.nroSerieMaquina,
+            marcaMaquina: maquinaSeleccionada.marcaMaquina,
+            ubicacionMaquina: maquinaSeleccionada.ubicacionMaquina,
+            usuario: user.username,
+            tipoDeMantenimiento,
+            componentesAsignados: [],
+            componentesSobrantes: [],
+        };
+
+        try {
+            await axios.post('http://localhost:4000/api/ordenes', nuevaOrden);
+            setSuccessMessage('Orden enviada exitosamente.');
+            setDescripcionOrden('');
+            setMaquinaSeleccionada(null);
+            setTipoDeMantenimiento([]);
+            setError(null); // Limpiar error en caso de éxito
+        } catch (error) {
+            console.error('Error al crear la orden:', error);
+            setError('No se pudo crear la orden. Inténtalo de nuevo.');
+        }
+    };
 
     // Opciones para el selector de máquinas
     const maquinaOptions = maquinas.map(maquina => ({
@@ -104,8 +105,9 @@ const GenerarOrden = () => {
                         <textarea
                             value={descripcionOrden}
                             onChange={(e) => setDescripcionOrden(e.target.value)}
+                            maxLength={1000} // Limitar a 500 caracteres
                             className="w-full h-32 bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                            placeholder="Solicita una orden aquí"
+                            placeholder="Solicita una orden aquí (máx. 1000 caracteres)"
                         ></textarea>
                     </div>
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 mt-5">
@@ -151,12 +153,16 @@ const GenerarOrden = () => {
                         </div>
                     </div>
                     {successMessage && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
-                        {successMessage}
-                    </div>
-                )}
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+                            {successMessage}
+                        </div>
+                    )}
                     <div className="mt-4">
-                        {error && <p className="text-red-500 text-xs italic">{error}</p>}
+                        {error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+                                {error}
+                            </div>
+                        )}
                         <button
                             type="submit"
                             className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"

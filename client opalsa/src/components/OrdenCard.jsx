@@ -113,8 +113,8 @@ const OrdenCard = ({
             onClick={() => handleDescriptionClick(item)}
           >
             <strong>Orden:</strong> <br />
-            {descripcionOrden.length > 10
-              ? `${descripcionOrden.substring(0, 10)}...`
+            {descripcionOrden.length > 20
+              ? `${descripcionOrden.substring(0, 20)}...`
               : descripcionOrden}
           </p>
           <p className="text-gray-600 mb-2">

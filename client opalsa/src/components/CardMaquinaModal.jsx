@@ -14,10 +14,9 @@ function CardMaquinaModal({
     nroSerieMaquina: maquina.nroSerieMaquina,
     modeloMaquina: maquina.modeloMaquina,
     marcaMaquina: maquina.marcaMaquina,
-    softwareMaquina: maquina.softwareMaquina,
+    precioMaquina: maquina.precioMaquina,
     juegoMaquina: maquina.juegoMaquina,
     estadoMaquina: maquina.estadoMaquina,
-    descripcionMaquina: maquina.descripcionMaquina,
     ubicacionMaquina: maquina.ubicacionMaquina,
     fechaInstalacionMaquina: maquina.fechaInstalacionMaquina,
     proveedorMaquina: maquina.proveedorMaquina,
@@ -141,19 +140,19 @@ function CardMaquinaModal({
             </div>
             <div className="mt-1">
               <span className="text-teal-600 text-md font-semibold">
-                Software:
+                Precio:
               </span>{" "}
               <span className="text-sm text-gray-600">
                 {editMode ? (
                   <input
                     type="text"
-                    value={editedMaquina.softwareMaquina}
-                    name="softwareMaquina"
+                    value={editedMaquina.precioMaquina}
+                    name="precioMaquina"
                     onChange={handleInputChange}
                     className="text-black"
                   />
                 ) : (
-                  maquina.softwareMaquina
+                  maquina.precioMaquina
                 )}
               </span>
             </div>
@@ -190,24 +189,6 @@ function CardMaquinaModal({
                   />
                 ) : (
                   maquina.proveedorMaquina
-                )}
-              </span>
-            </div>
-            <div className="mt-1">
-              <span className="text-teal-600 text-md font-semibold">
-                Descripción:
-              </span>{" "}
-              <span className="text-sm text-gray-600">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={editedMaquina.descripcionMaquina}
-                    name="descripcionMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.descripcionMaquina
                 )}
               </span>
             </div>

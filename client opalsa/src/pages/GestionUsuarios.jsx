@@ -86,20 +86,23 @@ function GestionUsuarios() {
             </div>
             <div className='overflow-y-auto max-h-[650px]'>
               {filteredUsers.map(user => (
-                <div key={user._id} className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-start lg:items-center p-4 drop-shadow-xl'>
-                  
-                  {/* Nombre */}
-                  <div className="lg:flex lg:space-x-2">
-                    <span className="block font-bold lg:hidden">Nombre:</span>
-                    <div className="relative flex space-x-2 text-gray-400 text-sm">
-                      <FaRegUser className="h-5 w-5" />
-                      <p>{user.username.length > 8 ? user.username.slice(0, 15) + '...' : user.username}</p>
-                      {tooltipId === user._id && (
-                        <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
-                          {user.username}
-                        </div>
-                      )}
-                    </div>
+                <div 
+                  key={user._id} 
+                  className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-start lg:items-center p-4 drop-shadow-xl'
+                >
+                  {/* Nombre con tooltip */}
+                  <div 
+                    className="relative lg:flex lg:space-x-2 text-gray-400 text-sm" 
+                    onMouseEnter={() => setTooltipId(user._id)} 
+                    onMouseLeave={() => setTooltipId(null)}
+                  >
+                    <FaRegUser className="h-5 w-5" />
+                    <p>{user.username.length > 8 ? user.username.slice(0, 15) + '...' : user.username}</p>
+                    {tooltipId === user._id && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.username}
+                      </div>
+                    )}
                   </div>
 
                   {/* Cédula */}
@@ -114,30 +117,32 @@ function GestionUsuarios() {
                     <p className="text-gray-600">{user.ciudad}</p>
                   </div>
 
-                  {/* Correo */}
-                  <div className="lg:flex lg:space-x-2">
-                    <span className="block font-bold lg:hidden">Correo Electrónico:</span>
-                    <div className="relative flex space-x-2 text-gray-400 text-sm">
-                      <p>{user.email.length > 8 ? user.email.slice(0, 20) + '...' : user.email}</p>
-                      {tooltipId === user._id + '-email' && (
-                        <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
-                          {user.email}
-                        </div>
-                      )}
-                    </div>
+                  {/* Correo con tooltip */}
+                  <div 
+                    className="relative lg:flex lg:space-x-2 text-gray-400 text-sm" 
+                    onMouseEnter={() => setTooltipId(user._id + '-email')} 
+                    onMouseLeave={() => setTooltipId(null)}
+                  >
+                    <p>{user.email.length > 8 ? user.email.slice(0, 20) + '...' : user.email}</p>
+                    {tooltipId === user._id + '-email' && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.email}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Cargo */}
-                  <div className="lg:flex lg:space-x-2">
-                    <span className="block font-bold lg:hidden">Cargo:</span>
-                    <div className="relative flex space-x-2 text-gray-400 text-sm lg:pl-8">
-                      <p>{user.cargo.length > 8 ? user.cargo.slice(0, 8) + '...' : user.cargo}</p>
-                      {tooltipId === user._id + '-cargo' && (
-                        <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
-                          {user.cargo}
-                        </div>
-                      )}
-                    </div>
+                  {/* Cargo con tooltip */}
+                  <div 
+                    className="relative lg:flex lg:space-x-2 text-gray-400 text-sm lg:pl-8" 
+                    onMouseEnter={() => setTooltipId(user._id + '-cargo')} 
+                    onMouseLeave={() => setTooltipId(null)}
+                  >
+                    <p>{user.cargo.length > 8 ? user.cargo.slice(0, 8) + '...' : user.cargo}</p>
+                    {tooltipId === user._id + '-cargo' && (
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                        {user.cargo}
+                      </div>
+                    )}
                   </div>
 
                   {/* Rol */}

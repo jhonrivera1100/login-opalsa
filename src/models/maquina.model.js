@@ -17,7 +17,7 @@ const maquinaSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    softwareMaquina: {
+    precioMaquina: {
       type: String,
       required: true,
       trim: true,

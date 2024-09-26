@@ -36,7 +36,7 @@ export const crearMaquina = async (req, res) => {
     nroSerieMaquina,
     modeloMaquina,
     marcaMaquina,
-    softwareMaquina,
+    precioMaquina,
     juegoMaquina,
     estadoMaquina,
     ubicacionMaquina, // Asegúrate de que esto sea siempre una cadena
@@ -74,7 +74,7 @@ export const crearMaquina = async (req, res) => {
     nroSerieMaquina,
     modeloMaquina,
     marcaMaquina,
-    softwareMaquina,
+    precioMaquina,
     juegoMaquina,
     estadoMaquina,
     imgMaquina,
@@ -102,7 +102,7 @@ export const actualizarMaquina = async (req, res) => {
     nroSerieMaquina,
     modeloMaquina,
     marcaMaquina,
-    softwareMaquina,
+    precioMaquina,
     juegoMaquina,
     estadoMaquina,
     ubicacionMaquina, // Este campo será actualizado en la transferencia
@@ -119,7 +119,7 @@ export const actualizarMaquina = async (req, res) => {
     nroSerieMaquina,
     modeloMaquina,
     marcaMaquina,
-    softwareMaquina,
+    precioMaquina,
     juegoMaquina,
     estadoMaquina,
     ubicacionMaquina, // Se espera que sea una cadena con el nombre del casino

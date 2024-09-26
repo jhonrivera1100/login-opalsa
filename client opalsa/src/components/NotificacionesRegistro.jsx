@@ -9,7 +9,7 @@ const CrearNotificacion = () => {
   const [fechaMantenimiento, setFechaMantenimiento] = useState("");
   const [documentoRecordatorio, setDocumentoRecordatorio] = useState(null);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null); // Estado para manejar el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileChange = (e) => {
@@ -19,14 +19,14 @@ const CrearNotificacion = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     const formData = new FormData();
     formData.append('titulo', titulo);
     formData.append('descripcion', descripcion);
     formData.append('fechaRecordatorio', fechaMantenimiento);
     formData.append('usuario', user.username);
     formData.append('documentoRecordatorio', documentoRecordatorio);
-  
+
     try {
       const response = await axios.post("/recordatorios", formData, {
         headers: {
@@ -56,9 +56,6 @@ const CrearNotificacion = () => {
         <div className="flex justify-center">
           <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">Notificar Al Administrador</h2>
         </div>
-
-    
-
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
             <div className="col-span-1">
@@ -67,7 +64,9 @@ const CrearNotificacion = () => {
                 type="text"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
+                maxLength={100}  // Limitar a 100 caracteres
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
+                placeholder="Título (máx. 100 caracteres)"
                 required
               />
             </div>
@@ -76,7 +75,9 @@ const CrearNotificacion = () => {
               <textarea
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
+                maxLength={1000}  // Limitar a 500 caracteres
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline h-32"
+                placeholder="Descripción (máx. 1000 caracteres)"
                 required
               ></textarea>
             </div>
@@ -99,21 +100,21 @@ const CrearNotificacion = () => {
               />
             </div>
           </div>
-          <div className='mt-5'>
-                {/* Mostrar la alerta de éxito si successMessage existe */}
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
-            <p>{successMessage}</p>
-          </div>
-        )}
 
-        {/* Mostrar la alerta de error si error existe */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
-            {error}
+          {/* Mensajes de éxito o error */}
+          <div className="mt-5">
+            {successMessage && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-4">
+                <p>{successMessage}</p>
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
           </div>
-        )}
-          </div>
+
           <div className="mt-4">
             <button
               type="submit"

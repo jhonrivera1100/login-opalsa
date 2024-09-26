@@ -13,10 +13,9 @@ function FormMaquina({ onClose }) {
     nroSerieMaquina: "",
     modeloMaquina: "",
     marcaMaquina: "",
-    softwareMaquina: "",
+    precioMaquina: "",
     juegoMaquina: "",
     estadoMaquina: "activo",
-    descripcionMaquina: "",
     ubicacionMaquina: "",
     fechaInstalacionMaquina: "",
     proveedorMaquina: "",
@@ -71,10 +70,9 @@ function FormMaquina({ onClose }) {
       nroSerieMaquina: "",
       modeloMaquina: "",
       marcaMaquina: "",
-      softwareMaquina: "",
+      precioMaquina: "",
       juegoMaquina: "",
       estadoMaquina: "activo",
-      descripcionMaquina: "",
       ubicacionMaquina: "",
       fechaInstalacionMaquina: "",
       proveedorMaquina: "",
@@ -144,14 +142,14 @@ function FormMaquina({ onClose }) {
       </div>
       <div>
         <label htmlFor="softwareMaquina" className="text-black font-bold block mb-1">
-          Software de la Máquina:
+          Precio de la Máquina:
         </label>
         <input
           type="text"
-          name="softwareMaquina"
-          value={formData.softwareMaquina}
-          {...register("softwareMaquina")}
-          placeholder="Software de la Máquina"
+          name="precioMaquina"
+          value={formData.precioMaquina}
+          {...register("precioMaquina")}
+          placeholder="Precio de la Máquina"
           onChange={handleInputChange}
           className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
         />
@@ -183,19 +181,7 @@ function FormMaquina({ onClose }) {
           placeholder="Selecciona una ubicación"
         />
       </div>
-      <div>
-        <label htmlFor="descripcionMaquina" className="text-black font-bold block mb-1">
-          Descripción de la Máquina:
-        </label>
-        <textarea
-          name="descripcionMaquina"
-          value={formData.descripcionMaquina}
-          {...register("descripcionMaquina")}
-          placeholder="Descripción de la Máquina"
-          onChange={handleInputChange}
-          className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-        />
-      </div>
+
       <div>
         <label htmlFor="fechaInstalacionMaquina" className="text-black font-bold block mb-1">
           Fecha de Instalación:
