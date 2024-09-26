@@ -233,7 +233,7 @@ function FormMaquina({ onClose }) {
             Precio de la Máquina:
           </label>
           <input
-            type="text"
+            type="number"
             name="precioMaquina"
             {...register("precioMaquina", {
               required: "Este campo es obligatorio",
@@ -369,4 +369,3 @@ function FormMaquina({ onClose }) {
 }
 
 export default FormMaquina;
-
