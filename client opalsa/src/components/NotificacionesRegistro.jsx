@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import axios from '../api/axios';
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import axios from "../api/axios";
 
 const CrearNotificacion = () => {
   const { user } = useAuth();
@@ -21,21 +21,21 @@ const CrearNotificacion = () => {
     setIsSubmitting(true);
 
     const formData = new FormData();
-    formData.append('titulo', titulo);
-    formData.append('descripcion', descripcion);
-    formData.append('fechaRecordatorio', fechaMantenimiento);
-    formData.append('usuario', user.username);
-    formData.append('documentoRecordatorio', documentoRecordatorio);
+    formData.append("titulo", titulo);
+    formData.append("descripcion", descripcion);
+    formData.append("fechaRecordatorio", fechaMantenimiento);
+    formData.append("usuario", user.username);
+    formData.append("documentoRecordatorio", documentoRecordatorio);
 
     try {
       const response = await axios.post("/recordatorios", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
       console.log("Recordatorio creado:", response.data);
       setError(null);
-      setSuccessMessage('Notificación creada exitosamente');
+      setSuccessMessage("Notificación creada exitosamente");
       setTitulo("");
       setDescripcion("");
       setFechaMantenimiento("");
@@ -43,7 +43,9 @@ const CrearNotificacion = () => {
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error("Error al crear recordatorio:", error);
-      setError("Error al crear el recordatorio. Por favor, inténtalo de nuevo.");
+      setError(
+        "Error al crear el recordatorio. Por favor, inténtalo de nuevo."
+      );
       setSuccessMessage(null);
     } finally {
       setIsSubmitting(false);
@@ -52,37 +54,57 @@ const CrearNotificacion = () => {
 
   return (
     <div className="container mx-auto my-4 px-4 lg:px-20">
+      {isSubmitting && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-100 bg-opacity-75 z-50">
+          <div className="relative flex justify-center items-center">
+            <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-28 w-28"
+              alt="Loader"
+            />
+          </div>
+        </div>
+      )}
       <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
         <div className="flex justify-center">
-          <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">Notificar Al Administrador</h2>
+          <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">
+            Notificar Al Administrador
+          </h2>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Título</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Título
+              </label>
               <input
                 type="text"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                maxLength={100}  // Limitar a 100 caracteres
+                maxLength={100}
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
                 placeholder="Título (máx. 100 caracteres)"
                 required
               />
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Descripción
+              </label>
               <textarea
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                maxLength={1000}  // Limitar a 500 caracteres
+                maxLength={1000}
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline h-32"
                 placeholder="Descripción (máx. 1000 caracteres)"
                 required
               ></textarea>
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Fecha de Recordatorio</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Fecha de Recordatorio
+              </label>
               <input
                 type="date"
                 value={fechaMantenimiento}
@@ -92,7 +114,9 @@ const CrearNotificacion = () => {
               />
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Documento</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Documento
+              </label>
               <input
                 type="file"
                 onChange={handleFileChange}
