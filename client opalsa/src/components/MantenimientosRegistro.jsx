@@ -14,7 +14,7 @@ const MantenimientoRegistro = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [maquinas, setMaquinas] = useState([]);
-  const [mantenimientos, setMantenimientos] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchMaquinas = async () => {
@@ -50,6 +50,7 @@ const MantenimientoRegistro = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const formData = new FormData();
     formData.append('tipoMantenimiento', tipoMantenimiento);
@@ -69,7 +70,6 @@ const MantenimientoRegistro = () => {
         },
       });
 
-      setMantenimientos([...mantenimientos, response.data]);
       setSuccessMessage('Mantenimiento registrado exitosamente');
       setError(null);
       setTipoMantenimiento('');
@@ -83,6 +83,8 @@ const MantenimientoRegistro = () => {
       console.error('Error al crear mantenimiento:', error);
       setError('Error al crear mantenimiento. Inténtalo de nuevo.');
       setSuccessMessage(null);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -93,6 +95,18 @@ const MantenimientoRegistro = () => {
 
   return (
     <div className="container mx-auto my-4 px-4 lg:px-20">
+      {isSubmitting && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-100 bg-opacity-75 z-50">
+          <div className="relative flex justify-center items-center">
+            <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-28 w-28"
+              alt="Loader"
+            />
+          </div>
+        </div>
+      )}
       <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
         <div className="flex justify-center">
           <h1 className="font-bold uppercase text-3xl md:text-4xl text-center">Registrar Mantenimiento</h1>
@@ -135,7 +149,7 @@ const MantenimientoRegistro = () => {
                 type="text"
                 value={tipoMantenimiento}
                 onChange={(e) => setTipoMantenimiento(e.target.value)}
-                maxLength={50} // Limite de caracteres
+                maxLength={50}
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
                 placeholder="Tipo de Mantenimiento (máx. 50 caracteres)"
               />
@@ -155,7 +169,7 @@ const MantenimientoRegistro = () => {
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              maxLength={1000} // Limite de caracteres
+              maxLength={1000}
               className="w-full h-32 bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
               placeholder="Descripción del Mantenimiento (máx. 1000 caracteres)"
             ></textarea>
@@ -187,12 +201,13 @@ const MantenimientoRegistro = () => {
             <button
               type="submit"
               className="uppercase text-sm font-bold tracking-wide bg-blue-900 text-white p-3 rounded-lg w-full focus:outline-none focus:shadow-outline"
+              disabled={isSubmitting}
             >
               Enviar
             </button>
           </div>
         </form>
-      </div>                  
+      </div>
     </div>
   );
 };

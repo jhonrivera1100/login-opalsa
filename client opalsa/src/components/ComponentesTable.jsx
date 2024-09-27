@@ -24,7 +24,7 @@ function ComponentesTable({
   };
 
   return (
-    <div className="w-full flex flex-col max-h-[90vh] overflow-y-auto relative">
+    <div className="w-full flex flex-col min-h-[600px] max-h-[90vh] overflow-y-auto relative">
       {sortedComponentes.length === 0 ? (
         <div className="flex flex-col items-center mt-4 space-y-4">
           <span className="text-gray-500 text-lg text-center">
@@ -290,8 +290,8 @@ function ComponentesTable({
               className="absolute bg-white border border-gray-300 p-4 rounded shadow-lg"
               style={{
                 top: "50%",
-                left: "70%",
-                transform: "translate(-50%, -80%)",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
               }}
             >
               <h3 className="text-lg text-center font-semibold">
