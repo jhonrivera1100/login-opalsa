@@ -11,6 +11,7 @@ function ComponentesTable({
   handleDeleteComponente,
   abrirDocumento,
 }) {
+  const [tooltipSerial, setTooltipSerial] = useState(null); // Estado para manejar el tooltip del serial
   const [tooltipUser, setTooltipUser] = useState(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null); // Estado para manejar la vista previa de la imagen
@@ -21,6 +22,14 @@ function ComponentesTable({
 
   const handleMouseLeave = () => {
     setZoomedImage(null); // Quita la imagen ampliada cuando se quita el mouse
+  };
+
+  const handleSerialMouseEnter = (serial) => {
+    setTooltipSerial(serial); // Muestra el tooltip con el serial completo
+  };
+
+  const handleSerialMouseLeave = () => {
+    setTooltipSerial(null); // Oculta el tooltip del serial
   };
 
   return (
@@ -63,11 +72,11 @@ function ComponentesTable({
                   <span className="sr-only">Acciones</span>
                 </th>
               </tr>
-              
             </thead>
             <tbody className="divide-y divide-gray-200">
               {sortedComponentes.map((componente) => {
                 const isAssigned = componente.usuarioEncargado !== null;
+                const serialComponente = componente.serialComponente || "";
 
                 return (
                   <tr
@@ -111,7 +120,14 @@ function ComponentesTable({
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    <td
+                      className="px-6 py-4 whitespace-nowrap relative"
+                      onMouseEnter={() =>
+                        handleSerialMouseEnter(serialComponente)
+                      }
+                      onMouseLeave={handleSerialMouseLeave}
+                    >
                       {editComponentId === componente._id ? (
                         <input
                           type="text"
@@ -123,10 +139,20 @@ function ComponentesTable({
                         />
                       ) : (
                         <div className="text-sm text-gray-500">
-                          {componente.serialComponente}
+                          {serialComponente.length > 20
+                            ? `${serialComponente.slice(0, 16)}...`
+                            : serialComponente}
+                        </div>
+                      )}
+
+                      {/* Tooltip para mostrar el serial completo */}
+                      {tooltipSerial === serialComponente && (
+                        <div className="absolute bg-white border border-gray-300 p-2 rounded shadow-lg z-10">
+                          {serialComponente}
                         </div>
                       )}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editComponentId === componente._id ? (
                         <input
@@ -143,6 +169,7 @@ function ComponentesTable({
                         </div>
                       )}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div
                         className="text-gray-500 ml-8 flex items-center cursor-pointer"
@@ -163,10 +190,10 @@ function ComponentesTable({
                             strokeLinejoin="round"
                             d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                           />
-                          
                         </svg>
                       </div>
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       {editComponentId === componente._id ? (
                         <div className="flex gap-4">
