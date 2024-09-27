@@ -86,6 +86,22 @@ function FormMaquina({ onClose }) {
       // Si la creación fue exitosa
       setIsSuccess(true); // Mostramos mensaje de éxito
       setError(null); // Aseguramos que no hay error
+
+      // Resetear el formulario al estado inicial
+      reset();  // Resetear el formulario usando react-hook-form
+      setFormData({
+        imgMaquina: null,
+        nroSerieMaquina: "",
+        modeloMaquina: "",
+        marcaMaquina: "",
+        precioMaquina: "",
+        juegoMaquina: "",
+        estadoMaquina: "activo",
+        ubicacionMaquina: "",
+        fechaInstalacionMaquina: "",
+        proveedorMaquina: "",
+        documentoMaquina: null,
+      });
     } catch (error) {
       setError("Error al crear la máquina. Por favor, intente nuevamente.");
       setIsSuccess(false); // Nos aseguramos de que no haya éxito
