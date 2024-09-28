@@ -18,7 +18,7 @@ export default {
         },
       },
       backgroundImage: {
-        'casino-background': "url('https://res.cloudinary.com/dtqiwgbbp/image/upload/v1721338474/Maquinas/jix8shzajboqxs85gjpw.jpg')",
+        'casino-background': "url('https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727471920/wmijfcuvu84ysxyniaew.jpg')",
       },
     },
     fontFamily: {
