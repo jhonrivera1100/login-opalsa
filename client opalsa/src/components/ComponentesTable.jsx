@@ -3,8 +3,8 @@ import React, { useState, useEffect, useMemo } from "react";
 // Helper para generar URL optimizada desde Cloudinary
 const getOptimizedImageUrl = (
   url,
-  width = 150,
-  height = 150,
+  width = 500,
+  height = 500,
   quality = "auto"
 ) => {
   const transformation = `w_${width},h_${height},c_limit,q_${quality},f_auto`;
@@ -444,11 +444,11 @@ function ComponentesTable({
 
           {/* Mostrar la vista previa de la imagen */}
           {zoomedImage && (
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 bg-black bg-opacity-75 p-2 rounded-lg">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50   rounded-lg w-96 h-96 flex items-center justify-center">
               <img
                 src={zoomedImage}
                 alt="Vista Previa"
-                className="max-w-xs max-h-xs object-contain"
+                className="w-full h-full object-contain"
               />
             </div>
           )}
