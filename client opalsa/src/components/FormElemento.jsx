@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useElementos } from "../context/ElementosContext";
 import { getCasinosRequest } from "../api/casinos";
 
+
 function FormElemento({ closeModal }) {
   const { register, handleSubmit, reset } = useForm();
   const { createElemento } = useElementos();

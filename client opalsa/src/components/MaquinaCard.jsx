@@ -65,12 +65,12 @@ function MaquinaCard({ maquina }) {
                   : maquina.estadoMaquina}
               </span>
               <div className="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
-                {maquina.nroSerieMaquina}
+                {maquina.marcaMaquina}
               </div>
             </div>
 
             <h4 className="mt-1 text-xl font-semibold uppercase leading-tight truncate">
-              {maquina.marcaMaquina}
+              {maquina.nroSerieMaquina}
             </h4>
 
             <div className="mt-1 flex items-center">

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import MaquinaCard from "../components/MaquinaCard";
-import CasinoCard from "../components/casinoCard";
+import CasinoCard from "../components/CasinoCard";
 import CasinoDetail from "../components/CasinoDetail";
 
 const SectionContent = ({
@@ -26,20 +26,64 @@ const SectionContent = ({
   handlePreviousPageCasinos,
   handleNextPageCasinos,
 }) => {
-  if (selectedCasino) {
-    const filteredMaquinas = maquinas.filter((maquina) => {
-      const maquinaUbicacion = maquina.ubicacionMaquina || "";
-      const maquinaNombre = maquina.nombreMaquina || "";
-      const maquinaSerie = maquina.nroSerieMaquina || "";
+  // Memoizamos las máquinas filtradas basadas en los filtros de búsqueda y el casino seleccionado
+  const filteredMaquinas = useMemo(() => {
+    if (selectedCasino) {
+      return maquinas.filter((maquina) => {
+        const maquinaUbicacion = maquina.ubicacionMaquina || "";
+        const maquinaNombre = maquina.nombreMaquina || "";
+        const maquinaSerie = maquina.nroSerieMaquina || "";
 
-      return (
-        maquinaUbicacion === selectedCasino.nombreCasino &&
-        (maquinaNombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          maquinaSerie.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        return (
+          maquinaUbicacion === selectedCasino.nombreCasino &&
+          (maquinaNombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            maquinaSerie.toLowerCase().includes(searchQuery.toLowerCase())) &&
+          (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
+        );
+      });
+    }
+    return maquinas
+      .filter((maquina) =>
+        maquina.nroSerieMaquina.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
       );
-    });
+  }, [maquinas, selectedCasino, searchQuery, selectedBrand]);
 
+  // Memoizamos los casinos filtrados basados en los filtros de búsqueda y ciudad
+  const filteredCasinos = useMemo(() => {
+    return casinos.filter((casino) =>
+      casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (cityFilter === "" || casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
+    );
+  }, [casinos, searchQuery, cityFilter]);
+
+  // Paginación de máquinas
+  const startIndexMaquinas = (currentPageMaquinas - 1) * itemsPerPage;
+  const paginatedMaquinas = filteredMaquinas.slice(startIndexMaquinas, startIndexMaquinas + itemsPerPage);
+
+  // Paginación de casinos
+  const startIndexCasinos = (currentPageCasinos - 1) * itemsPerPage;
+  const paginatedCasinos = filteredCasinos.slice(startIndexCasinos, startIndexCasinos + itemsPerPage);
+
+  // Renderizado de las tarjetas de máquinas y casinos
+  const renderMaquinas = useCallback(() => {
+    return paginatedMaquinas.map((maquina) => (
+      <MaquinaCard key={maquina._id} maquina={maquina} />
+    ));
+  }, [paginatedMaquinas]);
+
+  const renderCasinos = useCallback(() => {
+    return paginatedCasinos.map((casino) => (
+      <CasinoCard
+        key={casino._id}
+        casino={casino}
+        onVerMas={() => setSelectedCasino(casino)}
+        onVerDocumentos={() => handleVerDocumentos(casino)}
+      />
+    ));
+  }, [paginatedCasinos]);
+
+  if (selectedCasino) {
     return (
       <div className="font-poppins">
         <CasinoDetail
@@ -51,40 +95,15 @@ const SectionContent = ({
           handleFilterChange={handleFilterChange}
           abrirDocumento={abrirDocumento}
           setSelectedMaquina={setSelectedMaquina}
-          setSelectedCasino={setSelectedCasino} // Pasar la función para cerrar el detalle del casino
+          setSelectedCasino={setSelectedCasino} 
         />
       </div>
     );
   }
 
-  const startIndexMaquinas = (currentPageMaquinas - 1) * itemsPerPage;
-  const endIndexMaquinas = startIndexMaquinas + itemsPerPage;
-  const paginatedMaquinas = maquinas
-    .filter(
-      (maquina) =>
-        (maquina.nroSerieMaquina
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-          maquina.nroSerieMaquina
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())) &&
-        (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-    )
-    .slice(startIndexMaquinas, endIndexMaquinas);
-
-  const startIndexCasinos = (currentPageCasinos - 1) * itemsPerPage;
-  const endIndexCasinos = startIndexCasinos + itemsPerPage;
-  const paginatedCasinos = casinos
-    .filter(
-      (casino) =>
-        casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (cityFilter === "" ||
-          casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
-    )
-    .slice(startIndexCasinos, endIndexCasinos);
-
   return (
     <div className="font-poppins mx-auto bg-gray-100 w-11/12 md:w-10/12 h-144 overflow-auto p-4">
+      {/* Filtros de máquinas */}
       {section === "Maquinas" && (
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
@@ -107,6 +126,7 @@ const SectionContent = ({
           </select>
         </div>
       )}
+      {/* Filtros de casinos */}
       {section === "Casinos" && (
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
@@ -129,21 +149,13 @@ const SectionContent = ({
           </select>
         </div>
       )}
+      {/* Renderizado de las tarjetas de máquinas o casinos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {section === "Maquinas" &&
-          paginatedMaquinas.map((maquina) => (
-            <MaquinaCard key={maquina._id} maquina={maquina} />
-          ))}
-        {section === "Casinos" &&
-          paginatedCasinos.map((casino) => (
-            <CasinoCard
-              key={casino._id}
-              casino={casino}
-              onVerMas={() => setSelectedCasino(casino)}
-              onVerDocumentos={() => handleVerDocumentos(casino)} // Pasa el objeto completo del casino
-            />
-          ))}
+        {section === "Maquinas" && renderMaquinas()}
+        {section === "Casinos" && renderCasinos()}
       </div>
+
+      {/* Controles de paginación para máquinas */}
       {section === "Maquinas" && (
         <div className="flex justify-between mt-4">
           <button
@@ -155,13 +167,15 @@ const SectionContent = ({
           </button>
           <button
             onClick={handleNextPageMaquinas}
-            disabled={currentPageMaquinas * itemsPerPage >= maquinas.length}
+            disabled={currentPageMaquinas * itemsPerPage >= filteredMaquinas.length}
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente
           </button>
         </div>
       )}
+
+      {/* Controles de paginación para casinos */}
       {section === "Casinos" && (
         <div className="flex justify-between mt-4">
           <button
@@ -173,7 +187,7 @@ const SectionContent = ({
           </button>
           <button
             onClick={handleNextPageCasinos}
-            disabled={currentPageCasinos * itemsPerPage >= casinos.length}
+            disabled={currentPageCasinos * itemsPerPage >= filteredCasinos.length}
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente
@@ -184,4 +198,4 @@ const SectionContent = ({
   );
 };
 
-export default SectionContent;
+export default React.memo(SectionContent);

@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState } from "react";
-import { createCasinoRequest, updateCasinoRequest } from "../api/casinos"; // Importamos la función de actualización
+import {
+  createCasinoRequest,
+  updateCasinoRequest,
+  deleteCasinoRequest, // Importamos la función para eliminar
+} from "../api/casinos"; 
 
 const CasinosContext = createContext();
 
@@ -43,12 +47,27 @@ export function CasinosProvider({ children }) {
     }
   };
 
+  // Función para eliminar un casino
+  const deleteCasino = async (casinoId) => {
+    try {
+      await deleteCasinoRequest(casinoId);
+      setCasinos((prevCasinos) =>
+        prevCasinos.filter((casino) => casino._id !== casinoId)
+      );
+      console.log(`Casino con ID ${casinoId} eliminado.`);
+    } catch (error) {
+      console.error("Error al eliminar el casino:", error);
+      throw error;
+    }
+  };
+
   return (
     <CasinosContext.Provider
       value={{
         casinos,
         createCasino,
-        updateCasino, // Hacemos disponible la función de actualización
+        updateCasino,
+        deleteCasino, // Hacemos disponible la función de eliminar
       }}
     >
       {children}

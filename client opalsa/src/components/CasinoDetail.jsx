@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMapMarkerAlt,
@@ -24,6 +24,44 @@ const CasinoDetail = ({
   const [showModal, setShowModal] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para controlar el modal de confirmación
 
+  // Estado para la paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Cálculo de las máquinas a mostrar por página
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMaquinas = filteredMaquinas.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Estado de carga para las imágenes de las máquinas
+  const [loadingImages, setLoadingImages] = useState(
+    new Array(currentMaquinas.length).fill(true) // Inicializamos un estado de carga para cada máquina
+  );
+
+  // Función para manejar la carga de las imágenes al cambiar de página
+  useEffect(() => {
+    const newLoadingImages = new Array(currentMaquinas.length).fill(true);
+    setLoadingImages(newLoadingImages);
+
+    const timers = currentMaquinas.map((_, index) => {
+      return setTimeout(() => {
+        setLoadingImages((prev) => {
+          const newLoadingImages = [...prev];
+          newLoadingImages[index] = false;
+          return newLoadingImages;
+        });
+      }, 1000); // Simula un retraso de 2 segundos
+    });
+
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, [currentPage, currentMaquinas.length]);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calcular el número total de páginas
+  const totalPages = Math.ceil(filteredMaquinas.length / itemsPerPage);
+
   // Función para abrir el modal de elementos del casino
   const handleOpenModal = async () => {
     await getElementosByCasino(selectedCasino._id);
@@ -32,19 +70,13 @@ const CasinoDetail = ({
 
   // Función para eliminar el casino
   const handleDeleteCasino = async () => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que deseas eliminar este casino? Esta acción es irreversible."
-      )
-    ) {
-      try {
-        await deleteCasinoRequest(selectedCasino._id); // Llamada a la API para eliminar el casino
-        setSelectedCasino(null); // Regresar a la vista de casinos
-        alert("Casino eliminado con éxito");
-      } catch (error) {
-        console.error("Error al eliminar el casino:", error);
-        alert("Hubo un error al eliminar el casino. Inténtalo de nuevo.");
-      }
+    try {
+      console.log('Eliminando casino con ID:', selectedCasino._id); // Verifica que esté imprimiendo un ID válido
+      await deleteCasinoRequest(selectedCasino._id);
+      setSelectedCasino(null);
+      setIsConfirmModalOpen(false);
+    } catch (error) {
+      console.error("Error al eliminar el casino:", error);
     }
   };
 
@@ -155,24 +187,29 @@ const CasinoDetail = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredMaquinas.map((maquina) => (
+              {currentMaquinas.map((maquina, index) => (
                 <tr
                   key={maquina._id}
                   className="border-t border-gray-200 hover:bg-gray-50"
                 >
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div className="flex items-center justify-center">
-                      <div className="w-16 h-16 mr-2">
-                        {maquina.imgMaquina && maquina.imgMaquina.url ? (
+                      <div className="w-16 h-16 mr-2 relative">
+                        {loadingImages[index] ? (
+                          <div className="relative flex justify-center items-center w-16 h-16">
+                            <div className="absolute animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                            <img
+                              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+                              className="rounded-full h-12 w-12 object-cover"
+                              alt="Loader"
+                            />
+                          </div>
+                        ) : (
                           <img
                             src={maquina.imgMaquina.url}
                             alt="Logo Maquina"
                             className="w-full h-full object-cover rounded-lg"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
-                            <span>No Imagen</span>
-                          </div>
                         )}
                       </div>
                     </div>
@@ -217,7 +254,7 @@ const CasinoDetail = ({
                   <td className="px-4 py-2 whitespace-nowrap"></td>
                 </tr>
               ))}
-              {filteredMaquinas.length === 0 && (
+              {currentMaquinas.length === 0 && (
                 <tr>
                   <td
                     colSpan="6"
@@ -229,6 +266,41 @@ const CasinoDetail = ({
               )}
             </tbody>
           </table>
+
+          {/* Paginación */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`mx-1 px-4 py-2 rounded-md ${
+                currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"
+              }`}
+            >
+              Anterior
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`mx-1 px-4 py-2 rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`mx-1 px-4 py-2 rounded-md ${
+                currentPage === totalPages ? "bg-gray-300" : "bg-blue-500 text-white"
+              }`}
+            >
+              Siguiente
+            </button>
+          </div>
         </div>
 
         {/* Botón para eliminar el casino */}

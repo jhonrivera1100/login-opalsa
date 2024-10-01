@@ -1,4 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+
+// Helper para generar URL optimizada desde Cloudinary
+const getOptimizedImageUrl = (
+  url,
+  width = 150,
+  height = 150,
+  quality = "auto"
+) => {
+  const transformation = `w_${width},h_${height},c_limit,q_${quality},f_auto`;
+  return url.replace("/upload/", `/upload/${transformation}/`);
+};
 
 function ComponentesTable({
   sortedComponentes,
@@ -11,9 +22,52 @@ function ComponentesTable({
   handleDeleteComponente,
   abrirDocumento,
 }) {
+  const [tooltipSerial, setTooltipSerial] = useState(null); // Estado para manejar el tooltip del serial
   const [tooltipUser, setTooltipUser] = useState(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null); // Estado para manejar la vista previa de la imagen
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // Memoizamos los componentes mostrados por página para evitar recalculaciones innecesarias
+  const currentComponentes = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return sortedComponentes.slice(indexOfFirstItem, indexOfLastItem);
+  }, [sortedComponentes, currentPage]);
+
+  // Calcular el número total de páginas
+  const totalPages = useMemo(
+    () => Math.ceil(sortedComponentes.length / itemsPerPage),
+    [sortedComponentes.length]
+  );
+
+  // Estado de carga para las imágenes de los componentes
+  const [loadingImages, setLoadingImages] = useState(
+    new Array(currentComponentes.length).fill(true)
+  );
+
+  // Función para manejar la carga de las imágenes al cambiar de página
+  useEffect(() => {
+    const newLoadingImages = new Array(currentComponentes.length).fill(true);
+    setLoadingImages(newLoadingImages);
+
+    const timers = currentComponentes.map((_, index) => {
+      return setTimeout(() => {
+        setLoadingImages((prev) => {
+          const newLoadingImages = [...prev];
+          newLoadingImages[index] = false;
+          return newLoadingImages;
+        });
+      }, 1000); // Simula un retraso de 1 segundo
+    });
+
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, [currentComponentes]);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleMouseEnter = (imgUrl) => {
     setZoomedImage(imgUrl); // Establece la imagen ampliada al pasar el mouse
@@ -21,6 +75,14 @@ function ComponentesTable({
 
   const handleMouseLeave = () => {
     setZoomedImage(null); // Quita la imagen ampliada cuando se quita el mouse
+  };
+
+  const handleSerialMouseEnter = (serial) => {
+    setTooltipSerial(serial); // Muestra el tooltip con el serial completo
+  };
+
+  const handleSerialMouseLeave = () => {
+    setTooltipSerial(null); // Oculta el tooltip del serial
   };
 
   return (
@@ -31,10 +93,7 @@ function ComponentesTable({
             Esta máquina aún no tiene componentes.
           </span>
           <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => setShowAgregarModal(true)}
-              className="bg-blue-500 text-white px-2 py-2 rounded"
-            >
+            <button className="bg-blue-500 text-white px-2 py-2 rounded">
               Agregar Componente
             </button>
           </div>
@@ -63,11 +122,15 @@ function ComponentesTable({
                   <span className="sr-only">Acciones</span>
                 </th>
               </tr>
-              
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {sortedComponentes.map((componente) => {
+              {currentComponentes.map((componente, index) => {
                 const isAssigned = componente.usuarioEncargado !== null;
+                const serialComponente = componente.serialComponente || "";
+
+                const optimizedImageUrl = componente.imagenComponente?.url
+                  ? getOptimizedImageUrl(componente.imagenComponente.url)
+                  : null;
 
                 return (
                   <tr
@@ -76,17 +139,26 @@ function ComponentesTable({
                       isAssigned ? "bg-yellow-50" : "hover:bg-gray-50"
                     }`}
                   >
-                    {/* Nueva columna para la imagen */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {componente.imagenComponente?.url ? (
+                      {loadingImages[index] ? (
+                        <div className="relative flex justify-center items-center w-12 h-12">
+                          <div className="absolute animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+                          <img
+                            src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+                            className="rounded-full h-10 w-10 object-cover"
+                            alt="Loader"
+                          />
+                        </div>
+                      ) : optimizedImageUrl ? (
                         <img
-                          src={componente.imagenComponente.url}
+                          src={optimizedImageUrl}
                           alt={componente.nombreComponente}
                           className="w-12 h-12 object-cover rounded cursor-pointer transform transition duration-200 hover:scale-125"
                           onMouseEnter={() =>
-                            handleMouseEnter(componente.imagenComponente.url)
+                            handleMouseEnter(optimizedImageUrl)
                           }
                           onMouseLeave={handleMouseLeave}
+                          loading="lazy" // Lazy loading
                         />
                       ) : (
                         <span className="text-sm text-gray-500">
@@ -111,7 +183,14 @@ function ComponentesTable({
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    <td
+                      className="px-6 py-4 whitespace-nowrap relative"
+                      onMouseEnter={() =>
+                        handleSerialMouseEnter(serialComponente)
+                      }
+                      onMouseLeave={handleSerialMouseLeave}
+                    >
                       {editComponentId === componente._id ? (
                         <input
                           type="text"
@@ -123,10 +202,20 @@ function ComponentesTable({
                         />
                       ) : (
                         <div className="text-sm text-gray-500">
-                          {componente.serialComponente}
+                          {serialComponente.length > 20
+                            ? `${serialComponente.slice(0, 16)}...`
+                            : serialComponente}
+                        </div>
+                      )}
+
+                      {/* Tooltip para mostrar el serial completo */}
+                      {tooltipSerial === serialComponente && (
+                        <div className="absolute bg-white border border-gray-300 p-2 rounded shadow-lg z-10">
+                          {serialComponente}
                         </div>
                       )}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editComponentId === componente._id ? (
                         <input
@@ -143,6 +232,7 @@ function ComponentesTable({
                         </div>
                       )}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div
                         className="text-gray-500 ml-8 flex items-center cursor-pointer"
@@ -163,10 +253,10 @@ function ComponentesTable({
                             strokeLinejoin="round"
                             d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                           />
-                          
                         </svg>
                       </div>
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       {editComponentId === componente._id ? (
                         <div className="flex gap-4">
@@ -284,6 +374,43 @@ function ComponentesTable({
               })}
             </tbody>
           </table>
+
+          {/* Paginación */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`mx-1 px-4 py-2 rounded-md ${
+                currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"
+              }`}
+            >
+              Anterior
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`mx-1 px-4 py-2 rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`mx-1 px-4 py-2 rounded-md ${
+                currentPage === totalPages
+                  ? "bg-gray-300"
+                  : "bg-blue-500 text-white"
+              }`}
+            >
+              Siguiente
+            </button>
+          </div>
 
           {tooltipVisible && tooltipUser && (
             <div
