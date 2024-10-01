@@ -6,6 +6,12 @@ export const getMaquinasRequest = () => axios.get('/maquina');
 // Obtener una máquina por su ID
 export const getMaquinaRequest = (id) => axios.get(`/maquina/${id}`);
 
+export const getMaquinasByCasinoRequest = (nombreCasino) => {
+  return axios.get(`/maquina/casino`, {
+    params: { nombreCasino },
+  });
+};
+
 // Crear una nueva máquina con datos en formato multipart (para enviar imágenes y otros archivos)
 export const createMaquinasRequest = (formData) => {
     return axios.post('/maquina', formData, {

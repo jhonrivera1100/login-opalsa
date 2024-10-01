@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
   getMaquinasRequest,
   createMaquinasRequest,
   updateMaquinasRequest,
-  deleteMaquinasRequest
+  deleteMaquinasRequest,
+  getMaquinasByCasinoRequest,
 } from "../api/maquinas.js";
 
 const MaquinaContext = createContext();
@@ -18,6 +19,7 @@ export const useMaquinas = () => {
 
 export function MaquinasProvider({ children }) {
   const [maquinas, setMaquinas] = useState([]);
+  const [noMaquinas, setNoMaquinas] = useState(false); // Nuevo estado para manejar si no hay máquinas
 
   const loadMaquinas = async () => {
     try {
@@ -36,6 +38,22 @@ export function MaquinasProvider({ children }) {
       console.error("Error al crear una máquina:", error);
     }
   };
+
+  const loadMaquinasByCasino = useCallback(async (nombreCasino) => {
+    try {
+      const res = await getMaquinasByCasinoRequest(nombreCasino);
+      if (res.data.message === "No se encontraron máquinas para este casino") {
+        setMaquinas([]); // No mostrar máquinas
+        setNoMaquinas(true); // Indicamos que no hay máquinas
+      } else {
+        setMaquinas(res.data); // Mostrar las máquinas recibidas
+        setNoMaquinas(false); // Resetear el estado si hay máquinas
+      }
+    } catch (error) {
+      console.error("Error al cargar las máquinas:", error);
+      setNoMaquinas(true); // También manejar errores como "no hay máquinas"
+    }
+  }, []);
 
   const updateMaquina = async (id, maquinaData) => {
     try {
@@ -66,9 +84,11 @@ export function MaquinasProvider({ children }) {
     <MaquinaContext.Provider
       value={{
         maquinas,
+        noMaquinas, // Nuevo valor en el contexto
+        loadMaquinasByCasino,
         createMaquina,
-        updateMaquina, // Función para actualizar la máquina
-        deleteMaquina
+        updateMaquina,
+        deleteMaquina,
       }}
     >
       {children}
