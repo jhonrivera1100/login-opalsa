@@ -34,25 +34,40 @@ function AgregarComponenteModal({ maquinaId, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.documentoComponente) {
+      alert("El documento del componente es obligatorio.");
+      return;
+    }
+  
     const formDataToSend = new FormData();
     formDataToSend.append("serialComponente", formData.serialComponente);
     formDataToSend.append("nombreComponente", formData.nombreComponente);
     formDataToSend.append("marcaComponente", formData.marcaComponente);
     formDataToSend.append("maquina", formData.maquina);
     formDataToSend.append("documentoComponente", formData.documentoComponente);
-    formDataToSend.append("imagenComponente", formData.imagenComponente); // Agregar la imagen al FormData
-
+    
+    if (formData.imagenComponente) {
+      formDataToSend.append("imagenComponente", formData.imagenComponente);
+    }
+  
+    // Verificar qué se está enviando
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(key, value);
+    }
+  
     await createComponente(formDataToSend);
     setFormData({
       serialComponente: "",
       nombreComponente: "",
       marcaComponente: "",
       documentoComponente: null,
-      imagenComponente: null, // Reiniciar el campo de imagen
+      imagenComponente: null,
       maquina: maquinaId,
     });
     onClose();
   };
+  
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 overflow-auto">

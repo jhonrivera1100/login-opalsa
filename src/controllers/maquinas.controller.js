@@ -16,6 +16,29 @@ export const traerMaquinas = async (req, res) => {
   }
 };
 
+export const traerMaquinasPorCasino = async (req, res) => {
+  const { nombreCasino } = req.query; // Obtenemos el nombre del casino desde la query
+  try {
+    if (!nombreCasino) {
+      return res.status(400).json({ message: "El nombre del casino es requerido" });
+    }
+    
+    // Filtramos las máquinas según el nombre del casino
+    const maquinas = await Maquinas.find({ ubicacionMaquina: nombreCasino });
+
+    if (!maquinas.length) {
+      return res.status(404).json({ message: "No se encontraron máquinas para este casino" });
+    }
+
+    res.json(maquinas);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al recuperar las máquinas",
+      error: error.message,
+    });
+  }
+};
+
 // Traer una máquina por su ID
 export const traerMaquina = async (req, res) => {
   // Validar si el ID es un ObjectId válido

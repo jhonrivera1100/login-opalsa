@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMapMarkerAlt,
   faMapMarkedAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useElementos } from "../context/ElementosContext";
+import { useMaquinas } from "../context/MaquinasContext"; // Para cargar las máquinas filtradas desde el backend
 import ElementsModal from "./ElementsModal";
 import ConfirmModal from "./ConfirmModal";
-import { deleteCasinoRequest } from "../api/casinos"; // Importar la función para eliminar casinos
+import { deleteCasinoRequest } from "../api/casinos";
 
 const CasinoDetail = ({
   selectedCasino,
-  filteredMaquinas,
   searchQuery,
   handleSearch,
   selectedBrand,
@@ -20,23 +20,47 @@ const CasinoDetail = ({
   setSelectedMaquina,
   setSelectedCasino,
 }) => {
-  const { getElementosByCasino, elementos } = useElementos(); // Asegúrate de que `elementos` esté en el contexto
+  const { getElementosByCasino } = useElementos(); // Contexto para obtener los elementos del casino
+  const { loadMaquinasByCasino, maquinas, noMaquinas } = useMaquinas(); // Añadir el estado noMaquinas
   const [showModal, setShowModal] = useState(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para controlar el modal de confirmación
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para el modal de confirmación
 
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Cálculo de las máquinas a mostrar por página
+  // Filtrar máquinas basadas en la búsqueda y el filtro de marca
+  const filteredMaquinas = useMemo(() => {
+    return maquinas.filter((maquina) => {
+      const matchesSearch = searchQuery
+        ? (maquina.nroSerieMaquina?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           maquina.nombreMaquina?.toLowerCase().includes(searchQuery.toLowerCase()))
+        : true;
+
+      const matchesBrand = selectedBrand
+        ? maquina.marcaMaquina === selectedBrand
+        : true;
+
+      return matchesSearch && matchesBrand;
+    });
+  }, [maquinas, searchQuery, selectedBrand]);
+
+  // Cálculo de las máquinas a mostrar por página (después del filtrado)
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentMaquinas = filteredMaquinas.slice(indexOfFirstItem, indexOfLastItem);
+  const currentMaquinas = filteredMaquinas.slice(indexOfFirstItem, indexOfLastItem); // Utilizamos las máquinas filtradas
 
   // Estado de carga para las imágenes de las máquinas
   const [loadingImages, setLoadingImages] = useState(
-    new Array(currentMaquinas.length).fill(true) // Inicializamos un estado de carga para cada máquina
+    new Array(currentMaquinas.length).fill(true) // Inicializamos el estado de carga para cada máquina
   );
+
+  // Cargar máquinas filtradas por el casino cuando se seleccione un casino
+  useEffect(() => {
+    if (selectedCasino && selectedCasino.nombreCasino) {
+      loadMaquinasByCasino(selectedCasino.nombreCasino); // Cargar máquinas filtradas desde el backend
+    }
+  }, [selectedCasino]);
 
   // Función para manejar la carga de las imágenes al cambiar de página
   useEffect(() => {
@@ -50,7 +74,7 @@ const CasinoDetail = ({
           newLoadingImages[index] = false;
           return newLoadingImages;
         });
-      }, 1000); // Simula un retraso de 2 segundos
+      }, 1000); // Simula un retraso de 1 segundo
     });
 
     return () => timers.forEach((timer) => clearTimeout(timer));
@@ -71,7 +95,6 @@ const CasinoDetail = ({
   // Función para eliminar el casino
   const handleDeleteCasino = async () => {
     try {
-      console.log('Eliminando casino con ID:', selectedCasino._id); // Verifica que esté imprimiendo un ID válido
       await deleteCasinoRequest(selectedCasino._id);
       setSelectedCasino(null);
       setIsConfirmModalOpen(false);
@@ -112,7 +135,7 @@ const CasinoDetail = ({
           </div>
           <div className="text-center w-1/3 mr-20 mt-20">
             <p className="text-sky-200 font-bold text-4xl">
-              {filteredMaquinas.length}
+              {noMaquinas ? "0" : filteredMaquinas.length}
             </p>
             <h3 className="text-base font-bold text-white mt-2 inline-block py-1 px-2 rounded-md">
               MÁQUINAS EN EL CASINO
@@ -152,160 +175,130 @@ const CasinoDetail = ({
         </div>
 
         <div className="w-full mt-5">
-          <table className="min-w-full bg-gray-50 divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
-            <thead className="bg-gray-200">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 uppercase tracking-wider"
-                ></th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider"
-                >
-                  Serial
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider"
-                >
-                  Marca
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider"
-                >
-                  Documento
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"
-                ></th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Acciones</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {currentMaquinas.map((maquina, index) => (
-                <tr
-                  key={maquina._id}
-                  className="border-t border-gray-200 hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <div className="flex items-center justify-center">
-                      <div className="w-16 h-16 mr-2 relative">
-                        {loadingImages[index] ? (
-                          <div className="relative flex justify-center items-center w-16 h-16">
-                            <div className="absolute animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-                            <img
-                              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
-                              className="rounded-full h-12 w-12 object-cover"
-                              alt="Loader"
-                            />
-                          </div>
-                        ) : (
-                          <img
-                            src={maquina.imgMaquina.url}
-                            alt="Logo Maquina"
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-black font-medium text-left">
-                    {maquina.nroSerieMaquina}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
-                    {maquina.marcaMaquina}
-                  </td>
-                  <td className="px-12 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="h-6 w-6 hover:text-gray-900 cursor-pointer"
-                        onClick={() =>
-                          abrirDocumento(maquina.documentoMaquina.url)
-                        }
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                        />
-                      </svg>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-4">
-                      <button
-                        className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs transition duration-200 ease-in-out transform hover:scale-110 hover:shadow-lg"
-                        onClick={() => setSelectedMaquina(maquina)}
-                      >
-                        Ver más
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap"></td>
-                </tr>
-              ))}
-              {currentMaquinas.length === 0 && (
+          {noMaquinas ? (
+            <div className="text-center text-red-500 font-bold">
+              No se encontraron máquinas para este casino
+            </div>
+          ) : (
+            <table className="min-w-full bg-gray-50 divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+              <thead className="bg-gray-200">
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No hay máquinas disponibles
-                  </td>
+                  <th className="px-6 py-3 uppercase tracking-wider"></th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider">
+                    Serial
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider">
+                    Marca
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-blue-600 uppercase tracking-wider">
+                    Documento
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-teal-600 uppercase tracking-wider"></th>
+                  <th scope="col" className="relative px-6 py-3">
+                    <span className="sr-only">Acciones</span>
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {currentMaquinas.map((maquina, index) => (
+                  <tr key={maquina._id} className="border-t border-gray-200 hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="flex items-center justify-center">
+                        <div className="w-16 h-16 mr-2 relative">
+                          {loadingImages[index] ? (
+                            <div className="relative flex justify-center items-center w-16 h-16">
+                              <div className="absolute animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                              <img
+                                src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+                                className="rounded-full h-12 w-12 object-cover"
+                                alt="Loader"
+                              />
+                            </div>
+                          ) : (
+                            <img
+                              src={maquina.imgMaquina.url}
+                              alt="Logo Maquina"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-black font-medium text-left">
+                      {maquina.nroSerieMaquina}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+                      {maquina.marcaMaquina}
+                    </td>
+                    <td className="px-12 py-2 whitespace-nowrap text-gray-500 font-normal text-left">
+                      <div className="flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="h-6 w-6 hover:text-gray-900 cursor-pointer"
+                          onClick={() => abrirDocumento(maquina.documentoMaquina.url)}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                          />
+                        </svg>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end gap-4">
+                        <button
+                          className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs transition duration-200 ease-in-out transform hover:scale-110 hover:shadow-lg"
+                          onClick={() => setSelectedMaquina(maquina)}
+                        >
+                          Ver más
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
           {/* Paginación */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`mx-1 px-4 py-2 rounded-md ${
-                currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"
-              }`}
-            >
-              Anterior
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
+          {!noMaquinas && (
+            <div className="flex justify-center mt-4">
               <button
-                key={index}
-                onClick={() => paginate(index + 1)}
-                className={`mx-1 px-4 py-2 rounded-md ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200"
-                }`}
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`mx-1 px-4 py-2 rounded-md ${currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"}`}
               >
-                {index + 1}
+                Anterior
               </button>
-            ))}
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`mx-1 px-4 py-2 rounded-md ${
-                currentPage === totalPages ? "bg-gray-300" : "bg-blue-500 text-white"
-              }`}
-            >
-              Siguiente
-            </button>
-          </div>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => paginate(index + 1)}
+                  className={`mx-1 px-4 py-2 rounded-md ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`mx-1 px-4 py-2 rounded-md ${currentPage === totalPages ? "bg-gray-300" : "bg-blue-500 text-white"}`}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Botón para eliminar el casino */}
         <button
-          onClick={() => setIsConfirmModalOpen(true)} // Abre el modal de confirmación
+          onClick={() => setIsConfirmModalOpen(true)}
           className="bg-red-500 text-white font-bold py-2 px-4 rounded-md mt-6 hover:bg-red-600 transition duration-300 ease-in-out hover:shadow-lg hover:scale-105"
         >
           Eliminar Casino
@@ -314,16 +307,12 @@ const CasinoDetail = ({
 
       <ConfirmModal
         isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)} // Cerrar el modal si se cancela
-        onConfirm={handleDeleteCasino} // Ejecutar la eliminación si se confirma
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleDeleteCasino}
         message="¿Estás seguro de que deseas eliminar este casino? Esta acción no se puede deshacer."
       />
 
-      <ElementsModal
-        isOpen={showModal}
-        onRequestClose={() => setShowModal(false)}
-        casinoId={selectedCasino._id}
-      />
+      <ElementsModal isOpen={showModal} onRequestClose={() => setShowModal(false)} casinoId={selectedCasino._id} />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import {
   crearMaquina,
   eliminarMaquina,
   actualizarMaquina,
+  traerMaquinasPorCasino
   } from "../controllers/maquinas.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createMaquinaSchema } from "../schemas/maquinas.schema.js";
@@ -14,6 +15,7 @@ const router = Router();
 
 
 router.get("/maquina", authRequired, traerMaquinas);
+router.get("/maquina/casino", authRequired, traerMaquinasPorCasino);
 router.get("/maquina/:id", authRequired, traerMaquina);
 router.post(
   "/maquina",

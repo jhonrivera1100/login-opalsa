@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import MaquinaCard from "../components/MaquinaCard";
-import CasinoCard from "../components/CasinoCard";
+import CasinoCard from "./CasinoCard";
 import CasinoDetail from "../components/CasinoDetail";
 
 const SectionContent = ({
@@ -42,28 +42,38 @@ const SectionContent = ({
         );
       });
     }
-    return maquinas
-      .filter((maquina) =>
-        maquina.nroSerieMaquina.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    return maquinas.filter(
+      (maquina) =>
+        maquina.nroSerieMaquina
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) &&
         (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-      );
+    );
   }, [maquinas, selectedCasino, searchQuery, selectedBrand]);
 
   // Memoizamos los casinos filtrados basados en los filtros de búsqueda y ciudad
   const filteredCasinos = useMemo(() => {
-    return casinos.filter((casino) =>
-      casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (cityFilter === "" || casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
+    return casinos.filter(
+      (casino) =>
+        casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (cityFilter === "" ||
+          casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
     );
   }, [casinos, searchQuery, cityFilter]);
 
   // Paginación de máquinas
   const startIndexMaquinas = (currentPageMaquinas - 1) * itemsPerPage;
-  const paginatedMaquinas = filteredMaquinas.slice(startIndexMaquinas, startIndexMaquinas + itemsPerPage);
+  const paginatedMaquinas = filteredMaquinas.slice(
+    startIndexMaquinas,
+    startIndexMaquinas + itemsPerPage
+  );
 
   // Paginación de casinos
   const startIndexCasinos = (currentPageCasinos - 1) * itemsPerPage;
-  const paginatedCasinos = filteredCasinos.slice(startIndexCasinos, startIndexCasinos + itemsPerPage);
+  const paginatedCasinos = filteredCasinos.slice(
+    startIndexCasinos,
+    startIndexCasinos + itemsPerPage
+  );
 
   // Renderizado de las tarjetas de máquinas y casinos
   const renderMaquinas = useCallback(() => {
@@ -77,11 +87,16 @@ const SectionContent = ({
       <CasinoCard
         key={casino._id}
         casino={casino}
-        onVerMas={() => setSelectedCasino(casino)}
+        onVerMas={() => {
+          if (selectedCasino?._id !== casino._id) {
+            // Prevenir múltiples selecciones del mismo casino
+            setSelectedCasino(casino);
+          }
+        }}
         onVerDocumentos={() => handleVerDocumentos(casino)}
       />
     ));
-  }, [paginatedCasinos]);
+  }, [paginatedCasinos, selectedCasino]);
 
   if (selectedCasino) {
     return (
@@ -95,7 +110,7 @@ const SectionContent = ({
           handleFilterChange={handleFilterChange}
           abrirDocumento={abrirDocumento}
           setSelectedMaquina={setSelectedMaquina}
-          setSelectedCasino={setSelectedCasino} 
+          setSelectedCasino={setSelectedCasino}
         />
       </div>
     );
@@ -167,7 +182,9 @@ const SectionContent = ({
           </button>
           <button
             onClick={handleNextPageMaquinas}
-            disabled={currentPageMaquinas * itemsPerPage >= filteredMaquinas.length}
+            disabled={
+              currentPageMaquinas * itemsPerPage >= filteredMaquinas.length
+            }
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente
@@ -187,7 +204,9 @@ const SectionContent = ({
           </button>
           <button
             onClick={handleNextPageCasinos}
-            disabled={currentPageCasinos * itemsPerPage >= filteredCasinos.length}
+            disabled={
+              currentPageCasinos * itemsPerPage >= filteredCasinos.length
+            }
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente
