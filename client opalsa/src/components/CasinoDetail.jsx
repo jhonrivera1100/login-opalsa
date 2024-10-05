@@ -176,7 +176,7 @@ const CasinoDetail = ({
 
         <div className="w-full mt-5">
           {noMaquinas ? (
-            <div className="text-center text-red-500 font-bold">
+            <div className="text-center text-white font-bold">
               No se encontraron máquinas para este casino
             </div>
           ) : (

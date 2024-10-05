@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { useAuth } from '../context/AuthContext';
-import { getComponentesRequest } from '../api/componentes';
+import { useComponentes } from '../context/ComponentesContext';
 
 const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
-  const [componentes, setComponentes] = useState([]);
+  const { getComponenteBySerial, componentes, loading } = useComponentes();
   const [selectedComponentes, setSelectedComponentes] = useState([]);
   const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
   const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.maquina?.nroSerieMaquina || '');
@@ -18,18 +18,12 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [numeroOrden, setNumeroOrden] = useState(orden.numeroOrden || '');
   const [fechaOrden, setFechaOrden] = useState('');
   const [tiposMantenimiento, setTiposMantenimiento] = useState([]);
+  const [serialSearch, setSerialSearch] = useState(''); // Estado para manejar el campo de búsqueda de serial
+  const [searchMessage, setSearchMessage] = useState(''); // Estado para mensaje de búsqueda
+  const [searchError, setSearchError] = useState(''); // Estado para error en búsqueda
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchComponentes = async () => {
-      try {
-        const response = await getComponentesRequest();
-        setComponentes(response.data);
-      } catch (err) {
-        console.error('Error al obtener los Componentes:', err);
-      }
-    };
-
     const fetchOrden = async () => {
       try {
         if (ordenId) {
@@ -58,7 +52,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
       }
     };
 
-    fetchComponentes();
     fetchOrden();
   }, [ordenId]);
 
@@ -80,27 +73,62 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
     setElementosOrden(elementosOrden.filter((_, i) => i !== index));
   };
 
+  const handleSearchBySerial = async () => {
+    if (serialSearch) {
+      try {
+        // Llamar directamente a la función getComponenteBySerial y obtener el componente
+        const componenteEncontrado = await getComponenteBySerial(serialSearch);
+
+        if (componenteEncontrado) {
+          // Verificar si el componente ya ha sido agregado
+          const yaAgregado = selectedComponentes.some(component => component.value === componenteEncontrado.serialComponente);
+
+          if (!yaAgregado) {
+            const nuevoComponente = {
+              value: componenteEncontrado.serialComponente,
+              label: `${componenteEncontrado.nombreComponente} (Serial: ${componenteEncontrado.serialComponente} Marca: ${componenteEncontrado.marcaComponente})`,
+            };
+
+            // Agregar el nuevo componente a la lista de componentes seleccionados
+            setSelectedComponentes([...selectedComponentes, nuevoComponente]);
+            setSearchMessage(`Componente con serial ${serialSearch} agregado.`);
+            setSearchError('');
+          } else {
+            setSearchError(`Componente con serial ${serialSearch} ya ha sido agregado.`);
+            setSearchMessage('');
+          }
+        } else {
+          setSearchError(`Componente con serial ${serialSearch} no encontrado.`);
+          setSearchMessage('');
+        }
+      } catch (error) {
+        setSearchError('Ocurrió un error al buscar el componente.');
+        setSearchMessage('');
+      }
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     const componentesAsignados = selectedComponentes.map(component => ({
       nombreComponente: component.label.split(' (Serial:')[0],
       serialComponente: component.value,  // Usar el serialComponente como value
     }));
-  
+
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
         fechaOrden: new Date(),
         descripcionOrden,
         nroSerieMaquina,
-        marcaMaquina, // Incluir marcaMaquina en la actualización
+        marcaMaquina,
         ubicacionMaquina,
         usuario: usuario._id, 
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
-        componentesAsignados,  // Guardar los componentes asignados con su serial
+        componentesAsignados,
       });
-  
+
       if (typeof onOrderAccepted === 'function') {
         onOrderAccepted(response.data);
       }
@@ -114,8 +142,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
-    value: componente.serialComponente, // Usar serialComponente como value
-    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`, // Mostrar serial en el label
+    value: componente.serialComponente,
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
     marcaComponente: componente.marcaComponente,
   }));
 
@@ -185,18 +213,53 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           </div>
 
           <div className="mt-4">
-            <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
-            <Select
-              isMulti
-              name="componentes"
-              options={componenteOptions}
-              className="basic-multi-select"
-              classNamePrefix="select"
-              value={selectedComponentes} // Mostrar los componentes ya seleccionados
-              onChange={handleComponentesChange}
-              placeholder="Selecciona componentes"
-            />
+            <h4 className="text-gray-600 mb-2 font-bold">Buscar Componente por Número de Serie</h4>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Ingresa número de serie"
+                value={serialSearch}
+                onChange={(e) => setSerialSearch(e.target.value)}
+                className="px-4 py-2 border rounded mr-2 w-full"
+              />
+              <button
+                type="button"
+                onClick={handleSearchBySerial}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                disabled={loading}
+              >
+                {loading ? 'Buscando...' : 'Buscar'}
+              </button>
+            </div>
+
+            {/* Mostrar mensajes de búsqueda */}
+            {searchMessage && (
+              <div className="bg-green-100 text-green-800 p-3 rounded-lg mt-2">
+                {searchMessage}
+              </div>
+            )}
+            {searchError && (
+              <div className="bg-red-100 text-red-800 p-3 rounded-lg mt-2">
+                {searchError}
+              </div>
+            )}
           </div>
+
+          {componentes.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-gray-600 mb-2 font-bold">Componentes Seleccionados</h4>
+              <Select
+                isMulti
+                name="componentes"
+                options={componenteOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                value={selectedComponentes}
+                onChange={handleComponentesChange}
+                placeholder="Selecciona componentes"
+              />
+            </div>
+          )}
 
           <div className="mt-4">
             <h4 className="text-gray-600 mb-2 font-bold">Asignar elementos</h4>

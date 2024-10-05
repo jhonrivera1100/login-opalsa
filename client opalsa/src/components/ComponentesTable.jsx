@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 
+
 // Helper para generar URL optimizada desde Cloudinary
 const getOptimizedImageUrl = (
   url,
@@ -376,41 +377,7 @@ function ComponentesTable({
           </table>
 
           {/* Paginación */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`mx-1 px-4 py-2 rounded-md ${
-                currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"
-              }`}
-            >
-              Anterior
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => paginate(index + 1)}
-                className={`mx-1 px-4 py-2 rounded-md ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`mx-1 px-4 py-2 rounded-md ${
-                currentPage === totalPages
-                  ? "bg-gray-300"
-                  : "bg-blue-500 text-white"
-              }`}
-            >
-              Siguiente
-            </button>
-          </div>
+
 
           {tooltipVisible && tooltipUser && (
             <div

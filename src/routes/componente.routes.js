@@ -6,6 +6,7 @@ import {
   getComponenteById,
   deleteComponenteById,
   updateComponenteById,
+  getComponenteBySerial, // Nueva función
 } from "../controllers/componentes.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createComponenteSchema } from "../schemas/componente.schema.js";
@@ -14,6 +15,7 @@ const router = Router();
 
 router.get("/componentes", authRequired, getComponentes);
 router.get("/componentes/:id", authRequired, getComponenteById);
+router.get("/componentes-serial", authRequired, getComponenteBySerial); // Nueva ruta para buscar por serial
 router.post(
   "/componentes",
   authRequired,
