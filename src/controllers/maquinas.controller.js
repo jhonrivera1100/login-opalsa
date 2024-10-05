@@ -5,8 +5,35 @@ import mongoose from "mongoose"; // Asegúrate de importar mongoose para validar
 
 // Traer todas las máquinas
 export const traerMaquinas = async (req, res) => {
+  const { page = 1, limit = 8 } = req.query; // Valores predeterminados de paginación
+
   try {
-    const maquinas = await Maquinas.find();
+    // Calcular el total de máquinas
+    const totalMaquinas = await Maquinas.countDocuments();
+    // Aplicar paginación y traer las máquinas
+    const maquinas = await Maquinas.find()
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    res.json({
+      totalPages: Math.ceil(totalMaquinas / limit),
+      currentPage: Number(page),
+      maquinas,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al recuperar las máquinas",
+      error: error.message,
+    });
+  }
+};
+
+// Traer todas las máquinas (para el componente MantenimientoRegistro)
+// Traer todas las máquinas con campos específicos para el registro de mantenimientos
+export const traerTodasMaquinas = async (req, res) => {
+  try {
+    // Solo cargamos los campos necesarios: número de serie, marca y ubicación
+    const maquinas = await Maquinas.find().select('nroSerieMaquina marcaMaquina ubicacionMaquina');
     res.json(maquinas);
   } catch (error) {
     res.status(500).json({
@@ -15,6 +42,27 @@ export const traerMaquinas = async (req, res) => {
     });
   }
 };
+
+// Búsqueda por número de serie
+// Búsqueda por número de serie
+export const buscarMaquinaPorNumeroDeSerie = async (req, res) => {
+  const { nroSerieMaquina } = req.query; // Se recibe el número de serie desde la query
+
+  try {
+    const maquina = await Maquinas.findOne({ nroSerieMaquina }).select('nroSerieMaquina marcaMaquina ubicacionMaquina');
+
+    if (!maquina) {
+      return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });
+    }
+
+    res.json(maquina);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar la máquina', error: error.message });
+  }
+};
+
+
+
 
 export const traerMaquinasPorCasino = async (req, res) => {
   const { nombreCasino } = req.query; // Obtenemos el nombre del casino desde la query

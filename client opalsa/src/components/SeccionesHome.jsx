@@ -19,6 +19,7 @@ function SeccionesHome() {
   const [documentos, setDocumentos] = useState([]);
   const [isDocumentosModalOpen, setIsDocumentosModalOpen] = useState(false);
   const [currentPageMaquinas, setCurrentPageMaquinas] = useState(1);
+  const [totalPagesMaquinas, setTotalPagesMaquinas] = useState(1); // Para manejar el total de páginas de máquinas
   const [currentPageCasinos, setCurrentPageCasinos] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
@@ -38,20 +39,21 @@ function SeccionesHome() {
     fetchCasinos();
   }, []); // El efecto depende solo del montaje del componente, no de otras variables.
 
-  // Fetch de máquinas dependiendo de los filtros, la sección y el casino seleccionado
+  // Fetch de máquinas dependiendo de la sección y la paginación
   useEffect(() => {
     if (section === "Maquinas") {
       const fetchMaquinas = async () => {
         try {
-          const maquinasResponse = await getMaquinasRequest();
-          setMaquinas(maquinasResponse.data);
+          const maquinasResponse = await getMaquinasRequest(currentPageMaquinas, itemsPerPage);
+          setMaquinas(maquinasResponse.data.maquinas);
+          setTotalPagesMaquinas(maquinasResponse.data.totalPages); // Ajustamos el total de páginas
         } catch (error) {
           console.error("Error al cargar las máquinas:", error);
         }
       };
       fetchMaquinas();
     }
-  }, [section, selectedCasino, searchQuery, selectedBrand, currentPageMaquinas]); // Solo recargar máquinas cuando cambien estas variables
+  }, [section, currentPageMaquinas, itemsPerPage]); // Solo recargar máquinas cuando se cambia a la sección "Maquinas" o la página
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -79,14 +81,16 @@ function SeccionesHome() {
     }
   };
 
+  // Funciones para paginación de máquinas
   const handlePreviousPageMaquinas = () => {
     setCurrentPageMaquinas((prevPage) => Math.max(prevPage - 1, 1)); // Evitar ir a una página menor a 1
   };
 
   const handleNextPageMaquinas = () => {
-    setCurrentPageMaquinas((prevPage) => prevPage + 1); // Incrementar la página de máquinas
+    setCurrentPageMaquinas((prevPage) => Math.min(prevPage + 1, totalPagesMaquinas)); // Incrementar la página de máquinas
   };
 
+  // Funciones para paginación de casinos
   const handlePreviousPageCasinos = () => {
     setCurrentPageCasinos((prevPage) => Math.max(prevPage - 1, 1)); // Evitar ir a una página menor a 1
   };
@@ -168,6 +172,7 @@ function SeccionesHome() {
           currentPageMaquinas={currentPageMaquinas}
           currentPageCasinos={currentPageCasinos}
           itemsPerPage={itemsPerPage}
+          totalPagesMaquinas={totalPagesMaquinas} // Total de páginas de máquinas
           handleSearch={handleSearch}
           handleFilterChange={handleFilterChange}
           handleCityFilterChange={handleCityFilterChange}

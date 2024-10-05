@@ -12,6 +12,7 @@ const SectionContent = ({
   selectedBrand,
   cityFilter,
   currentPageMaquinas,
+  totalPagesMaquinas, // Añadido para controlar la cantidad total de páginas
   currentPageCasinos,
   itemsPerPage,
   handleSearch,
@@ -26,9 +27,10 @@ const SectionContent = ({
   handlePreviousPageCasinos,
   handleNextPageCasinos,
 }) => {
-  // Memoizamos las máquinas filtradas basadas en los filtros de búsqueda y el casino seleccionado
+  // Memoizamos las máquinas filtradas dependiendo de la sección
   const filteredMaquinas = useMemo(() => {
-    if (selectedCasino) {
+    // Si estamos en la sección de Casinos, se aplican los filtros por casino seleccionado
+    if (section === "Casinos" && selectedCasino) {
       return maquinas.filter((maquina) => {
         const maquinaUbicacion = maquina.ubicacionMaquina || "";
         const maquinaNombre = maquina.nombreMaquina || "";
@@ -42,14 +44,21 @@ const SectionContent = ({
         );
       });
     }
-    return maquinas.filter(
-      (maquina) =>
-        maquina.nroSerieMaquina
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) &&
-        (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-    );
-  }, [maquinas, selectedCasino, searchQuery, selectedBrand]);
+    
+    // Si estamos en la sección de máquinas, traemos todas las máquinas sin filtrar por casino
+    if (section === "Maquinas") {
+      return maquinas.filter(
+        (maquina) =>
+          maquina.nroSerieMaquina
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) &&
+          (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
+      );
+    }
+
+    // Por defecto, si no hay sección o condiciones, devolvemos todas las máquinas
+    return maquinas;
+  }, [maquinas, selectedCasino, searchQuery, selectedBrand, section]);
 
   // Memoizamos los casinos filtrados basados en los filtros de búsqueda y ciudad
   const filteredCasinos = useMemo(() => {
@@ -61,29 +70,15 @@ const SectionContent = ({
     );
   }, [casinos, searchQuery, cityFilter]);
 
-  // Paginación de máquinas
-  const startIndexMaquinas = (currentPageMaquinas - 1) * itemsPerPage;
-  const paginatedMaquinas = filteredMaquinas.slice(
-    startIndexMaquinas,
-    startIndexMaquinas + itemsPerPage
-  );
-
-  // Paginación de casinos
-  const startIndexCasinos = (currentPageCasinos - 1) * itemsPerPage;
-  const paginatedCasinos = filteredCasinos.slice(
-    startIndexCasinos,
-    startIndexCasinos + itemsPerPage
-  );
-
   // Renderizado de las tarjetas de máquinas y casinos
   const renderMaquinas = useCallback(() => {
-    return paginatedMaquinas.map((maquina) => (
+    return filteredMaquinas.map((maquina) => (
       <MaquinaCard key={maquina._id} maquina={maquina} />
     ));
-  }, [paginatedMaquinas]);
+  }, [filteredMaquinas]);
 
   const renderCasinos = useCallback(() => {
-    return paginatedCasinos.map((casino) => (
+    return filteredCasinos.map((casino) => (
       <CasinoCard
         key={casino._id}
         casino={casino}
@@ -96,7 +91,7 @@ const SectionContent = ({
         onVerDocumentos={() => handleVerDocumentos(casino)}
       />
     ));
-  }, [paginatedCasinos, selectedCasino]);
+  }, [filteredCasinos, selectedCasino]);
 
   if (selectedCasino) {
     return (
@@ -141,6 +136,7 @@ const SectionContent = ({
           </select>
         </div>
       )}
+
       {/* Filtros de casinos */}
       {section === "Casinos" && (
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
@@ -164,6 +160,7 @@ const SectionContent = ({
           </select>
         </div>
       )}
+
       {/* Renderizado de las tarjetas de máquinas o casinos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {section === "Maquinas" && renderMaquinas()}
@@ -180,11 +177,12 @@ const SectionContent = ({
           >
             Anterior
           </button>
+          <span>
+            Página {currentPageMaquinas} de {totalPagesMaquinas}
+          </span>
           <button
             onClick={handleNextPageMaquinas}
-            disabled={
-              currentPageMaquinas * itemsPerPage >= filteredMaquinas.length
-            }
+            disabled={currentPageMaquinas >= totalPagesMaquinas}
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { getMaquinasRequest } from '../api/maquinas';
-import Select from 'react-select';
+import { useMaquinas } from '../context/MaquinasContext'; // Importamos el contexto
 
 const MantenimientoRegistro = () => {
+  const { buscarMaquinaPorSerie } = useMaquinas(); // Usamos la búsqueda de máquina por número de serie
   const [nroSerieMaquina, setNroSerieMaquina] = useState('');
   const [nombreMaquina, setNombreMaquina] = useState('');
   const [ubicacionMaquina, setUbicacionMaquina] = useState('');
@@ -13,41 +13,45 @@ const MantenimientoRegistro = () => {
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [maquinas, setMaquinas] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    const fetchMaquinas = async () => {
-      try {
-        const response = await getMaquinasRequest();
-        setMaquinas(response.data);
-      } catch (err) {
-        console.error('Error al obtener las máquinas:', err);
-      }
-    };
-
-    fetchMaquinas();
-  }, []);
-
-  const handleSerieChange = (selectedOption) => {
-    if (selectedOption) {
-      const selectedSerie = selectedOption.value;
+  // Manejar la búsqueda de la máquina por número de serie
+  const handleSerieChange = async (e) => {
+    const selectedSerie = e.target.value.trim(); // Obtenemos el número de serie del input
+    if (selectedSerie) {
       setNroSerieMaquina(selectedSerie);
-      const selectedMaquina = maquinas.find(maquina => maquina.nroSerieMaquina === selectedSerie);
-      if (selectedMaquina) {
-        setNombreMaquina(selectedMaquina.marcaMaquina);
-        setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
-      } else {
-        setNombreMaquina('');
-        setUbicacionMaquina('');
+      setIsSearching(true);
+
+      try {
+        console.log("Buscando en el backend la máquina con serie:", selectedSerie); // Debugging
+        const selectedMaquina = await buscarMaquinaPorSerie(selectedSerie); // Realiza la búsqueda en el backend
+
+        if (selectedMaquina) {
+          setNombreMaquina(selectedMaquina.marcaMaquina);
+          setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
+          setError(null); // Limpia los errores si todo va bien
+          console.log("Máquina encontrada en el backend:", selectedMaquina); // Debugging
+        } else {
+          setError(`No se encontró la máquina con número de serie: ${selectedSerie}`);
+          setNombreMaquina('');
+          setUbicacionMaquina('');
+        }
+      } catch (err) {
+        console.error('Error al buscar la máquina:', err);
+        setError('Error al buscar la máquina. Inténtalo de nuevo.');
+      } finally {
+        setIsSearching(false);
       }
     } else {
       setNroSerieMaquina('');
       setNombreMaquina('');
       setUbicacionMaquina('');
+      setError(null);
     }
   };
 
+  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -72,6 +76,7 @@ const MantenimientoRegistro = () => {
 
       setSuccessMessage('Mantenimiento registrado exitosamente');
       setError(null);
+      // Limpiar el formulario
       setTipoMantenimiento('');
       setFechaMantenimiento('');
       setDescripcion('');
@@ -88,10 +93,7 @@ const MantenimientoRegistro = () => {
     }
   };
 
-  const maquinaOptions = maquinas.map(maquina => ({
-    value: maquina.nroSerieMaquina,
-    label: maquina.nroSerieMaquina,
-  }));
+  const isMaquinaValida = ubicacionMaquina !== ""; // Verificar si la ubicación está llena
 
   return (
     <div className="container mx-auto my-4 px-4 lg:px-20">
@@ -107,40 +109,52 @@ const MantenimientoRegistro = () => {
           </div>
         </div>
       )}
+      {isSearching && <p></p>}
       <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
         <div className="flex justify-center">
           <h1 className="font-bold uppercase text-3xl md:text-4xl text-center">Registrar Mantenimiento</h1>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 mt-5">
-            <div>
+            <div className="relative">
               <label className="block font-bold mb-2">Número de Serie</label>
-              <Select
-                value={maquinaOptions.find(option => option.value === nroSerieMaquina)}
+              <input
+                type="text"
+                value={nroSerieMaquina}
                 onChange={handleSerieChange}
-                options={maquinaOptions}
-                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                placeholder="Seleccione Número de Serie"
+                className={`w-full mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
+                  isMaquinaValida ? "bg-green-200" : "bg-gray-100"
+                } text-gray-900`}
+                placeholder="Ingrese Número de Serie de la maquina"
               />
+              {isMaquinaValida && (
+                <span className="absolute top-1/2 right-3 transform -translate-y-1/2 text-green-600 font-bold text-xl">
+                  ✔
+                </span>
+              )}
             </div>
             <div>
-              <label className="block font-bold mb-2">Marca de la Máquina</label>
+              <label className="block font-bold mb-2 text-gray-400">Marca de la Máquina</label>
               <input
                 type="text"
                 value={nombreMaquina}
                 readOnly
-                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                placeholder="Marca de la Máquina"
+                className={`w-full mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
+                  isMaquinaValida ? "bg-green-200" : "bg-gray-100"
+                } text-gray-900 font-bold`}
+                placeholder="Este campo se llenará automáticamente"
               />
             </div>
             <div>
-              <label className="block font-bold mb-2">Ubicación de la Máquina</label>
+              <label className="block font-bold mb-2 text-gray-400">Ubicación de la Máquina</label>
               <input
                 type="text"
                 value={ubicacionMaquina}
                 readOnly
-                className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
-                placeholder="Ubicación de la Máquina"
+                className={`w-full mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline ${
+                  isMaquinaValida ? "bg-green-200" : "bg-gray-100"
+                } text-gray-900 font-semibold`}
+                placeholder="Este campo se llenará automáticamente"
               />
             </div>
             <div>
