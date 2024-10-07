@@ -11,6 +11,16 @@ function AppAdmin() {
   const [userCount, setUserCount] = useState(0);
   const [latestUser, setLatestUser] = useState(null);
 
+  // Función para calcular los días restantes para el recordatorio
+  const calcularDiasRestantes = (fechaRecordatorio) => {
+    const fechaActual = new Date();
+    const fecha = new Date(fechaRecordatorio);
+    const diferencia = fecha - fechaActual; // Diferencia en milisegundos
+    const diasRestantes = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días
+
+    return diasRestantes;
+  };
+
   useEffect(() => {
     const fetchLatestUser = async () => {
       try {
@@ -46,7 +56,8 @@ function AppAdmin() {
 
   const fetchRecordatorios = async () => {
     try {
-      const response = await axios.get("/recordatorios");
+      // Usamos la nueva ruta para obtener los próximos 10 recordatorios
+      const response = await axios.get("/recordatorios/ultimos");
       setRecordatorios(response.data);
     } catch (error) {
       console.error("Error al obtener recordatorios:", error);
@@ -76,19 +87,29 @@ function AppAdmin() {
           {/* Card 2 */}
           <div className='col-span-2 flex flex-col items-center'>
             <div className='w-full'>
-              <h2 className="text-2xl font-bold mb-4 text-center ">Recordatorios</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center ">Recordatorios próximos a cumplir su fecha</h2>
               <ul className='w-full overflow-y-auto max-h-[315px]'>
                 {recordatorios.length === 0 ? (
                   <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
                 ) : (
-                  recordatorios.map(recordatorio => (
-                    <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
-                      <div >
-                        <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
-                        <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                      </div>
-                    </li>
-                  ))
+                  recordatorios.map(recordatorio => {
+                    const diasRestantes = calcularDiasRestantes(recordatorio.fechaRecordatorio);
+
+                    return (
+                      <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
+                        <div>
+                          {/* Mostrar el letrero de días restantes */}
+                          <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {diasRestantes < 0
+                              ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
+                              : `Faltan ${diasRestantes} días`}
+                          </span>
+                          <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
+                          <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
+                        </div>
+                      </li>
+                    );
+                  })
                 )}
               </ul>
             </div>
@@ -96,8 +117,8 @@ function AppAdmin() {
 
           {/* Card 3 */}
           <div className="p-6 bg-gray-800 text-white rounded-xl w-full h-full shadow-xl">
-            <div className="flex items-center gap-4 mb-4">
-              <h3 className="text-lg font-bold text-gray-100">Ultimo Usuario Creado</h3>
+          <div className="flex items-center gap-4 mb-4">
+              <h3 className="text-lg font-bold text-gray-100">Último Usuario Creado</h3>
             </div>
             {latestUser ? (
               <div className="flex items-center flex-col justify-between pt-3">
@@ -123,7 +144,7 @@ function AppAdmin() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
 export default AppAdmin;

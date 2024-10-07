@@ -1,51 +1,42 @@
 import React, { useState, useEffect } from "react";
+import { updateComponentesRequest, deleteComponentesRequest } from "../api/componentes";
 import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
-import TransferirMaquinaModal from "./TransferirMaquinaModal";
+import TransferirMaquinaModal from "./TransferirMaquinaModal"; // Modal de transferencia de máquina
 import ComponentesTable from "./ComponentesTable";
 import CardMaquinaModal from "./CardMaquinaModal";
-import {
-  deleteComponentesRequest,
-  updateComponentesRequest,
-} from "../api/componentes";
 import { deleteMaquinasRequest, updateMaquinasRequest } from "../api/maquinas";
 
 function ModalMaquina({ maquina, onClose }) {
-  const { componentes, getComponentes } = useComponentes();
-
+  const { componentes, getComponentes, pagination, loading } = useComponentes();
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
-  const [showComponentes, setShowComponentes] = useState(false);
-  const [showTransferirMaquinaModal, setShowTransferirMaquinaModal] =
-    useState(false);
+  const [showTransferirMaquinaModal, setShowTransferirMaquinaModal] = useState(false); // Transferir máquina
   const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
   const [editComponentId, setEditComponentId] = useState(null);
   const [editedComponent, setEditedComponent] = useState({});
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
 
-  // Cargar componentes cuando el modal se monta
+  // Cargar componentes cuando el modal se monta o cuando la página cambia
   useEffect(() => {
-    getComponentes();
-  }, []);
+    getComponentes(maquina._id, currentPage); // Cargar los componentes filtrados por máquina y paginados
+  }, [maquina._id, currentPage]);
 
-  // Filtrar y ordenar los componentes pertenecientes a la máquina
-  const sortedComponentes = componentes
-    .filter((componente) => componente.maquina === maquina._id)
-    .sort((a, b) => a.nombreComponente.localeCompare(b.nombreComponente));
-
-  const toggleComponentes = () => {
-    setShowComponentes(!showComponentes);
+  // Cambiar de página en la tabla de componentes
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handleTransferComplete = () => {
-    getComponentes();
+    getComponentes(maquina._id, currentPage);
     setShowTransferirModal(false);
   };
 
   const handleDeleteComponente = async (componenteId) => {
     try {
       await deleteComponentesRequest(componenteId);
-      getComponentes();
+      getComponentes(maquina._id, currentPage); // Recargar componentes después de la eliminación
     } catch (error) {
       console.error("Error al eliminar el componente:", error);
     }
@@ -77,7 +68,7 @@ function ModalMaquina({ maquina, onClose }) {
   const handleSaveClick = async () => {
     try {
       await updateComponentesRequest(editedComponent);
-      getComponentes();
+      getComponentes(maquina._id, currentPage); // Recargar componentes después de actualizar
       setEditComponentId(null);
     } catch (error) {
       console.error("Error al actualizar el componente:", error);
@@ -145,7 +136,7 @@ function ModalMaquina({ maquina, onClose }) {
           estadoMaquina={estadoMaquina}
           toggleEstadoMaquina={toggleEstadoMaquina}
           handleEliminarMaquina={handleEliminarMaquina}
-          setShowTransferirMaquinaModal={setShowTransferirMaquinaModal}
+          setShowTransferirMaquinaModal={setShowTransferirMaquinaModal} // Mostrar modal para transferir máquina
           updateMaquina={updateMaquina}
         />
 
@@ -153,7 +144,7 @@ function ModalMaquina({ maquina, onClose }) {
           <h1 className="text-xl text-slate-500 text-center py-3 font-bold mb-4">
             Componentes en {maquina.marcaMaquina} {maquina.modeloMaquina}
           </h1>
-          {sortedComponentes.length === 0 ? (
+          {componentes.length === 0 && !loading ? (
             <div className="flex flex-col items-center mt-4 space-y-4">
               <span className="text-gray-500 text-lg text-center">
                 Esta máquina aún no tiene componentes.
@@ -168,7 +159,7 @@ function ModalMaquina({ maquina, onClose }) {
           ) : (
             <>
               <ComponentesTable
-                sortedComponentes={sortedComponentes}
+                sortedComponentes={componentes} // Componentes paginados
                 editComponentId={editComponentId}
                 editedComponent={editedComponent}
                 handleEditClick={handleEditClick}
@@ -178,6 +169,25 @@ function ModalMaquina({ maquina, onClose }) {
                 handleDeleteComponente={handleDeleteComponente}
                 abrirDocumento={abrirDocumento}
               />
+
+              {/* Controles de paginación */}
+              {pagination.totalPages > 1 && (
+                <div className="flex justify-center mt-4">
+                  {[...Array(pagination.totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(index + 1)}
+                      className={`mx-1 px-4 py-2 rounded-md ${
+                        pagination.currentPage === index + 1
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className="flex justify-center space-x-4 mt-4">
                 <button
@@ -213,10 +223,10 @@ function ModalMaquina({ maquina, onClose }) {
         />
       )}
 
-      {showTransferirMaquinaModal && (
+      {showTransferirMaquinaModal && ( // Modal para transferir máquina
         <TransferirMaquinaModal
           maquina={maquina}
-          onClose={() => setShowTransferirMaquinaModal(false)}
+          onClose={() => setShowTransferirMaquinaModal(false)} // Cerrar el modal
         />
       )}
     </div>

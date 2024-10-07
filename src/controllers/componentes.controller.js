@@ -4,20 +4,68 @@ import { uploadFile, deleteImage } from "../libs/cloudinary.js";
 import fs from "fs-extra";
 
 // Obtener todos los componentes con detalles del usuario encargado
+// Obtener componentes paginados y filtrados por máquina
 export const getComponentes = async (req, res) => {
   try {
-    // Populate para traer los detalles del usuario encargado
-    const componentes = await Componente.find().populate("usuarioEncargado");
-    res.json(componentes);
+    const { maquinaId } = req.query;
+    const page = parseInt(req.query.page) || 1;  // Página actual
+    const limit = parseInt(req.query.limit) || 6; // Componentes por página
+
+    const skip = (page - 1) * limit;
+
+    // Filtrar componentes por máquina
+    const query = maquinaId ? { maquina: maquinaId } : {};
+
+    // Obtener el total de componentes que coinciden con el filtro
+    const totalComponentes = await Componente.countDocuments(query);
+
+    // Obtener los componentes con paginación y detalles del usuario encargado
+    const componentes = await Componente.find(query)
+      .populate("usuarioEncargado")
+      .skip(skip)
+      .limit(limit);
+
+    // Enviar los componentes junto con los datos de paginación
+    res.json({
+      componentes,
+      totalComponentes,
+      currentPage: page,
+      totalPages: Math.ceil(totalComponentes / limit),
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error al recuperar los componentes",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error al recuperar los componentes",
+      error: error.message,
+    });
   }
 };
+
+
+export const getComponenteBySerial = async (req, res) => {
+  try {
+    const { serial } = req.query;
+
+    // Verificar si se pasó el serial
+    if (!serial) {
+      return res.status(400).json({ message: "El número de serie es requerido" });
+    }
+
+    // Buscar el componente por número de serie
+    const componente = await Componente.findOne({ serialComponente: serial }).populate("usuarioEncargado");
+
+    if (!componente) {
+      return res.status(404).json({ message: "Componente no encontrado" });
+    }
+
+    res.json(componente);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al buscar el componente",
+      error: error.message,
+    });
+  }
+};
+
 
 // Obtener un componente por ID con detalles del usuario encargado
 export const getComponenteById = async (req, res) => {
@@ -38,6 +86,7 @@ export const getComponenteById = async (req, res) => {
       });
   }
 };
+
 
 // Crear un componente
 export const createComponente = async (req, res) => {
