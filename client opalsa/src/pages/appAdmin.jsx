@@ -15,8 +15,13 @@ function AppAdmin() {
   const calcularDiasRestantes = (fechaRecordatorio) => {
     const fechaActual = new Date();
     const fecha = new Date(fechaRecordatorio);
+
+    // Establecemos las horas a 0 para comparar solo la fecha
+    fechaActual.setHours(0, 0, 0, 0);
+    fecha.setHours(0, 0, 0, 0);
+
     const diferencia = fecha - fechaActual; // Diferencia en milisegundos
-    const diasRestantes = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días
+    const diasRestantes = Math.round(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días completos
 
     return diasRestantes;
   };
@@ -102,6 +107,8 @@ function AppAdmin() {
                           <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
                             {diasRestantes < 0
                               ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
+                              : diasRestantes === 0
+                              ? 'Recordatorio del dia de hoy'
                               : `Faltan ${diasRestantes} días`}
                           </span>
                           <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>

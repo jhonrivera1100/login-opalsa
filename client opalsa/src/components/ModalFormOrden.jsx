@@ -21,6 +21,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [serialSearch, setSerialSearch] = useState(''); // Estado para manejar el campo de búsqueda de serial
   const [searchMessage, setSearchMessage] = useState(''); // Estado para mensaje de búsqueda
   const [searchError, setSearchError] = useState(''); // Estado para error en búsqueda
+  const [previewImage, setPreviewImage] = useState(''); // Estado para mostrar la vista previa de la imagen
   const { user } = useAuth();
 
   useEffect(() => {
@@ -41,6 +42,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           const componentesSeleccionados = response.componentesAsignados.map(component => ({
             value: component.serialComponente,
             label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
+            marca: component.marcaComponente,
+            imagen: component.imagenComponente?.url
           }));
           setSelectedComponentes(componentesSeleccionados);
 
@@ -76,22 +79,21 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const handleSearchBySerial = async () => {
     if (serialSearch) {
       try {
-        // Llamar directamente a la función getComponenteBySerial y obtener el componente
         const componenteEncontrado = await getComponenteBySerial(serialSearch);
 
         if (componenteEncontrado) {
-          // Verificar si el componente ya ha sido agregado
           const yaAgregado = selectedComponentes.some(component => component.value === componenteEncontrado.serialComponente);
 
           if (!yaAgregado) {
             const nuevoComponente = {
               value: componenteEncontrado.serialComponente,
-              label: `${componenteEncontrado.nombreComponente} (Serial: ${componenteEncontrado.serialComponente} Marca: ${componenteEncontrado.marcaComponente})`,
+              label: `${componenteEncontrado.nombreComponente} (Serial: ${componenteEncontrado.serialComponente})`,
+              marca: componenteEncontrado.marcaComponente,
+              imagen: componenteEncontrado.imagenComponente?.url
             };
 
-            // Agregar el nuevo componente a la lista de componentes seleccionados
             setSelectedComponentes([...selectedComponentes, nuevoComponente]);
-            setSearchMessage(`Componente con serial ${serialSearch} agregado.`);
+            setSearchMessage(`Componente con serial ${serialSearch} encontrado.`);
             setSearchError('');
           } else {
             setSearchError(`Componente con serial ${serialSearch} ya ha sido agregado.`);
@@ -106,6 +108,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         setSearchMessage('');
       }
     }
+  };
+
+  const handleRemoveComponente = (serialComponente) => {
+    const updatedComponentes = selectedComponentes.filter(component => component.value !== serialComponente);
+    setSelectedComponentes(updatedComponentes);
   };
 
   const handleSubmit = async (event) => {
@@ -144,7 +151,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const componenteOptions = componentes.map((componente) => ({
     value: componente.serialComponente,
     label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
-    marcaComponente: componente.marcaComponente,
+    marca: componente.marcaComponente,
+    imagen: componente.imagenComponente?.url,
   }));
 
   return (
@@ -232,7 +240,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
               </button>
             </div>
 
-            {/* Mostrar mensajes de búsqueda */}
             {searchMessage && (
               <div className="bg-green-100 text-green-800 p-3 rounded-lg mt-2">
                 {searchMessage}
@@ -245,19 +252,46 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             )}
           </div>
 
-          {componentes.length > 0 && (
+          {/* Mostrar la lista de componentes seleccionados */}
+          {selectedComponentes.length > 0 && (
             <div className="mt-4">
               <h4 className="text-gray-600 mb-2 font-bold">Componentes Seleccionados</h4>
-              <Select
-                isMulti
-                name="componentes"
-                options={componenteOptions}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={selectedComponentes}
-                onChange={handleComponentesChange}
-                placeholder="Selecciona componentes"
-              />
+              <ul>
+                {selectedComponentes.map((componente, index) => (
+                  <li key={index} className="bg-gray-100 p-2 rounded mb-2 flex items-center relative">
+                    {componente.imagen && (
+                      <div
+                        onMouseEnter={() => setPreviewImage(componente.imagen)}
+                        onMouseLeave={() => setPreviewImage('')}
+                        className="mr-4"
+                      >
+                        <img
+                          src={componente.imagen}
+                          alt={`Imagen de ${componente.label}`}
+                          className="w-20 h-20 object-cover cursor-pointer"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <p>{componente.label}</p>
+                      <p className="text-sm text-gray-600">Marca: {componente.marca}</p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveComponente(componente.value)}
+                      className="ml-auto bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Vista previa de la imagen */}
+          {previewImage && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 p-2 shadow-lg">
+              <img src={previewImage} alt="Vista previa" className="w-64 h-64 object-cover" />
             </div>
           )}
 

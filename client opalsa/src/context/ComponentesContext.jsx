@@ -59,6 +59,7 @@ export function ComponentesProvider({ children }) {
     }
   };
   
+  
 
   const createComponente = async (componenteData) => {
     try {
