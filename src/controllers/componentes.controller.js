@@ -50,14 +50,14 @@ export const getComponenteBySerial = async (req, res) => {
       return res.status(400).json({ message: "El número de serie es requerido" });
     }
 
-    // Buscar el componente por número de serie
-    const componente = await Componente.findOne({ serialComponente: serial }).populate("usuarioEncargado");
+    // Buscar todos los componentes que coincidan con el número de serie
+    const componentes = await Componente.find({ serialComponente: serial }).populate("usuarioEncargado");
 
-    if (!componente) {
+    if (componentes.length === 0) {
       return res.status(404).json({ message: "Componente no encontrado" });
     }
 
-    res.json(componente);
+    res.json(componentes);
   } catch (error) {
     res.status(500).json({
       message: "Error al buscar el componente",
@@ -65,6 +65,7 @@ export const getComponenteBySerial = async (req, res) => {
     });
   }
 };
+
 
 
 // Obtener un componente por ID con detalles del usuario encargado

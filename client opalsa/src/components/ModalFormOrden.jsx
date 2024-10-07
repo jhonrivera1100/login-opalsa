@@ -40,6 +40,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
           // Actualizar selectedComponentes con los componentes ya asignados a la orden
           const componentesSeleccionados = response.componentesAsignados.map(component => ({
+            id: component._id,
             value: component.serialComponente,
             label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
             marca: component.marcaComponente,
@@ -79,39 +80,43 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const handleSearchBySerial = async () => {
     if (serialSearch) {
       try {
-        const componenteEncontrado = await getComponenteBySerial(serialSearch);
+        // Obtener todos los componentes con el número de serie
+        const componentesEncontrados = await getComponenteBySerial(serialSearch);
 
-        if (componenteEncontrado) {
-          const yaAgregado = selectedComponentes.some(component => component.value === componenteEncontrado.serialComponente);
+        if (componentesEncontrados && componentesEncontrados.length > 0) {
+          // Filtrar los que ya están agregados para no duplicar
+          const nuevosComponentes = componentesEncontrados.filter(
+            (componente) => !selectedComponentes.some((selComp) => selComp.id === componente._id)
+          ).map((componente) => ({
+            id: componente._id,
+            value: componente.serialComponente,
+            label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+            marca: componente.marcaComponente,
+            imagen: componente.imagenComponente?.url,
+          }));
 
-          if (!yaAgregado) {
-            const nuevoComponente = {
-              value: componenteEncontrado.serialComponente,
-              label: `${componenteEncontrado.nombreComponente} (Serial: ${componenteEncontrado.serialComponente})`,
-              marca: componenteEncontrado.marcaComponente,
-              imagen: componenteEncontrado.imagenComponente?.url
-            };
-
-            setSelectedComponentes([...selectedComponentes, nuevoComponente]);
-            setSearchMessage(`Componente con serial ${serialSearch} encontrado.`);
+          // Agregar los nuevos componentes a la lista seleccionada
+          if (nuevosComponentes.length > 0) {
+            setSelectedComponentes([...selectedComponentes, ...nuevosComponentes]);
+            setSearchMessage(`Componentes con serial ${serialSearch} agregados.`);
             setSearchError('');
           } else {
-            setSearchError(`Componente con serial ${serialSearch} ya ha sido agregado.`);
+            setSearchError(`Todos los componentes con serial ${serialSearch} ya han sido agregados.`);
             setSearchMessage('');
           }
         } else {
-          setSearchError(`Componente con serial ${serialSearch} no encontrado.`);
+          setSearchError(`No se encontraron componentes con serial ${serialSearch}.`);
           setSearchMessage('');
         }
       } catch (error) {
-        setSearchError('Ocurrió un error al buscar el componente.');
+        setSearchError('Ocurrió un error al buscar los componentes.');
         setSearchMessage('');
       }
     }
   };
 
-  const handleRemoveComponente = (serialComponente) => {
-    const updatedComponentes = selectedComponentes.filter(component => component.value !== serialComponente);
+  const handleRemoveComponente = (id) => {
+    const updatedComponentes = selectedComponentes.filter(component => component.id !== id);
     setSelectedComponentes(updatedComponentes);
   };
 
@@ -149,6 +154,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
+    id: componente._id,
     value: componente.serialComponente,
     label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
     marca: componente.marcaComponente,
@@ -277,7 +283,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
                       <p className="text-sm text-gray-600">Marca: {componente.marca}</p>
                     </div>
                     <button
-                      onClick={() => handleRemoveComponente(componente.value)}
+                      onClick={() => handleRemoveComponente(componente.id)}
                       className="ml-auto bg-red-500 text-white px-2 py-1 rounded"
                     >
                       Eliminar
