@@ -7,6 +7,7 @@ import {
   getMaquinasByCasinoRequest,
   getAllMaquinasRequest,
   buscarMaquinaPorNumeroDeSerieRequest,
+  buscarMaquinaPorSerieFlexibleRequest, // Importar la nueva petición
 } from "../api/maquinas.js";
 
 const MaquinaContext = createContext();
@@ -47,10 +48,21 @@ export function MaquinasProvider({ children }) {
     }
   }, []);
 
-  // Buscar máquina por número de serie (cuando no se encuentra localmente)
+  // Buscar máquina por número de serie (exacta)
   const buscarMaquinaPorSerie = useCallback(async (nroSerieMaquina) => {
     try {
       const res = await buscarMaquinaPorNumeroDeSerieRequest(nroSerieMaquina); // Petición para buscar máquina por número de serie
+      return res.data; // Retornar la máquina encontrada
+    } catch (error) {
+      console.error("Error al buscar la máquina por número de serie:", error);
+      return null; // Retornar null si ocurre un error
+    }
+  }, []);
+
+  // Nueva función: Buscar máquina por número de serie flexible (exacta o parcial)
+  const buscarMaquinaPorSerieFlexible = useCallback(async (nroSerieMaquina, exact = false) => {
+    try {
+      const res = await buscarMaquinaPorSerieFlexibleRequest(nroSerieMaquina, exact); // Petición al backend para búsqueda flexible
       return res.data; // Retornar la máquina encontrada
     } catch (error) {
       console.error("Error al buscar la máquina por número de serie:", error);
@@ -117,7 +129,8 @@ export function MaquinasProvider({ children }) {
         totalPages,
         loadMaquinas, // Cargar máquinas de forma paginada
         loadAllMaquinas, // Cargar todas las máquinas con campos limitados (solución híbrida)
-        buscarMaquinaPorSerie, // Buscar máquina por número de serie
+        buscarMaquinaPorSerie, // Buscar máquina por número de serie exacto
+        buscarMaquinaPorSerieFlexible, // Nueva funcionalidad: Búsqueda flexible
         loadMaquinasByCasino, // Cargar máquinas por casino
         createMaquina, // Crear máquina
         updateMaquina, // Actualizar máquina

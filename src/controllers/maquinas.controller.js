@@ -64,6 +64,38 @@ export const buscarMaquinaPorNumeroDeSerie = async (req, res) => {
 
 
 
+export const buscarMaquinaPorSerieFlexible = async (req, res) => {
+  const { nroSerieMaquina, exact } = req.query; // Obtener el número de serie y el parámetro exact desde la query
+
+  if (!nroSerieMaquina) {
+    return res.status(400).json({ message: 'El número de serie es requerido' });
+  }
+
+  try {
+    // Si el parámetro `exact` es verdadero, hacemos una búsqueda exacta
+    let query = {};
+    if (exact === 'true') {
+      query.nroSerieMaquina = nroSerieMaquina; // Búsqueda exacta
+    } else {
+      query.nroSerieMaquina = { $regex: nroSerieMaquina, $options: 'i' }; // Coincidencia parcial (insensible a mayúsculas)
+    }
+
+    // Buscar la máquina en la base de datos
+    const maquina = await Maquinas.findOne(query).select('nroSerieMaquina marcaMaquina ubicacionMaquina fechaInstalacionMaquina estadoMaquina imgMaquina.url');
+
+    if (!maquina) {
+      return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });
+    }
+
+    res.json(maquina);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar la máquina', error: error.message });
+  }
+};
+
+
+
+
 export const traerMaquinasPorCasino = async (req, res) => {
   const { nombreCasino } = req.query; // Obtenemos el nombre del casino desde la query
   try {
