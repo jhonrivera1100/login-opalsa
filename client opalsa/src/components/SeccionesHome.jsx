@@ -40,11 +40,16 @@ function SeccionesHome() {
   }, []); // El efecto depende solo del montaje del componente, no de otras variables.
 
   // Fetch de máquinas dependiendo de la sección y la paginación
+  // Fetch de máquinas dependiendo de la sección, página y marca seleccionada
   useEffect(() => {
     if (section === "Maquinas") {
       const fetchMaquinas = async () => {
         try {
-          const maquinasResponse = await getMaquinasRequest(currentPageMaquinas, itemsPerPage);
+          const maquinasResponse = await getMaquinasRequest(
+            currentPageMaquinas,
+            itemsPerPage,
+            selectedBrand
+          ); // Ahora se incluye la marca en la petición
           setMaquinas(maquinasResponse.data.maquinas);
           setTotalPagesMaquinas(maquinasResponse.data.totalPages); // Ajustamos el total de páginas
         } catch (error) {
@@ -53,7 +58,8 @@ function SeccionesHome() {
       };
       fetchMaquinas();
     }
-  }, [section, currentPageMaquinas, itemsPerPage]); // Solo recargar máquinas cuando se cambia a la sección "Maquinas" o la página
+  }, [section, currentPageMaquinas, itemsPerPage, selectedBrand]); // Se agrega selectedBrand como dependencia
+  // Solo recargar máquinas cuando se cambia a la sección "Maquinas" o la página
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -87,7 +93,9 @@ function SeccionesHome() {
   };
 
   const handleNextPageMaquinas = () => {
-    setCurrentPageMaquinas((prevPage) => Math.min(prevPage + 1, totalPagesMaquinas)); // Incrementar la página de máquinas
+    setCurrentPageMaquinas((prevPage) =>
+      Math.min(prevPage + 1, totalPagesMaquinas)
+    ); // Incrementar la página de máquinas
   };
 
   // Funciones para paginación de casinos

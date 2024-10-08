@@ -36,7 +36,9 @@ const SectionContent = ({
   useEffect(() => {
     const fetchFilteredMaquinas = async () => {
       if (section === "Maquinas" && searchQuery) {
-        const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(searchQuery); // Eliminado el parámetro exactSearch
+        const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(
+          searchQuery
+        ); // Eliminado el parámetro exactSearch
         if (maquinasFiltradas) {
           setFilteredMaquinas([maquinasFiltradas]); // Guardar la máquina encontrada
         } else {
@@ -115,7 +117,7 @@ const SectionContent = ({
           />
           <select
             value={selectedBrand}
-            onChange={handleFilterChange}
+            onChange={handleFilterChange} // Mantiene la lógica para actualizar la marca seleccionada
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las marcas</option>
@@ -123,9 +125,18 @@ const SectionContent = ({
             <option value="NOVOMATIC">NOVOMATIC</option>
             <option value="WILLIAMS">WILLIAMS</option>
             <option value="IGT">IGT</option>
-            <option value="GOLDCLUB">GOLD CLUB</option>
-            <option value="RFRANCO">R FRANCO</option>
-            
+            <option value="GOLD CLUB">GOLD CLUB</option>
+            <option value="R FRANCO">R FRANCO</option>
+            <option value="HOTBOX">HOTBOX</option>
+            <option value="BALLY">BALLY</option>
+            <option value="SPIELO">SPIELO</option>
+            <option value="ZITRO">ZITRO</option>
+            <option value="POKER">POKER</option>
+            <option value="ALFA STREET">ALFA STREET</option>
+            <option value="MERKUR">MERKUR</option>
+            <option value="GTS">GTS</option>
+            <option value="KONAMI">KONAMI</option>
+            <option value="ARISTOCRAT">ARISTOCRAT</option>
           </select>
         </div>
       )}

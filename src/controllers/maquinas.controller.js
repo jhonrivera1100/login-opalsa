@@ -4,14 +4,19 @@ import fs from "fs-extra";
 import mongoose from "mongoose"; // Asegúrate de importar mongoose para validar ObjectId
 
 // Traer todas las máquinas
+// Traer todas las máquinas con paginación y filtro por marca
 export const traerMaquinas = async (req, res) => {
-  const { page = 1, limit = 8 } = req.query; // Valores predeterminados de paginación
+  const { page = 1, limit = 8, marca = "" } = req.query; // Valores predeterminados de paginación y filtro
 
   try {
-    // Calcular el total de máquinas
-    const totalMaquinas = await Maquinas.countDocuments();
-    // Aplicar paginación y traer las máquinas
-    const maquinas = await Maquinas.find()
+    // Filtramos las máquinas por marca si el parámetro de marca está presente
+    const query = marca ? { marcaMaquina: marca } : {};
+
+    // Calcular el total de máquinas que coinciden con el filtro
+    const totalMaquinas = await Maquinas.countDocuments(query);
+
+    // Aplicar paginación y traer las máquinas filtradas
+    const maquinas = await Maquinas.find(query)
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
@@ -27,6 +32,7 @@ export const traerMaquinas = async (req, res) => {
     });
   }
 };
+
 
 // Traer todas las máquinas (para el componente MantenimientoRegistro)
 // Traer todas las máquinas con campos específicos para el registro de mantenimientos

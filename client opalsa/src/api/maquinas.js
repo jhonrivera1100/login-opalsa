@@ -1,9 +1,9 @@
 import axios from './axios';
 
 // Obtener todas las máquinas
-export const getMaquinasRequest = (page, limit = 8) => {
+export const getMaquinasRequest = (page, limit = 8, marca = "") => {
   return axios.get('/maquina', {
-    params: { page, limit },
+    params: { page, limit, marca }, // Se incluye el parámetro marca
   });
 };
 
