@@ -79,11 +79,11 @@ function AppAdmin() {
         <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
 
           {/* Card 1 */}
-          <div className='bg-sidebar-100 p-6 rounded-xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-2xl'>
-            <FaUsers className='text-7xl' />
-            <h4 className='text-3xl'>Total Usuarios</h4>
+          <div className='bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl'>
+            <FaUsers className='text-7xl animate-pulse' />
+            <h4 className='text-3xl font-semibold'>Total Usuarios</h4>
             <div>
-              <span className='flex text-3xl text-white'>
+              <span className='flex text-4xl text-white font-bold'>
                 {userCount} Usuarios
               </span>
             </div>
@@ -92,7 +92,7 @@ function AppAdmin() {
           {/* Card 2 */}
           <div className='col-span-2 flex flex-col items-center'>
             <div className='w-full'>
-              <h2 className="text-2xl font-bold mb-4 text-center ">Recordatorios próximos a cumplir su fecha</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center">Recordatorios próximos a cumplir su fecha</h2>
               <ul className='w-full overflow-y-auto max-h-[315px]'>
                 {recordatorios.length === 0 ? (
                   <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
@@ -101,14 +101,13 @@ function AppAdmin() {
                     const diasRestantes = calcularDiasRestantes(recordatorio.fechaRecordatorio);
 
                     return (
-                      <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
+                      <li key={recordatorio._id} className={`bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg  duration-300 hover:scale-100 hover:shadow-2xl ${diasRestantes < 0 ? 'border-l-4 border-red-600' : 'border-l-4 border-green-600'}`}>
                         <div>
-                          {/* Mostrar el letrero de días restantes */}
                           <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
                             {diasRestantes < 0
                               ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
                               : diasRestantes === 0
-                              ? 'Recordatorio del dia de hoy'
+                              ? 'Recordatorio del día de hoy'
                               : `Faltan ${diasRestantes} días`}
                           </span>
                           <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
@@ -123,8 +122,8 @@ function AppAdmin() {
           </div>
 
           {/* Card 3 */}
-          <div className="p-6 bg-gray-800 text-white rounded-xl w-full h-full shadow-xl">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="p-6 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-2xl w-full h-full shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+            <div className="flex items-center gap-4 mb-4">
               <h3 className="text-lg font-bold text-gray-100">Último Usuario Creado</h3>
             </div>
             {latestUser ? (
