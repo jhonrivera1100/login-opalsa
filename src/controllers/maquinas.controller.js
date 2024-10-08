@@ -4,14 +4,19 @@ import fs from "fs-extra";
 import mongoose from "mongoose"; // Asegúrate de importar mongoose para validar ObjectId
 
 // Traer todas las máquinas
+// Traer todas las máquinas con paginación y filtro por marca
 export const traerMaquinas = async (req, res) => {
-  const { page = 1, limit = 8 } = req.query; // Valores predeterminados de paginación
+  const { page = 1, limit = 8, marca = "" } = req.query; // Valores predeterminados de paginación y filtro
 
   try {
-    // Calcular el total de máquinas
-    const totalMaquinas = await Maquinas.countDocuments();
-    // Aplicar paginación y traer las máquinas
-    const maquinas = await Maquinas.find()
+    // Filtramos las máquinas por marca si el parámetro de marca está presente
+    const query = marca ? { marcaMaquina: marca } : {};
+
+    // Calcular el total de máquinas que coinciden con el filtro
+    const totalMaquinas = await Maquinas.countDocuments(query);
+
+    // Aplicar paginación y traer las máquinas filtradas
+    const maquinas = await Maquinas.find(query)
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
@@ -27,6 +32,7 @@ export const traerMaquinas = async (req, res) => {
     });
   }
 };
+
 
 // Traer todas las máquinas (para el componente MantenimientoRegistro)
 // Traer todas las máquinas con campos específicos para el registro de mantenimientos
@@ -50,6 +56,38 @@ export const buscarMaquinaPorNumeroDeSerie = async (req, res) => {
 
   try {
     const maquina = await Maquinas.findOne({ nroSerieMaquina }).select('nroSerieMaquina marcaMaquina ubicacionMaquina');
+
+    if (!maquina) {
+      return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });
+    }
+
+    res.json(maquina);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar la máquina', error: error.message });
+  }
+};
+
+
+
+
+export const buscarMaquinaPorSerieFlexible = async (req, res) => {
+  const { nroSerieMaquina, exact } = req.query; // Obtener el número de serie y el parámetro exact desde la query
+
+  if (!nroSerieMaquina) {
+    return res.status(400).json({ message: 'El número de serie es requerido' });
+  }
+
+  try {
+    // Si el parámetro `exact` es verdadero, hacemos una búsqueda exacta
+    let query = {};
+    if (exact === 'true') {
+      query.nroSerieMaquina = nroSerieMaquina; // Búsqueda exacta
+    } else {
+      query.nroSerieMaquina = { $regex: nroSerieMaquina, $options: 'i' }; // Coincidencia parcial (insensible a mayúsculas)
+    }
+
+    // Buscar la máquina en la base de datos
+    const maquina = await Maquinas.findOne(query).select('nroSerieMaquina marcaMaquina ubicacionMaquina fechaInstalacionMaquina estadoMaquina imgMaquina.url');
 
     if (!maquina) {
       return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });

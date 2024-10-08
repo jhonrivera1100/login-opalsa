@@ -95,7 +95,7 @@ const RespuestasOrden = () => {
         </div>
 
         {/* Contenedor de las órdenes */}
-        <div className="h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <div className="h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 pl-[70px] pt-[50px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredOrdenes.length === 0 ? (
               <p>No se encontraron órdenes.</p>
@@ -124,7 +124,7 @@ const RespuestasOrden = () => {
                   </div>
                   <div className="mt-4">
                     <h4 className="text-xl font-semibold text-gray-800">
-                      Numero de orden {orden.numeroOrden}
+                      Numero de orden  <br /> {orden.numeroOrden}
                     </h4>
                     <p className="mt-1 text-gray-600">
                       Estado: {orden.estadoOrden}

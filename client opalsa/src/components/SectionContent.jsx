@@ -1,18 +1,19 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import MaquinaCard from "../components/MaquinaCard";
 import CasinoCard from "./CasinoCard";
 import CasinoDetail from "../components/CasinoDetail";
+import { useMaquinas } from "../context/MaquinasContext"; // Importamos el contexto
 
 const SectionContent = ({
   section,
   selectedCasino,
-  maquinas,
+  maquinas, // Ya no se usará directamente para filtrar por serie
   casinos,
   searchQuery,
   selectedBrand,
   cityFilter,
   currentPageMaquinas,
-  totalPagesMaquinas, // Añadido para controlar la cantidad total de páginas
+  totalPagesMaquinas,
   currentPageCasinos,
   itemsPerPage,
   handleSearch,
@@ -27,41 +28,39 @@ const SectionContent = ({
   handlePreviousPageCasinos,
   handleNextPageCasinos,
 }) => {
-  // Memoizamos las máquinas filtradas dependiendo de la sección
-  const filteredMaquinas = useMemo(() => {
-    // Si estamos en la sección de Casinos, se aplican los filtros por casino seleccionado
-    if (section === "Casinos" && selectedCasino) {
-      return maquinas.filter((maquina) => {
-        const maquinaUbicacion = maquina.ubicacionMaquina || "";
-        const maquinaNombre = maquina.nombreMaquina || "";
-        const maquinaSerie = maquina.nroSerieMaquina || "";
+  const { buscarMaquinaPorSerieFlexible } = useMaquinas(); // Hook para acceder a la función de búsqueda flexible
 
-        return (
-          maquinaUbicacion === selectedCasino.nombreCasino &&
-          (maquinaNombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            maquinaSerie.toLowerCase().includes(searchQuery.toLowerCase())) &&
-          (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-        );
-      });
-    }
-    
-    // Si estamos en la sección de máquinas, traemos todas las máquinas sin filtrar por casino
-    if (section === "Maquinas") {
-      return maquinas.filter(
-        (maquina) =>
-          maquina.nroSerieMaquina
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) &&
-          (selectedBrand === "" || maquina.marcaMaquina === selectedBrand)
-      );
-    }
+  const [filteredMaquinas, setFilteredMaquinas] = useState(maquinas); // Estado local para almacenar máquinas filtradas
 
-    // Por defecto, si no hay sección o condiciones, devolvemos todas las máquinas
-    return maquinas;
-  }, [maquinas, selectedCasino, searchQuery, selectedBrand, section]);
+  // Efecto para buscar máquinas por número de serie en el backend cuando cambia el query
+  useEffect(() => {
+    const fetchFilteredMaquinas = async () => {
+      if (section === "Maquinas" && searchQuery) {
+        const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(
+          searchQuery
+        ); // Eliminado el parámetro exactSearch
+        if (maquinasFiltradas) {
+          setFilteredMaquinas([maquinasFiltradas]); // Guardar la máquina encontrada
+        } else {
+          setFilteredMaquinas([]); // Si no se encuentra nada, lista vacía
+        }
+      } else {
+        setFilteredMaquinas(maquinas); // Resetear las máquinas si no hay búsqueda activa
+      }
+    };
+
+    fetchFilteredMaquinas();
+  }, [searchQuery, section, maquinas, buscarMaquinaPorSerieFlexible]);
+
+  // Renderizado de las tarjetas de máquinas usando las filtradas del backend
+  const renderMaquinas = useCallback(() => {
+    return filteredMaquinas.map((maquina) => (
+      <MaquinaCard key={maquina._id} maquina={maquina} />
+    ));
+  }, [filteredMaquinas]);
 
   // Memoizamos los casinos filtrados basados en los filtros de búsqueda y ciudad
-  const filteredCasinos = useMemo(() => {
+  const filteredCasinos = useCallback(() => {
     return casinos.filter(
       (casino) =>
         casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -70,15 +69,8 @@ const SectionContent = ({
     );
   }, [casinos, searchQuery, cityFilter]);
 
-  // Renderizado de las tarjetas de máquinas y casinos
-  const renderMaquinas = useCallback(() => {
-    return filteredMaquinas.map((maquina) => (
-      <MaquinaCard key={maquina._id} maquina={maquina} />
-    ));
-  }, [filteredMaquinas]);
-
   const renderCasinos = useCallback(() => {
-    return filteredCasinos.map((casino) => (
+    return filteredCasinos().map((casino) => (
       <CasinoCard
         key={casino._id}
         casino={casino}
@@ -125,14 +117,26 @@ const SectionContent = ({
           />
           <select
             value={selectedBrand}
-            onChange={handleFilterChange}
+            onChange={handleFilterChange} // Mantiene la lógica para actualizar la marca seleccionada
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las marcas</option>
             <option value="AINSWORTH">AINSWORTH</option>
             <option value="NOVOMATIC">NOVOMATIC</option>
             <option value="WILLIAMS">WILLIAMS</option>
-            <option value="OPALSA">OTRO</option>
+            <option value="IGT">IGT</option>
+            <option value="GOLD CLUB">GOLD CLUB</option>
+            <option value="R FRANCO">R FRANCO</option>
+            <option value="HOTBOX">HOTBOX</option>
+            <option value="BALLY">BALLY</option>
+            <option value="SPIELO">SPIELO</option>
+            <option value="ZITRO">ZITRO</option>
+            <option value="POKER">POKER</option>
+            <option value="ALFA STREET">ALFA STREET</option>
+            <option value="MERKUR">MERKUR</option>
+            <option value="GTS">GTS</option>
+            <option value="KONAMI">KONAMI</option>
+            <option value="ARISTOCRAT">ARISTOCRAT</option>
           </select>
         </div>
       )}
@@ -203,7 +207,7 @@ const SectionContent = ({
           <button
             onClick={handleNextPageCasinos}
             disabled={
-              currentPageCasinos * itemsPerPage >= filteredCasinos.length
+              currentPageCasinos * itemsPerPage >= filteredCasinos().length
             }
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >

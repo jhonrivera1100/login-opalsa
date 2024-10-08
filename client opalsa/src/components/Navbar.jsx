@@ -70,12 +70,12 @@ function Navbar() {
 
   const handleNavigate = (path) => {
     navigate(path);
-    window.location.reload(); // Forzamos una recarga de la página cuando navegamos a "Perfil"
+    closeMenu(); // Cerrar el menú si está abierto en vista móvil
   };
 
-  const renderLink = (to, icon, label, isReload = false) => (
+  const renderLink = (to, icon, label) => (
     <div
-      onClick={() => (isReload ? handleNavigate(to) : navigate(to))}
+      onClick={() => handleNavigate(to)}
       className={getLinkClass(to)}
       style={{ cursor: "pointer" }}
     >
@@ -94,7 +94,7 @@ function Navbar() {
       {renderLink("/GestionMaquinas", <FaCog className={getIconClass("/GestionMaquinas")} />, "Gestión")}
       {renderLink("/Historial", <FaHistory className={getIconClass("/Historial")} />, "Historial")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil", true)} {/* Forzar recarga en perfil */}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
       {renderLink("/admin", <FaUserShield className={getIconClass("/admin")} />, "Administrador")}
     </>
   );
@@ -103,8 +103,8 @@ function Navbar() {
     <>
       {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
-      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil", true)} {/* Forzar recarga en perfil */}
-      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden", true)} {/* Forzar recarga */}
+      {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
+      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden")}
     </>
   );
 

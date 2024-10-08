@@ -9,3 +9,4 @@ export const verifyTokenRequest = (token) => axios.get('/verify', {
   withCredentials: true
 });
 export const updateUserRequest = (id, user) => axios.put(`/users/${id}`, user, { withCredentials: true });
+export const getUserDataRequest = (userId) => axios.get(`/users/${userId}`, { withCredentials: true });

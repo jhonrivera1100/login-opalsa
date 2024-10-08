@@ -7,6 +7,7 @@ import {
   getMaquinasByCasinoRequest,
   getAllMaquinasRequest,
   buscarMaquinaPorNumeroDeSerieRequest,
+  buscarMaquinaPorSerieFlexibleRequest, // Importar la nueva petición
 } from "../api/maquinas.js";
 
 const MaquinaContext = createContext();
@@ -24,11 +25,12 @@ export function MaquinasProvider({ children }) {
   const [noMaquinas, setNoMaquinas] = useState(false); // Bandera para indicar si no hay máquinas
   const [currentPage, setCurrentPage] = useState(1); // Página actual para la paginación
   const [totalPages, setTotalPages] = useState(1); // Total de páginas de máquinas para la paginación
+  const [selectedBrand, setSelectedBrand] = useState(""); // Almacena la marca seleccionada para el filtro
 
-  // Cargar máquinas de forma paginada
-  const loadMaquinas = useCallback(async (page = 1) => {
+  // Cargar máquinas de forma paginada y filtradas por marca
+  const loadMaquinas = useCallback(async (page = 1, limit = 8, marca = "") => {
     try {
-      const res = await getMaquinasRequest(page); // Petición para cargar máquinas con paginación
+      const res = await getMaquinasRequest(page, limit, marca); // Petición para cargar máquinas con paginación y filtro por marca
       setMaquinas(res.data.maquinas); // Guardar las máquinas recibidas
       setTotalPages(res.data.totalPages); // Establecer el total de páginas
       setCurrentPage(res.data.currentPage); // Establecer la página actual
@@ -47,10 +49,21 @@ export function MaquinasProvider({ children }) {
     }
   }, []);
 
-  // Buscar máquina por número de serie (cuando no se encuentra localmente)
+  // Buscar máquina por número de serie (exacta)
   const buscarMaquinaPorSerie = useCallback(async (nroSerieMaquina) => {
     try {
       const res = await buscarMaquinaPorNumeroDeSerieRequest(nroSerieMaquina); // Petición para buscar máquina por número de serie
+      return res.data; // Retornar la máquina encontrada
+    } catch (error) {
+      console.error("Error al buscar la máquina por número de serie:", error);
+      return null; // Retornar null si ocurre un error
+    }
+  }, []);
+
+  // Nueva función: Buscar máquina por número de serie flexible (exacta o parcial)
+  const buscarMaquinaPorSerieFlexible = useCallback(async (nroSerieMaquina, exact = false) => {
+    try {
+      const res = await buscarMaquinaPorSerieFlexibleRequest(nroSerieMaquina, exact); // Petición al backend para búsqueda flexible
       return res.data; // Retornar la máquina encontrada
     } catch (error) {
       console.error("Error al buscar la máquina por número de serie:", error);
@@ -115,14 +128,16 @@ export function MaquinasProvider({ children }) {
         noMaquinas,
         currentPage,
         totalPages,
-        loadMaquinas, // Cargar máquinas de forma paginada
+        loadMaquinas, // Cargar máquinas de forma paginada con filtro por marca
         loadAllMaquinas, // Cargar todas las máquinas con campos limitados (solución híbrida)
-        buscarMaquinaPorSerie, // Buscar máquina por número de serie
+        buscarMaquinaPorSerie, // Buscar máquina por número de serie exacto
+        buscarMaquinaPorSerieFlexible, // Nueva funcionalidad: Búsqueda flexible
         loadMaquinasByCasino, // Cargar máquinas por casino
         createMaquina, // Crear máquina
         updateMaquina, // Actualizar máquina
         deleteMaquina, // Eliminar máquina
         setCurrentPage, // Establecer la página actual para paginación
+        setSelectedBrand, // Establecer la marca seleccionada para el filtro
       }}
     >
       {children}

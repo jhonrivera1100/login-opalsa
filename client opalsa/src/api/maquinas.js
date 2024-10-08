@@ -1,9 +1,9 @@
 import axios from './axios';
 
 // Obtener todas las máquinas
-export const getMaquinasRequest = (page, limit = 8) => {
+export const getMaquinasRequest = (page, limit = 8, marca = "") => {
   return axios.get('/maquina', {
-    params: { page, limit },
+    params: { page, limit, marca }, // Se incluye el parámetro marca
   });
 };
 
@@ -16,6 +16,17 @@ export const buscarMaquinaPorNumeroDeSerieRequest = async (nroSerieMaquina) => {
   });
 };
 
+
+
+// Nueva función: Buscar máquina por número de serie flexible (exacta o parcial)
+export const buscarMaquinaPorSerieFlexibleRequest = async (nroSerieMaquina, exact = false) => {
+  return axios.get(`/maquina/buscar/serie-flexible`, {
+    params: { nroSerieMaquina, exact }, // Se pasa el número de serie y si es búsqueda exacta
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`, // Incluir el token de autenticación
+    },
+  });
+};
 
 export const getAllMaquinasRequest = async () =>
   await axios.get("/maquina/all"); // Nueva ruta para obtener todas las máquinas

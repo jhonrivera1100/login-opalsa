@@ -62,7 +62,7 @@ export const obtenerOrdenPorId = async (req, res) => {
 // Crear una nueva orden
 export const createOrden = async (req, res) => {
   try {
-    console.log('Datos recibidos:', req.body);  // Para verificar los datos que llegan desde el frontend
+    console.log('Datos recibidos:', req.body);
 
     const { descripcionOrden, nroSerieMaquina, marcaMaquina, ubicacionMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
@@ -71,7 +71,17 @@ export const createOrden = async (req, res) => {
     }
 
     const fechaOrden = new Date();
-    const numeroOrden = uuidv4();
+    // Formato de fecha: ddmmaaaa
+    const day = fechaOrden.getDate().toString().padStart(2, '0');
+    const month = (fechaOrden.getMonth() + 1).toString().padStart(2, '0');
+    const year = fechaOrden.getFullYear();
+    const fechaStr = `${day}${month}${year}`;
+
+    // Generar parte única basada en UUID (una porción más pequeña y legible)
+    const shortUuid = uuidv4().split('-')[0]; // Usar solo una parte del UUID
+
+    // Formato del número de orden mejorado
+    const numeroOrden = `ORD-${fechaStr}-${shortUuid}`; // Por ejemplo: "ORD-08102023-5f2c"
 
     // Verificar que el usuario exista
     const usuarioObj = await User.findOne({ username: usuario });
@@ -80,16 +90,14 @@ export const createOrden = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
-    console.log('Usuario encontrado:', usuarioObj); // Para verificar si se encuentra el usuario
+    console.log('Usuario encontrado:', usuarioObj);
 
     // Guardar los detalles de la máquina directamente desde la solicitud
     const maquinaInfo = {
       nroSerieMaquina,
       marcaMaquina,
-      ubicacionMaquina
+      ubicacionMaquina,
     };
-
-    console.log('Información de la máquina:', maquinaInfo); // Para verificar la máquina
 
     const nuevaOrden = new Orden({
       fechaOrden,
@@ -98,28 +106,25 @@ export const createOrden = async (req, res) => {
       usuario: {
         username: usuarioObj.username,
         email: usuarioObj.email,
-        cargo: usuarioObj.cargo
+        cargo: usuarioObj.cargo,
       },
-      idUsuario: usuarioObj._id, // Almacenar el ID del usuario en el campo idUsuario
+      idUsuario: usuarioObj._id,
       numeroOrden,
       tipoDeMantenimiento,
       componentesAsignados,
       componentesSobrantes,
       elementoOrden: [],
       elementoOrdenSobrantes: [],
-      fechaCumplimiento: null
+      fechaCumplimiento: null,
     });
-
-    console.log('Orden a guardar:', nuevaOrden); // Verifica si la orden se está creando correctamente
 
     await nuevaOrden.save();
     res.status(201).json(nuevaOrden);
   } catch (error) {
-    console.error('Error al crear la orden:', error.message); // Mostrar el mensaje de error
+    console.error('Error al crear la orden:', error.message);
     res.status(500).json({ message: 'Error al crear la orden', error: error.message });
   }
 };
-
 
 // Actualizar una orden (tarea realizada y elementos)
 export const updateOrdenAsignados = async (req, res) => {

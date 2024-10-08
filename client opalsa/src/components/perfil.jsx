@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UpdateProfileModal from '../components/ModalActualizarD';
 import axios from 'axios';
@@ -7,6 +7,13 @@ import perfilfondo from '../assets/images/perfil fondo.webp'; // Importar la ima
 const Perfil = () => {
   const { user, updateUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userData, setUserData] = useState(user);
+
+  useEffect(() => {
+    if (user) {
+      setUserData(user);
+    }
+  }, [user]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -26,6 +33,7 @@ const Perfil = () => {
       const response = await axios.put(`http://localhost:4000/api/users/${user._id}`, formData, { withCredentials: true });
       console.log('Usuario actualizado:', response.data);
       updateUser(response.data);
+      setUserData(response.data); // Actualizar el estado local del usuario
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
@@ -87,22 +95,22 @@ const Perfil = () => {
               </div>
               <div className="text-center mt-12">
                 <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-                  {user.username || 'Nombre del Usuario'}
+                  {userData?.username || 'Nombre del Usuario'}
                 </h3>
                 <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
                   <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-                  {user.ciudad || 'Ciudad no especificada'}
+                  {userData?.ciudad || 'Ciudad no especificada'}
                 </div>
                 <div className="mb-2 text-blueGray-600 mt-10">
                   <i className="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>
-                  {user.cargo || 'Cargo no especificado'}
+                  {userData?.cargo || 'Cargo no especificado'}
                 </div>
               </div>
               <div className="mt-10 py-10 border-t border-blueGray-200 text-center">
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full lg:w-9/12 px-4">
-                    <h3>Cédula: {user.cedula || 'recargar la pagina'}</h3>
-                    <h3>Email: {user.email || 'recargar la pagina'}</h3>
+                    <h3>Cédula: {userData?.cedula || 'recargar la pagina'}</h3>
+                    <h3>Email: {userData?.email || 'recargar la pagina'}</h3>
                   </div>
                 </div>
               </div>
@@ -122,7 +130,7 @@ const Perfil = () => {
       <UpdateProfileModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        user={user}
+        user={userData}
         onUpdate={handleUpdate}
       />
     </main>
