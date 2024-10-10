@@ -74,7 +74,7 @@ const ModalSobrantes = ({ item, onClose }) => {
       elementoOrden,
       elementoOrdenSobrantes,
       tareaRealizada,
-      estadoOrden: "Orden Finalizada",
+      estadoOrden: "Orden finalizada",
       componentesAsignados,
       componentesSobrantes,
       fechaCumplimiento,

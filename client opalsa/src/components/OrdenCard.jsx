@@ -36,7 +36,7 @@ const OrdenCard = ({
         return "bg-yellow-500";
       case "Orden aprobada":
         return "bg-blue-500";
-      case "Orden Finalizada":
+      case "Orden finalizada":
         return "bg-red-500";
       default:
         return "bg-gray-500";
@@ -162,7 +162,7 @@ const OrdenCard = ({
                 Finalizar orden
               </button>
             )}
-            {estadoOrden === "Orden Finalizada" && (
+            {estadoOrden === "Orden finalizada" && (
               <div className="flex justify-between mt-2 space-x-2">
                 <button
                   className="bg-sky-500 text-white py-1 px-4 rounded-md hover:bg-sky-700 transition-colors duration-300"
