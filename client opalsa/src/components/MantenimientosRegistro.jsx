@@ -24,14 +24,12 @@ const MantenimientoRegistro = () => {
       setIsSearching(true);
 
       try {
-        console.log("Buscando en el backend la máquina con serie:", selectedSerie); // Debugging
         const selectedMaquina = await buscarMaquinaPorSerie(selectedSerie); // Realiza la búsqueda en el backend
 
         if (selectedMaquina) {
           setNombreMaquina(selectedMaquina.marcaMaquina);
           setUbicacionMaquina(selectedMaquina.ubicacionMaquina);
           setError(null); // Limpia los errores si todo va bien
-          console.log("Máquina encontrada en el backend:", selectedMaquina); // Debugging
         } else {
           setError(`No se encontró la máquina con número de serie: ${selectedSerie}`);
           setNombreMaquina('');
@@ -55,10 +53,15 @@ const MantenimientoRegistro = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     const formData = new FormData();
     formData.append('tipoMantenimiento', tipoMantenimiento);
-    formData.append('fechaMantenimiento', fechaMantenimiento);
+  
+    // Guardar la fecha como cadena de texto "YYYY-MM-DD" para evitar la conversión automática a UTC
+    if (fechaMantenimiento) {
+      formData.append('fechaMantenimiento', fechaMantenimiento); // La dejamos como string sin convertirla a objeto Date
+    }
+  
     formData.append('descripcion', descripcion);
     formData.append('nroSerieMaquina', nroSerieMaquina);
     formData.append('nombreMaquina', nombreMaquina);
@@ -66,14 +69,14 @@ const MantenimientoRegistro = () => {
     if (archivo) {
       formData.append('archivo', archivo);
     }
-
+  
     try {
       const response = await axios.post('http://localhost:4000/api/mantenimientos', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       setSuccessMessage('Mantenimiento registrado exitosamente');
       setError(null);
       // Limpiar el formulario
@@ -92,6 +95,8 @@ const MantenimientoRegistro = () => {
       setIsSubmitting(false);
     }
   };
+  
+  
 
   const isMaquinaValida = ubicacionMaquina !== ""; // Verificar si la ubicación está llena
 

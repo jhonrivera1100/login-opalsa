@@ -10,12 +10,44 @@ const __dirname = path.dirname(__filename);
 
 export const getMantenimientos = async (req, res) => {
   try {
-    const mantenimientos = await Mantenimiento.find();
-    res.json(mantenimientos);
+    const { page = 1, limit = 8, nroSerieMaquina, fechaMantenimiento } = req.query;
+
+    let filter = {};
+    
+    // Filtro por número de serie
+    if (nroSerieMaquina) {
+      filter.nroSerieMaquina = { $regex: new RegExp(nroSerieMaquina, "i") };
+    }
+
+    // Filtro por fecha de mantenimiento (filtramos solo el día completo)
+    if (fechaMantenimiento) {
+      const startOfDay = new Date(`${fechaMantenimiento}T00:00:00`);
+      const endOfDay = new Date(`${fechaMantenimiento}T23:59:59`);
+      filter.fechaMantenimiento = { $gte: startOfDay, $lte: endOfDay };
+    }
+
+    const totalMantenimientos = await Mantenimiento.countDocuments(filter); // Contar los documentos filtrados
+    const mantenimientos = await Mantenimiento.find(filter)
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .lean(); // Usar lean para convertir a objetos simples
+
+    const mantenimientosWithType = mantenimientos.map((mantenimiento) => ({
+      ...mantenimiento,
+      type: "mantenimiento",
+    }));
+
+    res.json({
+      totalPages: Math.ceil(totalMantenimientos / limit),
+      currentPage: Number(page),
+      mantenimientos: mantenimientosWithType, // Devuelve los mantenimientos con el campo 'type'
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los mantenimientos', error });
+    res.status(500).json({ message: "Error al obtener los mantenimientos", error });
   }
 };
+
+
 
 export const createMantenimiento = async (req, res) => {
   try {
@@ -40,9 +72,10 @@ export const createMantenimiento = async (req, res) => {
       };
     }
 
+    // Asegurarse de que la fecha se almacene correctamente
     const nuevoMantenimiento = new Mantenimiento({
       tipoMantenimiento,
-      fechaMantenimiento,
+      fechaMantenimiento: new Date(`${fechaMantenimiento}T00:00:00`), // Convertir la cadena de fecha en un objeto Date sin afectar la zona horaria
       descripcion,
       nroSerieMaquina,
       nombreMaquina,
@@ -56,6 +89,8 @@ export const createMantenimiento = async (req, res) => {
     return res.status(500).json({ message: 'Error al crear el mantenimiento', error });
   }
 };
+
+
 
 export const deleteMantenimiento = async (req, res) => {
   try {

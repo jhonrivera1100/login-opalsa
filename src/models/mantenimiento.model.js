@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const mantenimientoSchema = new mongoose.Schema({
   tipoMantenimiento: { type: String, required: true },
-  fechaMantenimiento: { type: Date, default: Date.now, required: true },
+  fechaMantenimiento: { type: Date, required: true },
   descripcion: { type: String, required: true },
   archivo: {
     url: { type: String },

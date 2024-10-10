@@ -4,11 +4,41 @@ import Casinos from '../models/casino.model.js'; // Asumiendo que tienes un mode
 
 export const getMovimientosM = async (req, res) => {
   try {
-    const movimientosMaquina = await MovimientosM.find()
+    const { page = 1, limit = 8, serialMaquina = '', fechaTransferencia = '' } = req.query; // Parámetros de paginación, búsqueda y filtro
+    const skip = (page - 1) * limit;
+
+    // Crear objeto de filtro dinámico
+    const query = {};
+
+    // Filtrar por coincidencias parciales en el número de serie de la máquina
+    if (serialMaquina) {
+      query.serialMaquina = { $regex: serialMaquina, $options: 'i' }; // Coincidencias parciales y case-insensitive
+    }
+
+    // Filtrar por fecha de transferencia si existe
+    if (fechaTransferencia) {
+      const startDate = new Date(fechaTransferencia);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 1); // Considerar todo el día
+
+      query.fechaTransferencia = { $gte: startDate, $lt: endDate };
+    }
+
+    // Consultamos los movimientos con filtros y paginación
+    const movimientosMaquina = await MovimientosM.find(query)
       .populate('maquinaId')
       .populate('oldCasinoId')
-      .populate('newCasinoId');
-    res.status(200).json(movimientosMaquina);
+      .populate('newCasinoId')
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Calculamos el total de documentos que coinciden con los filtros
+    const totalMovimientos = await MovimientosM.countDocuments(query);
+
+    res.status(200).json({
+      movimientosMaquina,
+      totalPages: Math.ceil(totalMovimientos / limit), // Total de páginas
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al obtener los movimientos' });

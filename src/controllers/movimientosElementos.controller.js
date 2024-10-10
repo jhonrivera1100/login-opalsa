@@ -5,14 +5,43 @@ import mongoose from 'mongoose';
 
 export const getMovimientosElementos = async (req, res) => {
   try {
-    const movimientosElm = await MovimientosElementos.find()
-      .populate('codigoElemento')
+    const { page = 1, limit = 8, codigoElemento = '', fechaTransferenciaElm = '' } = req.query; // Paginación y filtros
+    const skip = (page - 1) * limit;
+
+    // Crear objeto de filtro dinámico
+    const query = {};
+
+    // Filtrar por coincidencias parciales en el código de elemento
+    if (codigoElemento) {
+      query.codigoElemento = { $regex: codigoElemento, $options: 'i' }; // Coincidencias parciales y case-insensitive
+    }
+
+    // Filtrar por fecha de transferencia si existe
+    if (fechaTransferenciaElm) {
+      const startDate = new Date(fechaTransferenciaElm);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 1); // Considerar todo el día
+
+      query.fechaTransferenciaElm = { $gte: startDate, $lt: endDate };
+    }
+
+    // Consultamos los movimientos de elementos con filtros y paginación
+    const movimientosElementos = await MovimientosElementos.find(query)
+      .populate('elementoId')
       .populate('oldUbicacionId')
-      .populate('newUbicacionId');
-    res.status(200).json(movimientosElm);
+      .populate('newUbicacionId')
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const totalMovimientos = await MovimientosElementos.countDocuments(query);
+
+    res.status(200).json({
+      movimientosElementos,
+      totalPages: Math.ceil(totalMovimientos / limit), // Total de páginas
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al obtener los movimientos elementos' });
+    res.status(500).json({ message: 'Error al obtener los movimientos de elementos' });
   }
 };
 
