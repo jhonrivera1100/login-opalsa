@@ -9,7 +9,6 @@ const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [filteredOrdenes, setFilteredOrdenes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterDate, setFilterDate] = useState(""); // Estado para manejar la fecha
   const [estadoOrden, setEstadoOrden] = useState(""); // Añadir estado para el filtro
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOrden, setSelectedOrden] = useState(null);
@@ -22,15 +21,14 @@ const RespuestasOrden = () => {
     const fetchOrdenes = async () => {
       if (!loading && user) {
         try {
-          // Enviar búsqueda (searchTerm), estado, fecha y paginación al backend
+          // Enviar búsqueda (searchTerm) y estado al backend
           const response = await axios.get(`/ordenes/usuario-autenticado`, {
-            params: { 
-              page, 
+            params: {
+              page,
               limit: 8,
               numeroOrden: searchTerm, // Añadir el término de búsqueda
               estadoOrden, // Enviar el estado seleccionado
-              filterDate // Enviar la fecha seleccionada
-            }
+            },
           });
 
           setOrdenes(response.data.ordenes);
@@ -42,29 +40,18 @@ const RespuestasOrden = () => {
     };
 
     fetchOrdenes();
-  }, [user, loading, page, searchTerm, estadoOrden, filterDate]); // Dependemos también del estado y la fecha para realizar la consulta
+  }, [user, loading, page, searchTerm, estadoOrden]); // Dependemos también del estado para realizar la consulta
+
+  // Función para filtrar las órdenes en base al número de orden y el estado
+  useEffect(() => {
+    setFilteredOrdenes(ordenes);
+  }, [ordenes]);
 
   // Función para formatear la fecha
   const formatDate = (date) => {
     const options = { day: "2-digit", month: "2-digit", year: "numeric" };
     return new Date(date).toLocaleDateString("es-ES", options);
   };
-
-  // Función para filtrar las órdenes en base al número de orden, la fecha y el estado
-  const filterOrdenes = () => {
-    let filtered = ordenes;
-    if (filterDate) {
-      filtered = filtered.filter((orden) =>
-        formatDate(orden.fechaOrden) === filterDate
-      );
-    }
-    setFilteredOrdenes(filtered);
-  };
-
-  // Actualiza el filtro cuando cambia la fecha o las órdenes
-  useEffect(() => {
-    filterOrdenes();
-  }, [filterDate, ordenes]);
 
   // Función para manejar la visualización de más detalles en el modal
   const handleShowMore = (orden) => {
@@ -89,7 +76,7 @@ const RespuestasOrden = () => {
         <HeaderRespuestas />
       </div>
       <div className="w-full pt-4 lg:pl-[50px]">
-        {/* Inputs para buscar, filtrar por estado y fecha */}
+        {/* Inputs para buscar y filtrar por estado */}
         <div className="mb-4 flex flex-col sm:flex-row gap-4 justify-center">
           <input
             type="text"
@@ -114,16 +101,6 @@ const RespuestasOrden = () => {
             <option value="Orden aprobada">Orden aprobada</option>
             <option value="Orden finalizada">Orden finalizada</option>
           </select>
-          <input
-  type="date"
-  className="px-4 py-2 border rounded-lg w-full sm:w-[150px] md:w-[200px]"
-  value={filterDate}
-  onChange={(e) => {
-    setFilterDate(e.target.value);
-    setPage(1); // Reinicia la paginación al cambiar la fecha
-  }}
-/>
-
         </div>
 
         {/* Contenedor de las órdenes */}
@@ -156,7 +133,7 @@ const RespuestasOrden = () => {
                   </div>
                   <div className="mt-4">
                     <h4 className="text-xl font-semibold text-gray-800">
-                      Numero de orden  <br /> {orden.numeroOrden}
+                      Numero de orden <br /> {orden.numeroOrden}
                     </h4>
                     <p className="mt-1 text-gray-600">
                       Estado: {orden.estadoOrden}
