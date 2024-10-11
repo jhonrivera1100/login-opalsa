@@ -8,19 +8,32 @@ import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 // Obtener todas las órdenes
 export const getOrdenes = async (req, res) => {
   try {
-    const ordenes = await Orden.find()
+    const { page = 1, limit = 8, estadoOrden } = req.query; // Recibe paginación y filtro de estado desde el frontend
+    const skip = (page - 1) * limit;
+
+    // Construir un filtro dinámico basado en el estado de la orden si se proporciona
+    const filter = estadoOrden ? { estadoOrden } : {};
+
+    const ordenes = await Orden.find(filter)
+      .sort({ fechaOrden: -1 }) // Ordenar por la fecha más reciente
+      .skip(skip)
+      .limit(parseInt(limit))
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
       .populate('componentesAsignados')
       .populate('componentesSobrantes');
 
-    res.json(ordenes);
+    const totalOrdenes = await Orden.countDocuments(filter); // Contar el total de órdenes basado en el filtro
+
+    res.status(200).json({
+      ordenes,
+      totalPages: Math.ceil(totalOrdenes / limit), // Total de páginas
+    });
   } catch (error) {
     console.error('Error al obtener las órdenes:', error.message);
     res.status(500).json({ message: 'Error al obtener las órdenes', error: error.message });
   }
 };
-
 
 export const getOrdenesByUser = async (req, res) => {
   try {

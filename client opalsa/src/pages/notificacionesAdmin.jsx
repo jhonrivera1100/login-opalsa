@@ -11,6 +11,8 @@ import ModalOrden from "../components/ModalFormOrden";
 import ModalSobrantes from "../components/ModalSobrantes";
 import debounce from "lodash/debounce";
 
+const ITEMS_PER_PAGE = 8; // Número de elementos por página
+
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,46 +20,72 @@ const NotificacionesAdmin = () => {
   const [modalOrdenVisible, setModalOrdenVisible] = useState(false);
   const [showSobrantesModal, setShowSobrantesModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("ordenes"); // Filtro para mostrar órdenes o notificaciones
+  const [orderStatusFilter, setOrderStatusFilter] = useState(""); // Filtro por estado de la orden
+
+  // Paginación para Órdenes
+  const [currentOrderPage, setCurrentOrderPage] = useState(1); // Página actual para Órdenes
+  const [totalOrderPages, setTotalOrderPages] = useState(1); // Total de páginas para Órdenes
+
+  // Paginación para Notificaciones
+  const [currentNotiPage, setCurrentNotiPage] = useState(1); // Página actual para Notificaciones
+  const [totalNotiPages, setTotalNotiPages] = useState(1); // Total de páginas para Notificaciones
+
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
-      const intervalId = setInterval(fetchData, 5000);
-      return () => clearInterval(intervalId);
+      if (filter === "ordenes") {
+        fetchOrdenes(currentOrderPage, orderStatusFilter); // Llamar a fetchOrdenes cuando estamos en Órdenes
+      } else {
+        fetchNotificaciones(currentNotiPage); // Llamar a fetchNotificaciones cuando estamos en Notificaciones
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, filter, currentOrderPage, currentNotiPage, orderStatusFilter]);
 
-  const fetchData = async () => {
+  // Fetch para Órdenes
+  const fetchOrdenes = async (page = 1, estadoOrden = "") => {
     try {
-      const [recordatoriosResponse, ordenesResponse] = await Promise.all([
-        axios.get("/recordatorios"),
-        axios.get("/ordenes"),
-      ]);
+      const response = await axios.get("/ordenes", {
+        params: { page, limit: ITEMS_PER_PAGE, estadoOrden },
+      });
 
-      const recordatorios = recordatoriosResponse.data.map((recordatorio) => ({
+      const { ordenes, totalPages } = response.data;
+      const formattedOrdenes = ordenes.map((orden) => ({
+        ...orden,
+        type: "orden",
+        fecha: new Date(orden.fechaOrden),
+        descripcionOrden: orden.descripcionOrden || "",
+        estadoOrden: orden.estadoOrden,
+        maquina: orden.maquina || {}, // Incluir el objeto de la máquina
+      }));
+
+      setCombinedItems(formattedOrdenes);
+      setTotalOrderPages(totalPages); // Actualizamos el total de páginas para Órdenes
+    } catch (error) {
+      console.error("Error al obtener órdenes:", error);
+    }
+  };
+
+  // Fetch para Notificaciones
+  const fetchNotificaciones = async (page = 1) => {
+    try {
+      const response = await axios.get("/recordatorios", {
+        params: { page, limit: ITEMS_PER_PAGE }, // Paginación para notificaciones
+      });
+
+      const { recordatorios, totalPages } = response.data;
+      const formattedRecordatorios = recordatorios.map((recordatorio) => ({
         ...recordatorio,
         type: "recordatorio",
         fecha: new Date(recordatorio.fechaRecordatorio),
         descripcion: recordatorio.descripcion || "",
       }));
 
-      const ordenes = ordenesResponse.data.map((orden) => ({
-        ...orden,
-        type: "orden",
-        fecha: new Date(orden.fechaOrden),
-        descripcionOrden: orden.descripcionOrden || "",
-        estadoOrden: orden.estadoOrden,
-        maquina: orden.maquina || {}, // Asegúrate de incluir el objeto de la máquina
-      }));
-
-      const combinedItems = [...recordatorios, ...ordenes];
-      combinedItems.sort((a, b) => b.fecha - a.fecha);
-
-      setCombinedItems(combinedItems);
+      setCombinedItems(formattedRecordatorios);
+      setTotalNotiPages(totalPages); // Actualizamos el total de páginas para Notificaciones
     } catch (error) {
-      console.error("Error al obtener datos:", error);
+      console.error("Error al obtener notificaciones:", error);
     }
   };
 
@@ -90,14 +118,10 @@ const NotificacionesAdmin = () => {
     );
   });
 
+  // Filtrar por tipo (órdenes o notificaciones)
   const filteredByState = filteredItems.filter((item) => {
-    if (filter === "all") return true;
-    if (item.type === "orden" && filter !== "notificaciones") {
-      return item.estadoOrden === filter;
-    }
-    if (filter === "notificaciones" && item.type === "recordatorio") {
-      return true;
-    }
+    if (filter === "ordenes") return item.type === "orden";
+    if (filter === "notificaciones") return item.type === "recordatorio";
     return false;
   });
 
@@ -207,6 +231,47 @@ const NotificacionesAdmin = () => {
     closeSobrantesModal();
   };
 
+  // Paginación para Órdenes
+  const handlePreviousOrderPage = () => {
+    if (currentOrderPage > 1) {
+      setCurrentOrderPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNextOrderPage = () => {
+    if (currentOrderPage < totalOrderPages) {
+      setCurrentOrderPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  // Paginación para Notificaciones
+  const handlePreviousNotiPage = () => {
+    if (currentNotiPage > 1) {
+      setCurrentNotiPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNextNotiPage = () => {
+    if (currentNotiPage < totalNotiPages) {
+      setCurrentNotiPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handleOrderStatusFilterChange = (e) => {
+    setOrderStatusFilter(e.target.value); // Cambiar el filtro por estado de la orden
+    setCurrentOrderPage(1); // Reiniciar a la primera página al cambiar el filtro
+  };
+
+  // Reiniciar las páginas al cambiar de sección (órdenes o notificaciones)
+  const handleSectionChange = (section) => {
+    setFilter(section);
+    if (section === "ordenes") {
+      setCurrentOrderPage(1); // Resetear la página de órdenes a 1
+    } else {
+      setCurrentNotiPage(1); // Resetear la página de notificaciones a 1
+    }
+  };
+
   return (
     <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins">
       <Sidebar />
@@ -226,44 +291,15 @@ const NotificacionesAdmin = () => {
             </div>
           </div>
         </div>
+
         <div className="mb-4 flex flex-wrap justify-center gap-4 pt-4 lg:pt-10">
           <button
             className={`px-4 py-2 rounded-lg ${
-              filter === "all" ? "bg-green-600 text-white" : "bg-gray-300"
+              filter === "ordenes" ? "bg-green-600 text-white" : "bg-gray-300"
             }`}
-            onClick={() => setFilter("all")}
+            onClick={() => handleSectionChange("ordenes")}
           >
-            Todos
-          </button>
-          <button
-            className={`px-4 py-2 rounded-lg ${
-              filter === "Orden en solicitud"
-                ? "bg-yellow-600 text-white"
-                : "bg-gray-300"
-            }`}
-            onClick={() => setFilter("Orden en solicitud")}
-          >
-            Ordenes Solicitadas
-          </button>
-          <button
-            className={`px-4 py-2 rounded-lg ${
-              filter === "Orden aprobada"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-300"
-            }`}
-            onClick={() => setFilter("Orden aprobada")}
-          >
-            Ordenes Aprobadas
-          </button>
-          <button
-            className={`px-4 py-2 rounded-lg ${
-              filter === "Orden Finalizada"
-                ? "bg-red-600 text-white"
-                : "bg-gray-300"
-            }`}
-            onClick={() => setFilter("Orden Finalizada")}
-          >
-            Ordenes Finalizadas
+            Órdenes
           </button>
           <button
             className={`px-4 py-2 rounded-lg ${
@@ -271,11 +307,27 @@ const NotificacionesAdmin = () => {
                 ? "bg-orange-600 text-white"
                 : "bg-gray-300"
             }`}
-            onClick={() => setFilter("notificaciones")}
+            onClick={() => handleSectionChange("notificaciones")}
           >
             Notificaciones
           </button>
         </div>
+
+        {/* Filtro por estado de la orden como lista desplegable */}
+        {filter === "ordenes" && (
+          <div className="mb-4 flex justify-center">
+            <select
+              className="px-4 py-2 border rounded-lg bg-gray-200"
+              value={orderStatusFilter}
+              onChange={handleOrderStatusFilterChange}
+            >
+              <option value="">Todas las Órdenes</option>
+              <option value="Orden aprobada">Orden Aprobada</option>
+              <option value="Orden en solicitud">Orden en Solicitud</option>
+              <option value="Orden finalizada">Orden finalizada</option>
+            </select>
+          </div>
+        )}
 
         <div className="w-full pt-6">
           <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
@@ -304,6 +356,49 @@ const NotificacionesAdmin = () => {
             </div>
           </div>
         </div>
+
+        {/* Botones de paginación */}
+        {filter === "ordenes" ? (
+          <div className="flex justify-center mt-6">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded mr-2"
+              onClick={handlePreviousOrderPage}
+              disabled={currentOrderPage === 1}
+            >
+              Anterior
+            </button>
+            <span className="px-4 py-2 text-gray-700">
+              Página {currentOrderPage} de {totalOrderPages}
+            </span>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded ml-2"
+              onClick={handleNextOrderPage}
+              disabled={currentOrderPage >= totalOrderPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center mt-6">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded mr-2"
+              onClick={handlePreviousNotiPage}
+              disabled={currentNotiPage === 1}
+            >
+              Anterior
+            </button>
+            <span className="px-4 py-2 text-gray-700">
+              Página {currentNotiPage} de {totalNotiPages}
+            </span>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded ml-2"
+              onClick={handleNextNotiPage}
+              disabled={currentNotiPage >= totalNotiPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
       {modalVisible && selectedItem && (
         <Modal onClose={closeModal}>
