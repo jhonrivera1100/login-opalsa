@@ -27,7 +27,7 @@ function Sidebar() {
 
       {/* MENU */}
       <div className='pt-4'>
-      <div className='bg-slate-200 font-semibold text-zinc-900 p-5 pt-[10px] rounded-tr-[100px] h-[95vh] flex flex-col justify-between gap-6'>
+      <div className='bg-slate-200 font-semibold text-zinc-900 p-5 pt-[10px] rounded-tr-[100px] h-[110vh] flex flex-col justify-between gap-6'>
         <nav className='flex flex-col gap-12   pt-14'>
           <Link to="/admin" className='flex items-center gap-4  py-2 px-4 rounded-xl hover:bg-sidebar-900/50 transition-colors'>
             <RiHome4Line /> Home
