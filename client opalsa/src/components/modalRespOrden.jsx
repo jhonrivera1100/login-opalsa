@@ -92,13 +92,18 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
             <p>{usuario.cargo || 'No disponible'}</p>
           </div>
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b ">
-            <p className="text-gray-600">Tarea Reallizada</p>
+            <p className="text-gray-600">Tarea Realizada</p>
             <p>{tareaRealizada}</p>
           </div>
           <div className="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
   <p className="text-gray-600">Fecha Cumplimiento</p>
-  <p>{new Date(new Date(fechaCumplimiento).getTime() + new Date(fechaCumplimiento).getTimezoneOffset() * 60000).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+  <p>
+    {fechaCumplimiento 
+      ? new Date(new Date(fechaCumplimiento).getTime() + new Date(fechaCumplimiento).getTimezoneOffset() * 60000).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+      : "Aún no hay fecha"}
+  </p>
 </div>
+
 
 
           <div className='flex justify-between border-b pr-[227px] hover:bg-gray-50 '>
@@ -109,7 +114,7 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
       {elementoOrden.length > 0 ? (
         elementoOrden.map((element, index) => (
           <li key={index}>
-            {element.nombre || 'No hay Elemento'} - {element.cantidad || 'Cantidad no disponible'}
+           Nombre: {element.nombre || 'No hay Elemento'} - Cantidad: {element.cantidad || 'Cantidad no disponible'}
           </li>
         ))
       ) : (
@@ -143,7 +148,7 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
       {elementoOrdenSobrantes.length > 0 ? (
         elementoOrdenSobrantes.map((elementSobra, index) => (
           <li key={index}>
-            {elementSobra.nombre || 'No hay Elemento'} - {elementSobra.cantidadSobrante || 'Cantidad no disponible'}
+            Nombre: {elementSobra.nombre || 'No hay Elemento'} - Cantidad: {elementSobra.cantidadSobrante || 'Cantidad no disponible'}
           </li>
         ))
       ) : (

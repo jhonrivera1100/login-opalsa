@@ -1,5 +1,6 @@
 import { Router } from "express";
-import {getOrdenes, createOrden, deleteOrden, updateOrdenAsignados, getOrdenesByUser, obtenerOrdenPorId, updateAceptar, updateOrdenSobrantes} from "../controllers/orden.controller.js";
+import { authRequired } from '../middlewares/validateToken.js';
+import {getOrdenes, createOrden, deleteOrden, updateOrdenAsignados, getOrdenesByUser, obtenerOrdenPorId, updateAceptar, updateOrdenSobrantes, getOrdenesUsuarioAutenticado} from "../controllers/orden.controller.js";
 
 const router = Router();
 
@@ -7,13 +8,19 @@ const router = Router();
 
 router.get("/ordenes", getOrdenes);
 
+router.get('/ordenes/usuario-autenticado', authRequired, getOrdenesUsuarioAutenticado);
+
 // Obtener órdenes del usuario autenticado
 
 // Ruta para obtener una orden por ID
 router.get('/ordenes/:id', obtenerOrdenPorId);
 
-// Obtener órdenes por usuario autenticado
-router.get("/ordenes/usuario", getOrdenesByUser);
+//filtrar ordenes solo para que aparezcan las del usuario que las creo
+router.get('/ordenes', authRequired, getOrdenesByUser);
+
+
+
+
 
 // Crear una nueva orden
 

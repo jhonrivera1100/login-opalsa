@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { useAuth } from '../context/AuthContext';
-import { getComponentesRequest } from '../api/componentes';
+import { useComponentes } from '../context/ComponentesContext';
 
 const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
-  const [componentes, setComponentes] = useState([]);
+  const { getComponenteBySerial, componentes, loading } = useComponentes();
   const [selectedComponentes, setSelectedComponentes] = useState([]);
   const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
   const [nroSerieMaquina, setNroSerieMaquina] = useState(orden.maquina?.nroSerieMaquina || '');
@@ -18,18 +18,13 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   const [numeroOrden, setNumeroOrden] = useState(orden.numeroOrden || '');
   const [fechaOrden, setFechaOrden] = useState('');
   const [tiposMantenimiento, setTiposMantenimiento] = useState([]);
+  const [serialSearch, setSerialSearch] = useState(''); // Estado para manejar el campo de búsqueda de serial
+  const [searchMessage, setSearchMessage] = useState(''); // Estado para mensaje de búsqueda
+  const [searchError, setSearchError] = useState(''); // Estado para error en búsqueda
+  const [previewImage, setPreviewImage] = useState(''); // Estado para mostrar la vista previa de la imagen
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchComponentes = async () => {
-      try {
-        const response = await getComponentesRequest();
-        setComponentes(response.data);
-      } catch (err) {
-        console.error('Error al obtener los Componentes:', err);
-      }
-    };
-
     const fetchOrden = async () => {
       try {
         if (ordenId) {
@@ -45,8 +40,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
 
           // Actualizar selectedComponentes con los componentes ya asignados a la orden
           const componentesSeleccionados = response.componentesAsignados.map(component => ({
+            id: component._id,
             value: component.serialComponente,
             label: `${component.nombreComponente} (Serial: ${component.serialComponente})`,
+            marca: component.marcaComponente,
+            imagen: component.imagenComponente?.url
           }));
           setSelectedComponentes(componentesSeleccionados);
 
@@ -58,7 +56,6 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
       }
     };
 
-    fetchComponentes();
     fetchOrden();
   }, [ordenId]);
 
@@ -80,27 +77,70 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
     setElementosOrden(elementosOrden.filter((_, i) => i !== index));
   };
 
+  const handleSearchBySerial = async () => {
+    if (serialSearch) {
+      try {
+        // Obtener todos los componentes con el número de serie
+        const componentesEncontrados = await getComponenteBySerial(serialSearch);
+
+        if (componentesEncontrados && componentesEncontrados.length > 0) {
+          // Filtrar los que ya están agregados para no duplicar
+          const nuevosComponentes = componentesEncontrados.filter(
+            (componente) => !selectedComponentes.some((selComp) => selComp.id === componente._id)
+          ).map((componente) => ({
+            id: componente._id,
+            value: componente.serialComponente,
+            label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+            marca: componente.marcaComponente,
+            imagen: componente.imagenComponente?.url,
+          }));
+
+          // Agregar los nuevos componentes a la lista seleccionada
+          if (nuevosComponentes.length > 0) {
+            setSelectedComponentes([...selectedComponentes, ...nuevosComponentes]);
+            setSearchMessage(`Componentes con serial ${serialSearch} agregados.`);
+            setSearchError('');
+          } else {
+            setSearchError(`Todos los componentes con serial ${serialSearch} ya han sido agregados.`);
+            setSearchMessage('');
+          }
+        } else {
+          setSearchError(`No se encontraron componentes con serial ${serialSearch}.`);
+          setSearchMessage('');
+        }
+      } catch (error) {
+        setSearchError('Ocurrió un error al buscar los componentes.');
+        setSearchMessage('');
+      }
+    }
+  };
+
+  const handleRemoveComponente = (id) => {
+    const updatedComponentes = selectedComponentes.filter(component => component.id !== id);
+    setSelectedComponentes(updatedComponentes);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     const componentesAsignados = selectedComponentes.map(component => ({
       nombreComponente: component.label.split(' (Serial:')[0],
       serialComponente: component.value,  // Usar el serialComponente como value
     }));
-  
+
     try {
       const response = await axios.put(`http://localhost:4000/api/ordenes/${ordenId}`, {
         fechaOrden: new Date(),
         descripcionOrden,
         nroSerieMaquina,
-        marcaMaquina, // Incluir marcaMaquina en la actualización
+        marcaMaquina,
         ubicacionMaquina,
         usuario: usuario._id, 
         estadoOrden: 'Orden aprobada',
         elementoOrden: elementosOrden,
-        componentesAsignados,  // Guardar los componentes asignados con su serial
+        componentesAsignados,
       });
-  
+
       if (typeof onOrderAccepted === 'function') {
         onOrderAccepted(response.data);
       }
@@ -114,9 +154,11 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
   };
 
   const componenteOptions = componentes.map((componente) => ({
-    value: componente.serialComponente, // Usar serialComponente como value
-    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`, // Mostrar serial en el label
-    marcaComponente: componente.marcaComponente,
+    id: componente._id,
+    value: componente.serialComponente,
+    label: `${componente.nombreComponente} (Serial: ${componente.serialComponente})`,
+    marca: componente.marcaComponente,
+    imagen: componente.imagenComponente?.url,
   }));
 
   return (
@@ -185,18 +227,79 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           </div>
 
           <div className="mt-4">
-            <h4 className="text-gray-600 mb-2 font-bold">Asignar componentes</h4>
-            <Select
-              isMulti
-              name="componentes"
-              options={componenteOptions}
-              className="basic-multi-select"
-              classNamePrefix="select"
-              value={selectedComponentes} // Mostrar los componentes ya seleccionados
-              onChange={handleComponentesChange}
-              placeholder="Selecciona componentes"
-            />
+            <h4 className="text-gray-600 mb-2 font-bold">Buscar Componente por Número de Serie</h4>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Ingresa número de serie"
+                value={serialSearch}
+                onChange={(e) => setSerialSearch(e.target.value)}
+                className="px-4 py-2 border rounded mr-2 w-full"
+              />
+              <button
+                type="button"
+                onClick={handleSearchBySerial}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                disabled={loading}
+              >
+                {loading ? 'Buscando...' : 'Buscar'}
+              </button>
+            </div>
+
+            {searchMessage && (
+              <div className="bg-green-100 text-green-800 p-3 rounded-lg mt-2">
+                {searchMessage}
+              </div>
+            )}
+            {searchError && (
+              <div className="bg-red-100 text-red-800 p-3 rounded-lg mt-2">
+                {searchError}
+              </div>
+            )}
           </div>
+
+          {/* Mostrar la lista de componentes seleccionados */}
+          {selectedComponentes.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-gray-600 mb-2 font-bold">Componentes Seleccionados</h4>
+              <ul>
+                {selectedComponentes.map((componente, index) => (
+                  <li key={index} className="bg-gray-100 p-2 rounded mb-2 flex items-center relative">
+                    {componente.imagen && (
+                      <div
+                        onMouseEnter={() => setPreviewImage(componente.imagen)}
+                        onMouseLeave={() => setPreviewImage('')}
+                        className="mr-4"
+                      >
+                        <img
+                          src={componente.imagen}
+                          alt={`Imagen de ${componente.label}`}
+                          className="w-20 h-20 object-cover cursor-pointer"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <p>{componente.label}</p>
+                      <p className="text-sm text-gray-600">Marca: {componente.marca}</p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveComponente(componente.id)}
+                      className="ml-auto bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Vista previa de la imagen */}
+          {previewImage && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 p-2 shadow-lg">
+              <img src={previewImage} alt="Vista previa" className="w-64 h-64 object-cover" />
+            </div>
+          )}
 
           <div className="mt-4">
             <h4 className="text-gray-600 mb-2 font-bold">Asignar elementos</h4>

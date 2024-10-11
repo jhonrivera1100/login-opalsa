@@ -17,7 +17,7 @@ const maquinaSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    softwareMaquina: {
+    precioMaquina: {
       type: String,
       required: true,
       trim: true,
@@ -39,10 +39,6 @@ const maquinaSchema = new mongoose.Schema(
     documentoMaquina: {
       url: String,
       public_id: String,
-    },
-    descripcionMaquina: {
-      type: String,
-      trim: true,
     },
     ubicacionMaquina: {
       type: String,

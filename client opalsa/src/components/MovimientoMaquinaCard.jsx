@@ -1,9 +1,22 @@
 import React from "react";
 import { FaTools } from "react-icons/fa";
-import { CgWebsite } from "react-icons/cg";
-import { MdAutoAwesomeMotion, MdCasino } from "react-icons/md";
+import { MdAutoAwesomeMotion } from "react-icons/md";
+import { BsBox } from "react-icons/bs"; // Ícono para el movimiento de elementos
 
 const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => {
+  // Formateo seguro de la fecha. Usamos la propiedad correspondiente a cada tipo de movimiento.
+  const formattedDate = item.fechaMantenimiento
+    ? new Date(item.fechaMantenimiento).toLocaleDateString()
+    : item.fechaTransferencia || item.fechaTransferenciaElm
+    ? new Date(item.fechaTransferencia || item.fechaTransferenciaElm).toLocaleDateString()
+    : "Fecha no disponible";
+
+  // Determinamos si es un mantenimiento, un movimiento de máquina, de componente o de elemento
+  const isMantenimiento = item.tipoMantenimiento !== undefined;
+  const isMovimientoMaquina = item.oldCasinoNombre && item.newCasinoNombre; // Movimientos de máquinas
+  const isMovimientoComponente = item.serialComponente && item.nombreComponente; // Movimientos de componentes
+  const isMovimientoElemento = item.oldUbicacionNombre && item.newUbicacionNombre && item.codigoElemento; // Movimientos de elementos
+
   return (
     <div
       key={item._id}
@@ -11,57 +24,53 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
     >
       <div
         className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${
-          item.type === "mantenimiento"
+          isMantenimiento
             ? "bg-green-500"
-            : item.type === "movimiento"
+            : isMovimientoComponente
             ? "bg-blue-500"
-            : "bg-yellow-500"
+            : isMovimientoMaquina
+            ? "bg-yellow-500"
+            : isMovimientoElemento
+            ? "bg-orange-500"
+            : "bg-gray-500"
         } left-4 -top-6`}
       >
-        {item.type === "mantenimiento" ? (
+        {isMantenimiento ? (
           <FaTools className="h-8 w-8" />
-        ) : item.type === "movimiento" ? (
+        ) : isMovimientoComponente || isMovimientoMaquina ? (
           <MdAutoAwesomeMotion className="h-8 w-8" />
-        ) : (
-          <div className="h-8 w-8 bg-yellow-500 rounded-full ">
-            <MdCasino className="h-8 w-8" />
-          </div>
-        )}
+        ) : isMovimientoElemento ? (
+          <BsBox className="h-8 w-8" />
+        ) : null}
       </div>
+
       <div className="mt-8">
         <p className="text-xl font-semibold my-2">
-          {item.type === "mantenimiento"
+          {isMantenimiento
             ? "Mantenimiento"
-            : item.type === "movimiento"
+            : isMovimientoComponente
             ? "Movimiento de Componente"
-            : "Movimiento de Máquina"}
+            : isMovimientoMaquina
+            ? "Movimiento de Máquina"
+            : isMovimientoElemento
+            ? "Movimiento de Elemento"
+            : "Movimiento Desconocido"}
         </p>
-        {item.type === "mantenimiento" ? (
+
+        {/* Mantenimiento */}
+        {isMantenimiento ? (
           <>
             <div className="flex space-x-2 text-gray-400 text-sm">
-              <CgWebsite />
-              <p>{item.tipoMantenimiento}</p>
+              <span>Tipo:</span>
+              <p>{item.tipoMantenimiento || "N/A"}</p>
             </div>
             <div className="flex space-x-2 text-gray-400 text-sm my-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <p>{item.fecha.toLocaleDateString()}</p>
+              <span>Fecha:</span>
+              <p>{formattedDate}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Número de Serie</p>
-              <p className="text-sm text-gray-500">{item.nroSerieMaquina}</p>
+              <p className="text-sm text-gray-500">{item.nroSerieMaquina || "N/A"}</p>
             </div>
             {item.nombreMaquina && (
               <div className="my-1">
@@ -72,9 +81,7 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             {item.ubicacionMaquina && (
               <div className="my-1">
                 <p className="font-semibold text-base mb-1">Ubicación</p>
-                <p className="text-sm text-gray-500">
-                  {item.ubicacionMaquina}
-                </p>
+                <p className="text-sm text-gray-500">{item.ubicacionMaquina}</p>
               </div>
             )}
             {item.descripcion && (
@@ -93,82 +100,107 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
                 </p>
               </div>
             )}
+            {/* Archivo (si existe) */}
             {item.archivo?.url && (
-              <div className="my-1">
-                <p className="font-semibold text-base mb-1">Evidencia</p>
+              <div className="my-2">
+                <p className="font-semibold text-base mb-1">Archivo:</p>
                 <a
                   href={item.archivo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-green-500 text-white px-2 py-1 rounded"
+                  className="text-blue-500 underline"
                 >
-                  Ver Archivo
+                  Ver archivo adjunto
                 </a>
               </div>
             )}
           </>
-        ) : item.type === "movimiento" ? (
+        ) : isMovimientoComponente ? (
           <>
+            {/* Movimiento de Componente */}
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Nombre Componente</p>
-              <p className="text-sm text-gray-500">{item.nombreComponente}</p>
+              <p className="text-sm text-gray-500">{item.nombreComponente || "N/A"}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Serial Componente</p>
-              <p className="text-sm text-gray-500">{item.serialComponente}</p>
+              <p className="text-sm text-gray-500">{item.serialComponente || "N/A"}</p>
             </div>
             <div className="my-1">
-              <p className="font-semibold text-base mb-1">
-                Serial Máquina Inicial
-              </p>
-              <p className="text-sm text-gray-500">{item.oldMaquinaSerial}</p>
+              <p className="font-semibold text-base mb-1">Serial Máquina Inicial</p>
+              <p className="text-sm text-gray-500">{item.oldMaquinaSerial || "N/A"}</p>
             </div>
             <div className="my-1">
-              <p className="font-semibold text-base mb-1">
-                Serial Máquina Final
-              </p>
-              <p className="text-sm text-gray-500">{item.newMaquinaSerial}</p>
+              <p className="font-semibold text-base mb-1">Serial Máquina Final</p>
+              <p className="text-sm text-gray-500">{item.newMaquinaSerial || "N/A"}</p>
             </div>
             <div className="my-1">
-              <p className="font-semibold text-base mb-1">
-                Fecha de Transferencia
-              </p>
-              <p className="text-sm text-gray-500">
-                {item.fecha.toLocaleDateString()}
-              </p>
+              <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
+              <p className="text-sm text-gray-500">{formattedDate}</p>
             </div>
           </>
-        ) : (
+        ) : isMovimientoMaquina ? (
           <>
+            {/* Movimiento de Máquina */}
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Serial Máquina</p>
-              <p className="text-sm text-gray-500">{item.serialMaquina}</p>
+              <p className="text-sm text-gray-500">{item.serialMaquina || "N/A"}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Marca Máquina</p>
-              <p className="text-sm text-gray-500">{item.marcaMaquina}</p>
+              <p className="text-sm text-gray-500">{item.marcaMaquina || "N/A"}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Casino Inicial</p>
-              <p className="text-sm text-gray-500">{item.oldCasinoNombre}</p>
+              <p className="text-sm text-gray-500">{item.oldCasinoNombre || "N/A"}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Casino Final</p>
-              <p className="text-sm text-gray-500">{item.newCasinoNombre}</p>
+              <p className="text-sm text-gray-500">{item.newCasinoNombre || "N/A"}</p>
             </div>
             <div className="my-1">
-              <p className="font-semibold text-base mb-1">
-                Fecha de Transferencia
-              </p>
-              <p className="text-sm text-gray-500">
-                {item.fecha.toLocaleDateString()}
-              </p>
+              <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
+              <p className="text-sm text-gray-500">{formattedDate}</p>
             </div>
           </>
+        ) : isMovimientoElemento ? (
+          <>
+            {/* Movimiento de Elemento */}
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Código Elemento</p>
+              <p className="text-sm text-gray-500">{item.codigoElemento || "N/A"}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Nombre Elemento</p>
+              <p className="text-sm text-gray-500">{item.nombreElemento || "N/A"}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Ubicación Inicial</p>
+              <p className="text-sm text-gray-500">{item.oldUbicacionNombre || "N/A"}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Ubicación Final</p>
+              <p className="text-sm text-gray-500">{item.newUbicacionNombre || "N/A"}</p>
+            </div>
+            <div className="my-1">
+              <p className="font-semibold text-base mb-1">Fecha de Transferencia</p>
+              <p className="text-sm text-gray-500">{formattedDate}</p>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-gray-500">Datos no disponibles</p>
         )}
+
         <button
           className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
-          onClick={() => deleteItem(item._id, item.type)}
+          onClick={() => deleteItem(item._id, 
+            isMantenimiento 
+            ? "mantenimiento" 
+            : isMovimientoComponente 
+            ? "movimiento" 
+            : isMovimientoMaquina 
+            ? "moviMaquina" 
+            : "movimientoElemento")}
         >
           Eliminar
         </button>

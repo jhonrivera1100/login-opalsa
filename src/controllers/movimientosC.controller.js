@@ -3,18 +3,50 @@ import MovimientosC from '../models/movimientosC.model.js';
 import Maquinas from '../models/maquina.model.js'; // Asegúrate de que la ruta es correcta
 import Componente from '../models/componente.model.js'; // Asegúrate de que la ruta es correcta
 
+// Controller (Backend)
 export const getMovimientosC = async (req, res) => {
   try {
-    const movimientos = await MovimientosC.find()
+    const { page = 1, limit = 8, serialComponente = '', fechaTransferencia = '' } = req.query; // Parámetros de paginación y filtro
+    const skip = (page - 1) * limit;
+
+    // Crear objeto de filtro dinámico
+    const query = {};
+
+    // Filtrar por coincidencias parciales en el número de serie
+    if (serialComponente) {
+      query.serialComponente = { $regex: serialComponente, $options: 'i' }; // 'i' para que sea case-insensitive
+    }
+
+    // Filtrar por fecha de transferencia si existe
+    if (fechaTransferencia) {
+      const startDate = new Date(fechaTransferencia);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 1); // Considerar todo el día
+
+      query.fechaTransferencia = { $gte: startDate, $lt: endDate };
+    }
+
+    // Consultamos los movimientos con filtros y paginación
+    const movimientos = await MovimientosC.find(query)
       .populate('componenteId')
       .populate('oldMaquinaId')
-      .populate('newMaquinaId');
-    res.status(200).json(movimientos);
+      .populate('newMaquinaId')
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Calculamos el total de documentos que coinciden con los filtros
+    const totalMovimientos = await MovimientosC.countDocuments(query);
+
+    res.status(200).json({
+      movimientos,
+      totalPages: Math.ceil(totalMovimientos / limit), // Total de páginas
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al obtener los movimientos' });
   }
 };
+
 
 export const addMovimientosC = async (req, res) => {
   try {

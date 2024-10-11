@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { getMaquinasRequest } from "../api/maquinas";
 import { getCasinosRequest } from "../api/casinos";
-import CasinoCard from "../components/casinoCard";
+import CasinoCard from "./CasinoCard";
 import BotonAgregar from "../components/BotonAgregar";
 import MaquinaCard from "../components/MaquinaCard";
 import ModalMaquina from "../components/ModalMaquina";
 import CasinoDetail from "../components/CasinoDetail";
 import ModalDocumentos from "../components/ModalDocumentos";
 import SectionContent from "./SectionContent";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMapMarkerAlt, faMapMarkedAlt } from "@fortawesome/free-solid-svg-icons";
 
 function SeccionesHome() {
   const [section, setSection] = useState("Casinos");
@@ -21,76 +19,113 @@ function SeccionesHome() {
   const [documentos, setDocumentos] = useState([]);
   const [isDocumentosModalOpen, setIsDocumentosModalOpen] = useState(false);
   const [currentPageMaquinas, setCurrentPageMaquinas] = useState(1);
+  const [totalPagesMaquinas, setTotalPagesMaquinas] = useState(1); // Para manejar el total de páginas de máquinas
   const [currentPageCasinos, setCurrentPageCasinos] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [cityFilter, setCityFilter] = useState("");
   const itemsPerPage = 8;
 
+  // Fetch de casinos solo una vez al montar el componente
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCasinos = async () => {
       try {
-        const maquinasResponse = await getMaquinasRequest();
-        setMaquinas(maquinasResponse.data);
         const casinosResponse = await getCasinosRequest();
         setCasinos(casinosResponse.data);
       } catch (error) {
-        console.error("Error al cargar los datos:", error);
+        console.error("Error al cargar los casinos:", error);
       }
     };
+    fetchCasinos();
+  }, []); // El efecto depende solo del montaje del componente, no de otras variables.
 
-    fetchData();
-  }, []);
+  // Fetch de máquinas dependiendo de la sección y la paginación
+  // Fetch de máquinas dependiendo de la sección, página y marca seleccionada
+  useEffect(() => {
+    if (section === "Maquinas") {
+      const fetchMaquinas = async () => {
+        try {
+          const maquinasResponse = await getMaquinasRequest(
+            currentPageMaquinas,
+            itemsPerPage,
+            selectedBrand
+          ); // Ahora se incluye la marca en la petición
+          setMaquinas(maquinasResponse.data.maquinas);
+          setTotalPagesMaquinas(maquinasResponse.data.totalPages); // Ajustamos el total de páginas
+        } catch (error) {
+          console.error("Error al cargar las máquinas:", error);
+        }
+      };
+      fetchMaquinas();
+    }
+  }, [section, currentPageMaquinas, itemsPerPage, selectedBrand]); // Se agrega selectedBrand como dependencia
+  // Solo recargar máquinas cuando se cambia a la sección "Maquinas" o la página
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    setCurrentPageMaquinas(1);
-    setCurrentPageCasinos(1);
+    setCurrentPageMaquinas(1); // Reiniciar la página cuando se realice una nueva búsqueda
+    setCurrentPageCasinos(1); // Reiniciar la página de casinos también
   };
 
   const handleFilterChange = (e) => {
     setSelectedBrand(e.target.value);
-    setCurrentPageMaquinas(1);
+    setCurrentPageMaquinas(1); // Reiniciar la página de máquinas
   };
 
   const handleCityFilterChange = (e) => {
     setCityFilter(e.target.value);
-    setCurrentPageCasinos(1);
+    setCurrentPageCasinos(1); // Reiniciar la página de casinos
   };
 
   const changeSection = (newSection) => {
     setSection(newSection);
-    setSelectedCasino(null);
+    setSelectedCasino(null); // Limpiar la selección de casino al cambiar de sección
     if (newSection === "Casinos") {
       setSelectedBrand("");
       setSearchQuery("");
-      setCurrentPageMaquinas(1);
+      setCurrentPageMaquinas(1); // Reiniciar la página de máquinas
     }
   };
 
+  // Funciones para paginación de máquinas
   const handlePreviousPageMaquinas = () => {
-    setCurrentPageMaquinas((prevPage) => Math.max(prevPage - 1, 1));
+    setCurrentPageMaquinas((prevPage) => Math.max(prevPage - 1, 1)); // Evitar ir a una página menor a 1
   };
 
   const handleNextPageMaquinas = () => {
-    setCurrentPageMaquinas((prevPage) => prevPage + 1);
+    setCurrentPageMaquinas((prevPage) =>
+      Math.min(prevPage + 1, totalPagesMaquinas)
+    ); // Incrementar la página de máquinas
   };
 
+  // Funciones para paginación de casinos
   const handlePreviousPageCasinos = () => {
-    setCurrentPageCasinos((prevPage) => Math.max(prevPage - 1, 1));
+    setCurrentPageCasinos((prevPage) => Math.max(prevPage - 1, 1)); // Evitar ir a una página menor a 1
   };
 
   const handleNextPageCasinos = () => {
-    setCurrentPageCasinos((prevPage) => prevPage + 1);
+    setCurrentPageCasinos((prevPage) => prevPage + 1); // Incrementar la página de casinos
   };
 
   const abrirDocumento = (url) => {
     window.open(url, "_blank");
   };
 
-  const handleVerDocumentos = (documentacion) => {
-    setDocumentos(documentacion);
-    setIsDocumentosModalOpen(true);
+  const handleVerDocumentos = (casino) => {
+    if (casino) {
+      const documentos = {
+        documentacionLegal: casino.documentacionLegal || [],
+        usoDeSuelos: casino.usoDeSuelos || [],
+        colJuegos: casino.colJuegos || [],
+        otrosDocumentos: casino.otrosDocumentos || [],
+      };
+
+      setDocumentos(documentos);
+      setSelectedCasino(casino); // Guardamos el casino seleccionado
+      setIsDocumentosModalOpen(true);
+    } else {
+      console.error("El casino no está definido o no contiene datos.");
+    }
   };
 
   const closeModal = () => {
@@ -102,7 +137,7 @@ function SeccionesHome() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col font-poppins">
       <div className="flex items-center justify-center py-3 bg-gray-100 mt-4">
         <div className="flex flex-wrap justify-center w-full">
           <div className="flex space-x-4 ml-4 md:ml-20">
@@ -145,6 +180,7 @@ function SeccionesHome() {
           currentPageMaquinas={currentPageMaquinas}
           currentPageCasinos={currentPageCasinos}
           itemsPerPage={itemsPerPage}
+          totalPagesMaquinas={totalPagesMaquinas} // Total de páginas de máquinas
           handleSearch={handleSearch}
           handleFilterChange={handleFilterChange}
           handleCityFilterChange={handleCityFilterChange}
@@ -170,6 +206,7 @@ function SeccionesHome() {
         isOpen={isDocumentosModalOpen}
         onClose={closeDocumentosModal}
         documentos={documentos}
+        casinoId={selectedCasino ? selectedCasino._id : null}
       />
     </div>
   );

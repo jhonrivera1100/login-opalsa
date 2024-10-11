@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { FaUsers } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import axios from "../api/axios";
-import { useState, useEffect } from 'react';
 
 function AppAdmin() {
   const [recordatorios, setRecordatorios] = useState([]);
   const [userCount, setUserCount] = useState(0);
   const [latestUser, setLatestUser] = useState(null);
+
+  // Función para calcular los días restantes para el recordatorio
+  const calcularDiasRestantes = (fechaRecordatorio) => {
+    const fechaActual = new Date();
+    const fecha = new Date(fechaRecordatorio);
+
+    // Establecemos las horas a 0 para comparar solo la fecha
+    fechaActual.setHours(0, 0, 0, 0);
+    fecha.setHours(0, 0, 0, 0);
+
+    const diferencia = fecha - fechaActual; // Diferencia en milisegundos
+    const diasRestantes = Math.round(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días completos
+
+    return diasRestantes;
+  };
 
   useEffect(() => {
     const fetchLatestUser = async () => {
@@ -46,7 +61,8 @@ function AppAdmin() {
 
   const fetchRecordatorios = async () => {
     try {
-      const response = await axios.get("/recordatorios");
+      // Usamos la nueva ruta para obtener los próximos 10 recordatorios
+      const response = await axios.get("/recordatorios/ultimos");
       setRecordatorios(response.data);
     } catch (error) {
       console.error("Error al obtener recordatorios:", error);
@@ -54,7 +70,7 @@ function AppAdmin() {
   };
 
   return (
-    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen'>
+    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'> {/* Se añadió font-poppins */}
       <Sidebar/>
       <main className='lg:col-span-3 xl:col-span-5 bg-gray-100 p-4 md:p-8'>
         <div className='flex justify-center pt-5'>
@@ -63,11 +79,11 @@ function AppAdmin() {
         <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
 
           {/* Card 1 */}
-          <div className='bg-sidebar-100 p-6 rounded-xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-2xl'>
-            <FaUsers className='text-7xl' />
-            <h4 className='text-3xl'>Total Usuarios</h4>
+          <div className='bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl'>
+            <FaUsers className='text-7xl animate-pulse' />
+            <h4 className='text-3xl font-semibold'>Total Usuarios</h4>
             <div>
-              <span className='flex text-3xl text-white'>
+              <span className='flex text-4xl text-white font-bold'>
                 {userCount} Usuarios
               </span>
             </div>
@@ -76,28 +92,39 @@ function AppAdmin() {
           {/* Card 2 */}
           <div className='col-span-2 flex flex-col items-center'>
             <div className='w-full'>
-              <h2 className="text-2xl font-bold mb-4 text-center ">Recordatorios</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center">Recordatorios próximos a cumplir su fecha</h2>
               <ul className='w-full overflow-y-auto max-h-[315px]'>
                 {recordatorios.length === 0 ? (
                   <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
                 ) : (
-                  recordatorios.map(recordatorio => (
-                    <li key={recordatorio._id} className='bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg'>
-                      <div >
-                        <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
-                        <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                      </div>
-                    </li>
-                  ))
+                  recordatorios.map(recordatorio => {
+                    const diasRestantes = calcularDiasRestantes(recordatorio.fechaRecordatorio);
+
+                    return (
+                      <li key={recordatorio._id} className={`bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg  duration-300 hover:scale-100 hover:shadow-2xl ${diasRestantes < 0 ? 'border-l-4 border-red-600' : 'border-l-4 border-green-600'}`}>
+                        <div>
+                          <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {diasRestantes < 0
+                              ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
+                              : diasRestantes === 0
+                              ? 'Recordatorio del día de hoy'
+                              : `Faltan ${diasRestantes} días`}
+                          </span>
+                          <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
+                          <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
+                        </div>
+                      </li>
+                    );
+                  })
                 )}
               </ul>
             </div>
           </div>
 
           {/* Card 3 */}
-          <div className="p-6 bg-gray-800 text-white rounded-xl w-full h-full shadow-xl">
+          <div className="p-6 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-2xl w-full h-full shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
             <div className="flex items-center gap-4 mb-4">
-              <h3 className="text-lg font-bold text-gray-100">Ultimo Usuario Creado</h3>
+              <h3 className="text-lg font-bold text-gray-100">Último Usuario Creado</h3>
             </div>
             {latestUser ? (
               <div className="flex items-center flex-col justify-between pt-3">
@@ -123,7 +150,7 @@ function AppAdmin() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
 export default AppAdmin;

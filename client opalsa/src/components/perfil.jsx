@@ -1,13 +1,19 @@
-// src/components/Perfil.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UpdateProfileModal from '../components/ModalActualizarD';
-import { updateUserRequest } from '../api/auth';
 import axios from 'axios';
+import perfilfondo from '../assets/images/perfil fondo.webp'; // Importar la imagen local
 
 const Perfil = () => {
   const { user, updateUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userData, setUserData] = useState(user);
+
+  useEffect(() => {
+    if (user) {
+      setUserData(user);
+    }
+  }, [user]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -16,16 +22,18 @@ const Perfil = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
   const handleUpdate = async (formData) => {
     try {
       console.log('Datos del formulario antes de actualizar:', formData);
-      if (!user || !user._id) { 
+      if (!user || !user._id) {
         console.error('ID de usuario no encontrado');
         return;
       }
       const response = await axios.put(`http://localhost:4000/api/users/${user._id}`, formData, { withCredentials: true });
       console.log('Usuario actualizado:', response.data);
       updateUser(response.data);
+      setUserData(response.data); // Actualizar el estado local del usuario
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
@@ -37,7 +45,7 @@ const Perfil = () => {
       <section className="relative block h-[500px]">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
-          style={{ backgroundImage: "url('https://wallpapercave.com/wp/wp4035445.jpg')" }}
+          style={{ backgroundImage: `url(${perfilfondo})` }} // Usar la imagen importada correctamente
         >
           <span id="blackOverlay" className="w-full h-full absolute opacity-50 bg-black"></span>
         </div>
@@ -76,35 +84,33 @@ const Perfil = () => {
                   <div className="py-6 px-3 mt-32 sm:mt-0 px-9">
                     <button
                       onClick={handleOpenModal}
-                      className="bg-blue-500 active:bg-blue-300 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1  ease-linear transition-all duration-150"
+                      className="bg-blue-500 active:bg-blue-300 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150"
                       type="button"
                     >
                       Actualizar Datos
                     </button>
                   </div>
                 </div>
-                <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                 
-                </div>
+                <div className="w-full lg:w-4/12 px-4 lg:order-1"></div>
               </div>
               <div className="text-center mt-12">
                 <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-                  {user.username || 'Nombre del Usuario'}
+                  {userData?.username || 'Nombre del Usuario'}
                 </h3>
                 <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
                   <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-                  {user.ciudad || 'Ciudad no especificada'}
+                  {userData?.ciudad || 'Ciudad no especificada'}
                 </div>
                 <div className="mb-2 text-blueGray-600 mt-10">
                   <i className="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>
-                  {user.cargo || 'Cargo no especificado'}
+                  {userData?.cargo || 'Cargo no especificado'}
                 </div>
               </div>
               <div className="mt-10 py-10 border-t border-blueGray-200 text-center">
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full lg:w-9/12 px-4">
-                    <h3>Cédula: {user.cedula || 'recargar la pagina'}</h3>
-                    <h3>Email: {user.email || 'recargar la pagina'}</h3>
+                    <h3>Cédula: {userData?.cedula || 'recargar la pagina'}</h3>
+                    <h3>Email: {userData?.email || 'recargar la pagina'}</h3>
                   </div>
                 </div>
               </div>
@@ -124,7 +130,7 @@ const Perfil = () => {
       <UpdateProfileModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        user={user}
+        user={userData}
         onUpdate={handleUpdate}
       />
     </main>

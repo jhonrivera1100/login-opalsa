@@ -94,55 +94,32 @@ export const crearElemento = async (req, res) => {
   }
 };
 
+
+
 // Actualizar un elemento existente
 export const actualizarElemento = async (req, res) => {
   const {
     nombreElemento,
-    codigoElemento,  // Campo nuevo
+    codigoElemento,
     marcaElemento,
     tipoElemento,
-    ubicacionDeElemento,
+    ubicacionDeElemento,  // Campo que actualiza la ubicación
   } = req.body;
 
   let updatedFields = {
     nombreElemento,
-    codigoElemento,  // Campo nuevo
+    codigoElemento,
     marcaElemento,
     tipoElemento,
-    ubicacionDeElemento,
+    ubicacionDeElemento,  // Asegúrate de que este campo se esté recibiendo y actualizando
   };
 
   try {
-    if (req.files && req.files.imgElemento) {
-      const elemento = await Elementos.findById(req.params.id);
-      if (elemento.imgElemento && elemento.imgElemento.public_id) {
-        await deleteImage(elemento.imgElemento.public_id);
-      }
-
-      const result = await uploadImage(req.files.imgElemento.tempFilePath);
-      await fs.remove(req.files.imgElemento.tempFilePath);
-      updatedFields.imgElemento = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
-    }
-
-    if (req.files && req.files.documentacionElemento) {
-      const elemento = await Elementos.findById(req.params.id);
-      if (elemento.documentacionElemento && elemento.documentacionElemento.public_id) {
-        await deleteImage(elemento.documentacionElemento.public_id);
-      }
-
-      const result = await uploadFile(req.files.documentacionElemento.tempFilePath, 'Documentos');
-      await fs.remove(req.files.documentacionElemento.tempFilePath);
-      updatedFields.documentacionElemento = {
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
-    }
-
+    // Actualizar el elemento con los campos actualizados, incluyendo la ubicación
     const updatedElemento = await Elementos.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
+
     if (!updatedElemento) return res.status(404).json({ message: "No se encuentra el elemento" });
+    
     res.json(updatedElemento);
   } catch (error) {
     res.status(500).json({
@@ -151,6 +128,8 @@ export const actualizarElemento = async (req, res) => {
     });
   }
 };
+
+
 
 // Eliminar un elemento
 export const eliminarElemento = async (req, res) => {

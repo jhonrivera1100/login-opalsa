@@ -3,13 +3,14 @@ import Sidebar from "../components/Sidebar";
 import HeaderNotificaciones from "../components/HeaderNotificaciones";
 import axios from "../api/axios";
 import OrdenCard from "../components/OrdenCard";
-import NotificacionesCard from "../components/NotificacionesCard"; // Importa NotificacionesCard
-import { FiSearch } from "react-icons/fi";
+import NotificacionesCard from "../components/NotificacionesCard";
 import { useAuth } from "../context/AuthContext";
 import Modal from "../components/ModalNotificaciones";
-import ModalOrden from "../components/ModalFormOrden"; // Importa el ModalOrden
+import ModalOrden from "../components/ModalFormOrden";
 import ModalSobrantes from "../components/ModalSobrantes";
 import debounce from "lodash/debounce";
+
+const ITEMS_PER_PAGE = 8; // Número de elementos por página
 
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
@@ -18,58 +19,106 @@ const NotificacionesAdmin = () => {
   const [modalOrdenVisible, setModalOrdenVisible] = useState(false);
   const [showSobrantesModal, setShowSobrantesModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const { user, isAuthenticated } = useAuth();
+  const [filter, setFilter] = useState("ordenes"); // Filtro para mostrar órdenes o notificaciones
+  const [orderStatusFilter, setOrderStatusFilter] = useState(""); // Filtro por estado de la orden
+
+  // Paginación para Órdenes
+  const [currentOrderPage, setCurrentOrderPage] = useState(1); // Página actual para Órdenes
+  const [totalOrderPages, setTotalOrderPages] = useState(1); // Total de páginas para Órdenes
+
+  // Paginación para Notificaciones
+  const [currentNotiPage, setCurrentNotiPage] = useState(1); // Página actual para Notificaciones
+  const [totalNotiPages, setTotalNotiPages] = useState(1); // Total de páginas para Notificaciones
+
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
-      const intervalId = setInterval(fetchData, 5000); // Actualiza cada 5 segundos
-      return () => clearInterval(intervalId);
+      if (filter === "ordenes") {
+        fetchOrdenes(currentOrderPage, orderStatusFilter); // Llamar a fetchOrdenes cuando estamos en Órdenes
+      } else {
+        fetchNotificaciones(currentNotiPage); // Llamar a fetchNotificaciones cuando estamos en Notificaciones
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, filter, currentOrderPage, currentNotiPage, orderStatusFilter]);
 
-  const fetchData = async () => {
+  // Fetch para Órdenes
+  const fetchOrdenes = async (page = 1, estadoOrden = "") => {
     try {
-      const [recordatoriosResponse, ordenesResponse] = await Promise.all([
-        axios.get("/recordatorios"),
-        axios.get("/ordenes"),
-      ]);
+      const response = await axios.get("/ordenes", {
+        params: { page, limit: ITEMS_PER_PAGE, estadoOrden },
+      });
 
-      const recordatorios = recordatoriosResponse.data.map(recordatorio => ({
+      const { ordenes, totalPages } = response.data;
+      const formattedOrdenes = ordenes.map((orden) => ({
+        ...orden,
+        type: "orden",
+        fecha: new Date(orden.fechaOrden),
+        descripcionOrden: orden.descripcionOrden || "",
+        estadoOrden: orden.estadoOrden,
+        maquina: orden.maquina || {}, // Incluir el objeto de la máquina
+      }));
+
+      setCombinedItems(formattedOrdenes);
+      setTotalOrderPages(totalPages); // Actualizamos el total de páginas para Órdenes
+    } catch (error) {
+      console.error("Error al obtener órdenes:", error);
+    }
+  };
+
+  // Fetch para Notificaciones
+  const fetchNotificaciones = async (page = 1) => {
+    try {
+      const response = await axios.get("/recordatorios", {
+        params: { page, limit: ITEMS_PER_PAGE }, // Paginación para notificaciones
+      });
+
+      const { recordatorios, totalPages } = response.data;
+      const formattedRecordatorios = recordatorios.map((recordatorio) => ({
         ...recordatorio,
         type: "recordatorio",
         fecha: new Date(recordatorio.fechaRecordatorio),
         descripcion: recordatorio.descripcion || "",
       }));
 
-      const ordenes = ordenesResponse.data.map(orden => ({
-        ...orden,
-        type: "orden",
-        fecha: new Date(orden.fechaOrden),
-        descripcionOrden: orden.descripcionOrden || "",
-      }));
-
-      // Asegúrate de que no haya duplicados en los datos combinados
-      const combinedItems = [...recordatorios, ...ordenes];
-      combinedItems.sort((a, b) => b.fecha - a.fecha);
-
-      setCombinedItems(combinedItems);
+      setCombinedItems(formattedRecordatorios);
+      setTotalNotiPages(totalPages); // Actualizamos el total de páginas para Notificaciones
     } catch (error) {
-      console.error("Error al obtener datos:", error);
+      console.error("Error al obtener notificaciones:", error);
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const filteredItems = combinedItems.filter(
-    (item) =>
-      (item.descripcion &&
-        item.descripcion.toLowerCase().includes(searchTerm.toLowerCase())) ||
+  const filteredItems = combinedItems.filter((item) => {
+    const term = searchTerm.toLowerCase();
+    const matchDescription =
+      (item.descripcion && item.descripcion.toLowerCase().includes(term)) ||
       (item.descripcionOrden &&
-        item.descripcionOrden.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+        item.descripcionOrden.toLowerCase().includes(term));
+    const matchMaquinaSerial =
+      item.type === "orden" &&
+      item.maquina.nroSerieMaquina &&
+      item.maquina.nroSerieMaquina.toLowerCase().includes(term);
+    const matchUbicacion =
+      item.type === "orden" &&
+      item.maquina.ubicacionMaquina &&
+      item.maquina.ubicacionMaquina.toLowerCase().includes(term);
+    const matchUsuario =
+      item.type === "orden" &&
+      item.usuario &&
+      item.usuario.username &&
+      item.usuario.username.toLowerCase().includes(term);
+
+    return (
+      matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario
+    );
+  });
+
+  // Filtrar por tipo (órdenes o notificaciones)
+  const filteredByState = filteredItems.filter((item) => {
+    if (filter === "ordenes") return item.type === "orden";
+    if (filter === "notificaciones") return item.type === "recordatorio";
+    return false;
+  });
 
   const handleDescriptionClick = (item) => {
     setSelectedItem({
@@ -91,8 +140,8 @@ const NotificacionesAdmin = () => {
   };
 
   const handleAcceptOrder = (item) => {
-    setSelectedItem(item); // Guarda la orden seleccionada
-    setModalOrdenVisible(true); // Muestra el modal
+    setSelectedItem(item);
+    setModalOrdenVisible(true);
   };
 
   const closeModal = () => {
@@ -105,12 +154,7 @@ const NotificacionesAdmin = () => {
     setSelectedItem(null);
   };
 
-  const handleOpenFile = (url) => {
-    window.open(url, "_blank");
-  };
-
   const handleDeleteItem = async (id, type) => {
-    console.log(`Eliminando ${type} con ID: ${id}`); // Añade esto para depuración
     try {
       if (type === "recordatorio") {
         await axios.delete(`/recordatorios/${id}`);
@@ -128,11 +172,9 @@ const NotificacionesAdmin = () => {
   const handleCheckboxChange = useCallback(
     debounce(async (id, visto) => {
       try {
-        console.log(`Actualizando recordatorio ${id} a visto: ${!visto}`);
         const response = await axios.patch(`/recordatorios/${id}/visto`, {
           visto: !visto,
         });
-        console.log("Respuesta del servidor:", response.data);
         setCombinedItems((prevItems) =>
           prevItems.map((item) =>
             item._id === id ? { ...item, visto: response.data.visto } : item
@@ -148,13 +190,9 @@ const NotificacionesAdmin = () => {
   const handleCheckboxAceptar = useCallback(
     debounce(async (id, aceptar) => {
       try {
-        console.log(`Actualizando orden ${id} a aceptado: ${!aceptar}`);
         const response = await axios.patch(`/ordenes/${id}/aceptar`, {
           aceptado: !aceptar,
         });
-        console.log("Respuesta del servidor:", response.data);
-
-        // Actualiza el estado local con la respuesta del servidor
         setCombinedItems((prevItems) =>
           prevItems.map((item) =>
             item._id === id
@@ -165,7 +203,7 @@ const NotificacionesAdmin = () => {
       } catch (error) {
         console.error("Error al actualizar el estado de aceptado:", error);
       }
-    }, 50), // Ajusta el debounce según sea necesario
+    }, 50),
     []
   );
 
@@ -188,29 +226,96 @@ const NotificacionesAdmin = () => {
     closeSobrantesModal();
   };
 
+  // Paginación para Órdenes
+  const handlePreviousOrderPage = () => {
+    if (currentOrderPage > 1) {
+      setCurrentOrderPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNextOrderPage = () => {
+    if (currentOrderPage < totalOrderPages) {
+      setCurrentOrderPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  // Paginación para Notificaciones
+  const handlePreviousNotiPage = () => {
+    if (currentNotiPage > 1) {
+      setCurrentNotiPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNextNotiPage = () => {
+    if (currentNotiPage < totalNotiPages) {
+      setCurrentNotiPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handleOrderStatusFilterChange = (e) => {
+    setOrderStatusFilter(e.target.value); // Cambiar el filtro por estado de la orden
+    setCurrentOrderPage(1); // Reiniciar a la primera página al cambiar el filtro
+  };
+
+  // Reiniciar las páginas al cambiar de sección (órdenes o notificaciones)
+  const handleSectionChange = (section) => {
+    setFilter(section);
+    if (section === "ordenes") {
+      setCurrentOrderPage(1); // Resetear la página de órdenes a 1
+    } else {
+      setCurrentNotiPage(1); // Resetear la página de notificaciones a 1
+    }
+  };
+
   return (
-    <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen">
+    <div className="grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins">
       <Sidebar />
       <div className="lg:col-span-3 xl:col-span-5 p-4 lg:p-8">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between">
           <HeaderNotificaciones />
-          <div className="relative mt-4 lg:mt-0 lg:ml-4">
-            <div className="relative w-full">
-              <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                className="bg-gray-200 outline-none py-2 pl-10 pr-4 rounded-xl w-full"
-                placeholder="Buscar"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-            </div>
-          </div>
         </div>
+
+        <div className="mb-4 flex flex-wrap justify-center gap-4 pt-4 lg:pt-10">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              filter === "ordenes" ? "bg-green-600 text-white" : "bg-gray-300"
+            }`}
+            onClick={() => handleSectionChange("ordenes")}
+          >
+            Órdenes
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              filter === "notificaciones"
+                ? "bg-orange-600 text-white"
+                : "bg-gray-300"
+            }`}
+            onClick={() => handleSectionChange("notificaciones")}
+          >
+            Notificaciones
+          </button>
+        </div>
+
+        {/* Filtro por estado de la orden como lista desplegable */}
+        {filter === "ordenes" && (
+          <div className="mb-4 flex justify-center">
+            <select
+              className="px-4 py-2 border rounded-lg bg-gray-200"
+              value={orderStatusFilter}
+              onChange={handleOrderStatusFilterChange}
+            >
+              <option value="">Todas las Órdenes</option>
+              <option value="Orden aprobada">Orden Aprobada</option>
+              <option value="Orden en solicitud">Orden en Solicitud</option>
+              <option value="Orden finalizada">Orden finalizada</option>
+            </select>
+          </div>
+        )}
+
         <div className="w-full pt-6">
           <div className="h-[640px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredItems.map((item) =>
+              {filteredByState.map((item) =>
                 item.type === "orden" ? (
                   <OrdenCard
                     key={item._id}
@@ -234,9 +339,50 @@ const NotificacionesAdmin = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Modal genérico para mostrar detalles del usuario o recordatorio */}
+        {/* Botones de paginación */}
+        {filter === "ordenes" ? (
+          <div className="flex justify-center mt-6">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded mr-2"
+              onClick={handlePreviousOrderPage}
+              disabled={currentOrderPage === 1}
+            >
+              Anterior
+            </button>
+            <span className="px-4 py-2 text-gray-700">
+              Página {currentOrderPage} de {totalOrderPages}
+            </span>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded ml-2"
+              onClick={handleNextOrderPage}
+              disabled={currentOrderPage >= totalOrderPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center mt-6">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded mr-2"
+              onClick={handlePreviousNotiPage}
+              disabled={currentNotiPage === 1}
+            >
+              Anterior
+            </button>
+            <span className="px-4 py-2 text-gray-700">
+              Página {currentNotiPage} de {totalNotiPages}
+            </span>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded ml-2"
+              onClick={handleNextNotiPage}
+              disabled={currentNotiPage >= totalNotiPages}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
+      </div>
       {modalVisible && selectedItem && (
         <Modal onClose={closeModal}>
           <div className="p-4">
@@ -258,8 +404,6 @@ const NotificacionesAdmin = () => {
           </div>
         </Modal>
       )}
-
-      {/* Modal para las órdenes */}
       {modalOrdenVisible && selectedItem && (
         <ModalOrden
           visible={modalOrdenVisible}
@@ -268,8 +412,6 @@ const NotificacionesAdmin = () => {
           handleSave={fetchData}
         />
       )}
-
-      {/* Modal para sobrantes */}
       {showSobrantesModal && selectedItem && (
         <ModalSobrantes
           visible={showSobrantesModal}

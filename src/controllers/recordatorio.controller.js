@@ -44,14 +44,43 @@ export const createRecordatorio = async (req, res) => {
 // Controlador para obtener todos los recordatorios
 export const getRecordatorios = async (req, res) => {
   try {
-    const recordatorios = await Recordatorio.find().populate('usuario', 'username');
-    res.status(200).json(recordatorios);
+    const { page = 1, limit = 8 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const recordatorios = await Recordatorio.find()
+      .sort({ fechaRecordatorio: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('usuario', 'username');
+
+    const totalRecordatorios = await Recordatorio.countDocuments();
+
+    res.status(200).json({
+      recordatorios,
+      totalPages: Math.ceil(totalRecordatorios / limit),
+    });
   } catch (error) {
     console.error("Error al obtener recordatorios:", error);
     res.status(500).json({ message: "Error al obtener los recordatorios." });
   }
 };
 
+export const getUltimos10Recordatorios = async (req, res) => {
+  try {
+    const fechaActual = new Date(); // Obtener la fecha actual
+    const recordatorios = await Recordatorio.find({
+      fechaRecordatorio: { $gte: fechaActual }  // Filtrar solo recordatorios con fecha futura o igual a hoy
+    })
+      .sort({ fechaRecordatorio: 1 })  // Ordenar por fecha más cercana
+      .limit(10)  // Limitar a los 10 más próximos
+      .populate('usuario', 'username');  // Popular el usuario relacionado si es necesario
+
+    res.status(200).json(recordatorios);
+  } catch (error) {
+    console.error("Error al obtener los últimos 10 recordatorios:", error);
+    res.status(500).json({ message: "Error al obtener los recordatorios." });
+  }
+};
 // Controlador para eliminar un recordatorio
 export const deleteRecordatorio = async (req, res) => {
   try {

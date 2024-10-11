@@ -8,31 +8,93 @@ import { v4 as uuidv4 } from 'uuid'; // Para generar números de orden únicos
 // Obtener todas las órdenes
 export const getOrdenes = async (req, res) => {
   try {
-    const ordenes = await Orden.find()
+    const { page = 1, limit = 8, estadoOrden } = req.query; // Recibe paginación y filtro de estado desde el frontend
+    const skip = (page - 1) * limit;
+
+    // Construir un filtro dinámico basado en el estado de la orden si se proporciona
+    const filter = estadoOrden ? { estadoOrden } : {};
+
+    const ordenes = await Orden.find(filter)
+      .sort({ fechaOrden: -1 }) // Ordenar por la fecha más reciente
+      .skip(skip)
+      .limit(parseInt(limit))
       .populate('elementoOrden')
       .populate('elementoOrdenSobrantes')
       .populate('componentesAsignados')
       .populate('componentesSobrantes');
 
-    res.json(ordenes);
+    const totalOrdenes = await Orden.countDocuments(filter); // Contar el total de órdenes basado en el filtro
+
+    res.status(200).json({
+      ordenes,
+      totalPages: Math.ceil(totalOrdenes / limit), // Total de páginas
+    });
   } catch (error) {
     console.error('Error al obtener las órdenes:', error.message);
     res.status(500).json({ message: 'Error al obtener las órdenes', error: error.message });
   }
 };
 
-// Obtener las órdenes de un usuario
-// Obtener las órdenes de un usuario
+// Obtener órdenes del usuario autenticado con paginación
+export const getOrdenesUsuarioAutenticado = async (req, res) => {
+  try {
+    const userId = req.idUsuario;
+
+    // Verificamos que el ID del usuario es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Usuario inválido" });
+    }
+
+    const { page = 1, limit = 8, estadoOrden, numeroOrden } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Filtro básico para órdenes del usuario
+    const filter = { idUsuario: userId };
+
+    // Añadir filtro por estado si se proporciona
+    if (estadoOrden) {
+      filter.estadoOrden = estadoOrden;
+    }
+
+    // Añadir filtro por número de orden si se proporciona
+    if (numeroOrden) {
+      filter.numeroOrden = { $regex: numeroOrden, $options: 'i' }; // Búsqueda insensible a mayúsculas
+    }
+
+    // Consulta con paginación
+    const ordenes = await Orden.find(filter)
+      .sort({ fechaOrden: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Contar el total de órdenes del usuario
+    const totalOrdenes = await Orden.countDocuments(filter);
+
+    // Devolver las órdenes paginadas y el total de páginas
+    res.status(200).json({
+      ordenes,
+      totalPages: Math.ceil(totalOrdenes / limit),
+    });
+  } catch (error) {
+    console.error('Error al obtener las órdenes del usuario:', error.message);
+    res.status(500).json({ message: 'Error al obtener las órdenes del usuario', error: error.message });
+  }
+};
+
+
+
+
 export const getOrdenesByUser = async (req, res) => {
   try {
-    const userId = req.user._id; // Asegúrate de que req.user esté definido
-    const ordenes = await Orden.find({ idUsuario: userId }) // Usa idUsuario para filtrar
-      .populate('componentesAsignados') // Asegúrate de que estos campos estén en tu esquema de Orden
-      .populate('componentesSobrantes');
-    res.status(200).json(ordenes);
+    // Obtén el ID del usuario autenticado
+    const userId = req.idUsuario;
+
+    // Busca las órdenes que pertenezcan a ese usuario
+    const ordenes = await Orden.find({ usuario: userId }).populate('usuario').populate('componentes');
+
+    res.json(ordenes);
   } catch (error) {
-    console.error('Error al obtener órdenes por usuario:', error.message);
-    res.status(500).json({ message: 'Error al obtener órdenes por usuario', error: error.message });
+    res.status(500).json({ message: 'Error al obtener las órdenes', error });
   }
 };
 
@@ -62,41 +124,60 @@ export const obtenerOrdenPorId = async (req, res) => {
 // Crear una nueva orden
 export const createOrden = async (req, res) => {
   try {
+    console.log('Datos recibidos:', req.body);
+
     const { descripcionOrden, nroSerieMaquina, marcaMaquina, ubicacionMaquina, usuario, tipoDeMantenimiento, componentesAsignados = [], componentesSobrantes = [] } = req.body;
 
+    if (!descripcionOrden || !nroSerieMaquina || !ubicacionMaquina || !usuario) {
+      return res.status(400).json({ message: 'Faltan campos requeridos' });
+    }
+
     const fechaOrden = new Date();
-    const numeroOrden = uuidv4();
+    // Formato de fecha: ddmmaaaa
+    const day = fechaOrden.getDate().toString().padStart(2, '0');
+    const month = (fechaOrden.getMonth() + 1).toString().padStart(2, '0');
+    const year = fechaOrden.getFullYear();
+    const fechaStr = `${day}${month}${year}`;
+
+    // Generar parte única basada en UUID (una porción más pequeña y legible)
+    const shortUuid = uuidv4().split('-')[0]; // Usar solo una parte del UUID
+
+    // Formato del número de orden mejorado
+    const numeroOrden = `ORD-${fechaStr}-${shortUuid}`; // Por ejemplo: "ORD-08102023-5f2c"
 
     // Verificar que el usuario exista
     const usuarioObj = await User.findOne({ username: usuario });
     if (!usuarioObj) {
+      console.log('Usuario no encontrado');
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
+
+    console.log('Usuario encontrado:', usuarioObj);
 
     // Guardar los detalles de la máquina directamente desde la solicitud
     const maquinaInfo = {
       nroSerieMaquina,
       marcaMaquina,
-      ubicacionMaquina
+      ubicacionMaquina,
     };
 
     const nuevaOrden = new Orden({
       fechaOrden,
       descripcionOrden,
-      maquina: maquinaInfo, // Almacenamos directamente la información de la máquina
+      maquina: maquinaInfo,
       usuario: {
         username: usuarioObj.username,
         email: usuarioObj.email,
-        cargo: usuarioObj.cargo
+        cargo: usuarioObj.cargo,
       },
-      idUsuario: usuarioObj._id, // Almacenar el ID del usuario en el campo idUsuario
+      idUsuario: usuarioObj._id,
       numeroOrden,
       tipoDeMantenimiento,
       componentesAsignados,
       componentesSobrantes,
       elementoOrden: [],
       elementoOrdenSobrantes: [],
-      fechaCumplimiento: null
+      fechaCumplimiento: null,
     });
 
     await nuevaOrden.save();

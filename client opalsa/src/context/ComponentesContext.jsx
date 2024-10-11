@@ -4,6 +4,7 @@ import {
   deleteComponentesRequest,
   getComponentesRequest,
   updateComponentesRequest,
+  getComponenteBySerialRequest,
 } from "../api/componentes.js";
 
 const ComponentesContext = createContext();
@@ -18,22 +19,54 @@ export const useComponentes = () => {
 
 export function ComponentesProvider({ children }) {
   const [componentes, setComponentes] = useState([]);
+  const [pagination, setPagination] = useState({
+    totalComponentes: 0,
+    currentPage: 1,
+    totalPages: 1,
+  });
+  const [loading, setLoading] = useState(false);
 
-  const getComponentes = async () => {
+  // Obtener componentes con paginación y filtrado por máquina
+  const getComponentes = async (maquinaId, page = 1, limit = 6) => {
+    setLoading(true); // Establecer estado de carga
     try {
-      const response = await getComponentesRequest();
-      setComponentes(response.data);
+      const response = await getComponentesRequest(maquinaId, page, limit);
+      setComponentes(response.data.componentes);
+
+      // Actualizar la paginación
+      setPagination({
+        totalComponentes: response.data.totalComponentes,
+        currentPage: response.data.currentPage,
+        totalPages: response.data.totalPages,
+      });
     } catch (error) {
       console.error("Error al obtener componentes:", error);
+    } finally {
+      setLoading(false); // Finalizar estado de carga
     }
   };
+
+  const getComponenteBySerial = async (serial) => {
+    setLoading(true); 
+    try {
+      const response = await getComponenteBySerialRequest(serial);
+      return response.data; // Devuelve el componente directamente en lugar de actualizar el estado de componentes
+    } catch (error) {
+      console.error("Error al obtener componente por serial:", error);
+      return null; // En caso de error o si no se encuentra, devolver null
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
 
   const createComponente = async (componenteData) => {
     try {
       const response = await createComponentesRequest(componenteData);
       console.log("Componente creado:", response.data);
-      // Actualizar la lista de componentes después de crear uno nuevo
-      getComponentes();
+      // Después de crear un nuevo componente, se recarga la lista de componentes
+      getComponentes(response.data.maquina);
     } catch (error) {
       console.error("Error al crear componente:", error);
     }
@@ -43,19 +76,19 @@ export function ComponentesProvider({ children }) {
     try {
       const response = await updateComponentesRequest(componenteData);
       console.log("Componente actualizado:", response.data);
-      // Actualizar la lista de componentes después de actualizar uno existente
-      getComponentes();
+      // Después de actualizar un componente, se recarga la lista de componentes
+      getComponentes(response.data.maquina, pagination.currentPage);
     } catch (error) {
       console.error("Error al actualizar componente:", error);
     }
   };
 
-  const deleteComponente = async (id) => {
+  const deleteComponente = async (id, maquinaId) => {
     try {
       const response = await deleteComponentesRequest(id);
       console.log("Componente eliminado:", response.data);
-      // Actualizar la lista de componentes después de eliminar uno
-      getComponentes();
+      // Después de eliminar un componente, se recarga la lista de componentes
+      getComponentes(maquinaId, pagination.currentPage);
     } catch (error) {
       console.error("Error al eliminar componente:", error);
     }
@@ -65,10 +98,13 @@ export function ComponentesProvider({ children }) {
     <ComponentesContext.Provider
       value={{
         componentes,
+        pagination, // Exponer el estado de la paginación
+        loading, // Exponer el estado de carga
         getComponentes,
         createComponente,
         updateComponente,
         deleteComponente,
+        getComponenteBySerial,
       }}
     >
       {children}

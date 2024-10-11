@@ -15,7 +15,8 @@ import mantenimientoRoutes from './routes/mantenimiento.routes.js';
 import movimientosCRoutes from './routes/movimientosC.routes.js';
 import moviMaquinasRoutes from './routes/moviMaquinas.routes.js';
 import ordenRoutes from './routes/orden.routes.js';
-import elementosRoutes from './routes/elementos.routes.js'; // Importa las rutas de elementos
+import elementosRoutes from './routes/elementos.routes.js'; // Rutas para elementos
+import movimientosElementosRoutes from './routes/movimientosElementos.routes.js'; // Rutas para movimientos de elementos
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(fileUpload({
 }));
 app.use(cookieParser());
 
+// Rutas de la API
 app.use('/api', authRoutes);
 app.use('/api', recordatorioRoutes);
 app.use('/api', userRoutes);
@@ -46,6 +48,8 @@ app.use('/api', movimientosCRoutes);
 app.use('/api', moviMaquinasRoutes);
 app.use('/api', ordenRoutes); 
 app.use('/api', elementosRoutes); // Agrega las rutas de elementos
+app.use('/api', movimientosElementosRoutes); // Agrega las rutas de movimientos de elementos
+
 // Middleware para servir archivos estáticos
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
