@@ -69,7 +69,7 @@ const CrearNotificacion = () => {
       <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
         <div className="flex justify-center">
           <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">
-            Notificar Al Administrador
+            Recordatorios para el administrador
           </h2>
         </div>
         <form onSubmit={handleSubmit}>
@@ -115,7 +115,7 @@ const CrearNotificacion = () => {
             </div>
             <div className="col-span-1">
               <label className="block text-gray-700 text-sm font-bold mb-2">
-                Documento
+                {"Documento (Opcional)"}
               </label>
               <input
                 type="file"

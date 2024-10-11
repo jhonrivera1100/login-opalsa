@@ -59,7 +59,7 @@ const NotificacionesCard = ({
         <GoDiscussionClosed className="w-8 h-8" />
       </div>
       <div>
-        <p className="text-xl font-semibold mb-2">Notificación</p>
+        <p className="text-xl font-semibold mb-2">Recordatorio</p>
         <div className="flex items-center space-x-2 text-gray-400 text-sm mb-3">
           <FaRegUser className="h-5 w-5" />
           <p>

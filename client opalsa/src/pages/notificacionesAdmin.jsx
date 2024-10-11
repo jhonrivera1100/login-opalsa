@@ -4,7 +4,6 @@ import HeaderNotificaciones from "../components/HeaderNotificaciones";
 import axios from "../api/axios";
 import OrdenCard from "../components/OrdenCard";
 import NotificacionesCard from "../components/NotificacionesCard";
-import { FiSearch } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import Modal from "../components/ModalNotificaciones";
 import ModalOrden from "../components/ModalFormOrden";
@@ -87,10 +86,6 @@ const NotificacionesAdmin = () => {
     } catch (error) {
       console.error("Error al obtener notificaciones:", error);
     }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
   };
 
   const filteredItems = combinedItems.filter((item) => {
@@ -278,18 +273,6 @@ const NotificacionesAdmin = () => {
       <div className="lg:col-span-3 xl:col-span-5 p-4 lg:p-8">
         <div className="mb-4 flex flex-col lg:flex-row lg:justify-between">
           <HeaderNotificaciones />
-          <div className="relative mt-4 lg:mt-0 lg:ml-4">
-            <div className="relative w-full">
-              <FiSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                className="bg-gray-200 outline-none py-2 pl-10 pr-4 rounded-xl w-full"
-                placeholder="Buscar"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="mb-4 flex flex-wrap justify-center gap-4 pt-4 lg:pt-10">

@@ -11,6 +11,7 @@ const OrdenCard = ({
   handleOpenSobrantesModal,
 }) => {
   const {
+    numeroOrden ="",
     estadoOrden = "Estado desconocido",
     usuario = {},
     descripcionOrden = "Descripción desconocida",
@@ -83,6 +84,7 @@ const OrdenCard = ({
         >
           <FaRegUser className="h-5 w-5" />
           <p>{usuario.username ? truncatedName : "Desconocido"}</p>
+          <p>{usuario.cargo}</p>
           {showTooltip && usuario.username && (
             <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
               {usuario.username}
@@ -112,10 +114,13 @@ const OrdenCard = ({
             className="text-gray-600 mb-2 cursor-pointer"
             onClick={() => handleDescriptionClick(item)}
           >
-            <strong>Orden:</strong> <br />
+            <strong>Descripcion:</strong> <br />
             {descripcionOrden.length > 20
               ? `${descripcionOrden.substring(0, 20)}...`
               : descripcionOrden}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <strong>Numero de orden:</strong> <br /> {numeroOrden}
           </p>
           <p className="text-gray-600 mb-2">
             <strong>Maquina Serial:</strong> <br /> {nroSerieMaquina}
