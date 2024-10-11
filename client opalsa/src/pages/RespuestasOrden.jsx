@@ -157,8 +157,8 @@ const RespuestasOrden = () => {
           </div>
         </div>
 
-        {/* Paginación */}
-        <div className="flex justify-center mt-4">
+        {/* Paginación y Contador de páginas */}
+        <div className="flex justify-center items-center mt-4">
           <button
             className="px-4 py-2 bg-gray-300 rounded mr-2"
             onClick={() => setPage(page > 1 ? page - 1 : 1)}
@@ -166,6 +166,9 @@ const RespuestasOrden = () => {
           >
             Anterior
           </button>
+          <span className="text-lg mx-4">
+            Página {page} de {totalPages}
+          </span>
           <button
             className="px-4 py-2 bg-gray-300 rounded"
             onClick={() => setPage(page < totalPages ? page + 1 : totalPages)}
