@@ -9,20 +9,32 @@ const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
   const [filteredOrdenes, setFilteredOrdenes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [filterDate, setFilterDate] = useState(""); // Estado para manejar la fecha
+  const [estadoOrden, setEstadoOrden] = useState(""); // Añadir estado para el filtro
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOrden, setSelectedOrden] = useState(null);
   const { user, loading } = useAuth();
+  const [page, setPage] = useState(1); // Para manejar la paginación
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
 
+  // Función para obtener las órdenes desde el backend
   useEffect(() => {
     const fetchOrdenes = async () => {
       if (!loading && user) {
         try {
-          const response = await axios.get(`/ordenes`);
-          const ordenesFiltradas = response.data.filter(
-            (orden) => orden.idUsuario === user._id
-          );
-          setOrdenes(ordenesFiltradas);
+          // Enviar búsqueda (searchTerm), estado, fecha y paginación al backend
+          const response = await axios.get(`/ordenes/usuario-autenticado`, {
+            params: { 
+              page, 
+              limit: 8,
+              numeroOrden: searchTerm, // Añadir el término de búsqueda
+              estadoOrden, // Enviar el estado seleccionado
+              filterDate // Enviar la fecha seleccionada
+            }
+          });
+
+          setOrdenes(response.data.ordenes);
+          setTotalPages(response.data.totalPages); // Ajustamos el número total de páginas según lo recibido del backend
         } catch (error) {
           console.error("Error al traer las órdenes:", error);
         }
@@ -30,24 +42,17 @@ const RespuestasOrden = () => {
     };
 
     fetchOrdenes();
-  }, [user, loading]);
+  }, [user, loading, page, searchTerm, estadoOrden, filterDate]); // Dependemos también del estado y la fecha para realizar la consulta
 
-  useEffect(() => {
-    filterOrdenes();
-  }, [searchTerm, filterDate, ordenes]);
-
+  // Función para formatear la fecha
   const formatDate = (date) => {
     const options = { day: "2-digit", month: "2-digit", year: "numeric" };
     return new Date(date).toLocaleDateString("es-ES", options);
   };
 
+  // Función para filtrar las órdenes en base al número de orden, la fecha y el estado
   const filterOrdenes = () => {
     let filtered = ordenes;
-    if (searchTerm) {
-      filtered = filtered.filter((orden) =>
-        orden.numeroOrden.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
     if (filterDate) {
       filtered = filtered.filter((orden) =>
         formatDate(orden.fechaOrden) === filterDate
@@ -56,15 +61,23 @@ const RespuestasOrden = () => {
     setFilteredOrdenes(filtered);
   };
 
+  // Actualiza el filtro cuando cambia la fecha o las órdenes
+  useEffect(() => {
+    filterOrdenes();
+  }, [filterDate, ordenes]);
+
+  // Función para manejar la visualización de más detalles en el modal
   const handleShowMore = (orden) => {
     setSelectedOrden(orden);
     setIsOpen(true);
   };
 
+  // Función para cerrar el modal
   const handleModalClose = () => {
     setIsOpen(false);
   };
 
+  // Renderizar el estado de carga
   if (loading) {
     return <div>Cargando...</div>;
   }
@@ -76,22 +89,41 @@ const RespuestasOrden = () => {
         <HeaderRespuestas />
       </div>
       <div className="w-full pt-4 lg:pl-[50px]">
-        {/* Inputs para buscar y filtrar */}
+        {/* Inputs para buscar, filtrar por estado y fecha */}
         <div className="mb-4 flex flex-col sm:flex-row gap-4 justify-center">
           <input
             type="text"
             placeholder="Buscar por número de orden"
             className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value); // Actualiza el término de búsqueda
+              setPage(1); // Reinicia a la primera página en cada búsqueda
+            }}
           />
-          <input
-            type="text"
-            placeholder="dd/mm/aaaa"
+          <select
             className="px-4 py-2 border rounded-lg w-full sm:w-[150px] md:w-[200px]"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-          />
+            value={estadoOrden}
+            onChange={(e) => {
+              setEstadoOrden(e.target.value); // Actualiza el estado de orden seleccionado
+              setPage(1); // Reinicia a la primera página cuando cambia el estado
+            }}
+          >
+            <option value="">Todos los estados</option>
+            <option value="Orden en solicitud">Orden en solicitud</option>
+            <option value="Orden aprobada">Orden aprobada</option>
+            <option value="Orden finalizada">Orden finalizada</option>
+          </select>
+          <input
+  type="date"
+  className="px-4 py-2 border rounded-lg w-full sm:w-[150px] md:w-[200px]"
+  value={filterDate}
+  onChange={(e) => {
+    setFilterDate(e.target.value);
+    setPage(1); // Reinicia la paginación al cambiar la fecha
+  }}
+/>
+
         </div>
 
         {/* Contenedor de las órdenes */}
@@ -147,6 +179,25 @@ const RespuestasOrden = () => {
             )}
           </div>
         </div>
+
+        {/* Paginación */}
+        <div className="flex justify-center mt-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded mr-2"
+            onClick={() => setPage(page > 1 ? page - 1 : 1)}
+            disabled={page === 1}
+          >
+            Anterior
+          </button>
+          <button
+            className="px-4 py-2 bg-gray-300 rounded"
+            onClick={() => setPage(page < totalPages ? page + 1 : totalPages)}
+            disabled={page === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+
         {isOpen && selectedOrden && (
           <ModalRespOrden
             isOpen={isOpen}

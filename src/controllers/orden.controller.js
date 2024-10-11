@@ -35,6 +35,55 @@ export const getOrdenes = async (req, res) => {
   }
 };
 
+// Obtener órdenes del usuario autenticado con paginación
+export const getOrdenesUsuarioAutenticado = async (req, res) => {
+  try {
+    const userId = req.idUsuario;
+
+    // Verificamos que el ID del usuario es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Usuario inválido" });
+    }
+
+    const { page = 1, limit = 8, estadoOrden, numeroOrden } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Filtro básico para órdenes del usuario
+    const filter = { idUsuario: userId };
+
+    // Añadir filtro por estado si se proporciona
+    if (estadoOrden) {
+      filter.estadoOrden = estadoOrden;
+    }
+
+    // Añadir filtro por número de orden si se proporciona
+    if (numeroOrden) {
+      filter.numeroOrden = { $regex: numeroOrden, $options: 'i' }; // Búsqueda insensible a mayúsculas
+    }
+
+    // Consulta con paginación
+    const ordenes = await Orden.find(filter)
+      .sort({ fechaOrden: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Contar el total de órdenes del usuario
+    const totalOrdenes = await Orden.countDocuments(filter);
+
+    // Devolver las órdenes paginadas y el total de páginas
+    res.status(200).json({
+      ordenes,
+      totalPages: Math.ceil(totalOrdenes / limit),
+    });
+  } catch (error) {
+    console.error('Error al obtener las órdenes del usuario:', error.message);
+    res.status(500).json({ message: 'Error al obtener las órdenes del usuario', error: error.message });
+  }
+};
+
+
+
+
 export const getOrdenesByUser = async (req, res) => {
   try {
     // Obtén el ID del usuario autenticado
