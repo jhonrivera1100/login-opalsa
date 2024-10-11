@@ -87,7 +87,7 @@ export const buscarMaquinaPorSerieFlexible = async (req, res) => {
     }
 
     // Buscar la máquina en la base de datos
-    const maquina = await Maquinas.findOne(query).select('nroSerieMaquina marcaMaquina ubicacionMaquina fechaInstalacionMaquina estadoMaquina imgMaquina.url');
+    const maquina = await Maquinas.findOne(query)
 
     if (!maquina) {
       return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });

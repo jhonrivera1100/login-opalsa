@@ -98,7 +98,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           // Agregar los nuevos componentes a la lista seleccionada
           if (nuevosComponentes.length > 0) {
             setSelectedComponentes([...selectedComponentes, ...nuevosComponentes]);
-            setSearchMessage(`Componentes con serial ${serialSearch} agregados.`);
+            setSearchMessage(`Componentes con serial ${serialSearch} encontrado.`);
             setSearchError('');
           } else {
             setSearchError(`Todos los componentes con serial ${serialSearch} ya han sido agregados.`);

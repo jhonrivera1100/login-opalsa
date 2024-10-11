@@ -44,16 +44,29 @@ export const createRecordatorio = async (req, res) => {
 // Controlador para obtener todos los recordatorios
 export const getRecordatorios = async (req, res) => {
   try {
-    const { page = 1, limit = 8 } = req.query;
+    const { page = 1, limit = 8, fechaRecordatorio } = req.query;
     const skip = (page - 1) * limit;
 
-    const recordatorios = await Recordatorio.find()
+    // Filtro dinámico basado en la fecha proporcionada
+    const filter = {};
+    if (fechaRecordatorio) {
+      const startDate = new Date(fechaRecordatorio);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1); // Sumamos un día para abarcar todo el día
+
+      filter.fechaRecordatorio = {
+        $gte: startDate,
+        $lt: endDate,
+      };
+    }
+
+    const recordatorios = await Recordatorio.find(filter)
       .sort({ fechaRecordatorio: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .populate('usuario', 'username');
 
-    const totalRecordatorios = await Recordatorio.countDocuments();
+    const totalRecordatorios = await Recordatorio.countDocuments(filter);
 
     res.status(200).json({
       recordatorios,
