@@ -14,7 +14,8 @@ const ITEMS_PER_PAGE = 8; // Número de elementos por página
 
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTermOrdenes, setSearchTermOrdenes] = useState(""); // Buscador para órdenes
+  const [searchTermNotificaciones, setSearchTermNotificaciones] = useState(""); // Buscador para notificaciones
   const [modalVisible, setModalVisible] = useState(false);
   const [modalOrdenVisible, setModalOrdenVisible] = useState(false);
   const [showSobrantesModal, setShowSobrantesModal] = useState(false);
@@ -35,18 +36,26 @@ const NotificacionesAdmin = () => {
   useEffect(() => {
     if (isAuthenticated) {
       if (filter === "ordenes") {
-        fetchOrdenes(currentOrderPage, orderStatusFilter); // Llamar a fetchOrdenes cuando estamos en Órdenes
+        fetchOrdenes(currentOrderPage, orderStatusFilter, searchTermOrdenes); // Usar searchTermOrdenes
       } else {
-        fetchNotificaciones(currentNotiPage); // Llamar a fetchNotificaciones cuando estamos en Notificaciones
+        fetchNotificaciones(currentNotiPage, searchTermNotificaciones); // Usar searchTermNotificaciones
       }
     }
-  }, [isAuthenticated, filter, currentOrderPage, currentNotiPage, orderStatusFilter]);
+  }, [
+    isAuthenticated,
+    filter,
+    currentOrderPage,
+    currentNotiPage,
+    orderStatusFilter,
+    searchTermOrdenes,
+    searchTermNotificaciones,
+  ]);
 
   // Fetch para Órdenes
-  const fetchOrdenes = async (page = 1, estadoOrden = "") => {
+  const fetchOrdenes = async (page = 1, estadoOrden = "", searchTerm = "") => {
     try {
       const response = await axios.get("/ordenes", {
-        params: { page, limit: ITEMS_PER_PAGE, estadoOrden },
+        params: { page, limit: ITEMS_PER_PAGE, estadoOrden, searchTerm },
       });
 
       const { ordenes, totalPages } = response.data;
@@ -56,21 +65,22 @@ const NotificacionesAdmin = () => {
         fecha: new Date(orden.fechaOrden),
         descripcionOrden: orden.descripcionOrden || "",
         estadoOrden: orden.estadoOrden,
-        maquina: orden.maquina || {}, // Incluir el objeto de la máquina
+        maquina: orden.maquina || {},
+        numeroOrden: orden.numeroOrden,
       }));
 
       setCombinedItems(formattedOrdenes);
-      setTotalOrderPages(totalPages); // Actualizamos el total de páginas para Órdenes
+      setTotalOrderPages(totalPages);
     } catch (error) {
       console.error("Error al obtener órdenes:", error);
     }
   };
 
   // Fetch para Notificaciones
-  const fetchNotificaciones = async (page = 1) => {
+  const fetchNotificaciones = async (page = 1, searchTerm = "") => {
     try {
       const response = await axios.get("/recordatorios", {
-        params: { page, limit: ITEMS_PER_PAGE }, // Paginación para notificaciones
+        params: { page, limit: ITEMS_PER_PAGE, searchTerm }, // Añadimos searchTerm para notificaciones
       });
 
       const { recordatorios, totalPages } = response.data;
@@ -82,18 +92,30 @@ const NotificacionesAdmin = () => {
       }));
 
       setCombinedItems(formattedRecordatorios);
-      setTotalNotiPages(totalPages); // Actualizamos el total de páginas para Notificaciones
+      setTotalNotiPages(totalPages);
     } catch (error) {
       console.error("Error al obtener notificaciones:", error);
     }
   };
 
+  // Manejar cambios en el buscador de órdenes
+  const handleSearchChangeOrdenes = (e) => {
+    setSearchTermOrdenes(e.target.value);
+    setCurrentOrderPage(1); // Reiniciar a la primera página cuando se cambia la búsqueda
+  };
+
+  // Manejar cambios en el buscador de notificaciones
+  const handleSearchChangeNotificaciones = (e) => {
+    setSearchTermNotificaciones(e.target.value);
+    setCurrentNotiPage(1); // Reiniciar a la primera página cuando se cambia la búsqueda
+  };
+
+  // Filtrado por estado y búsqueda
   const filteredItems = combinedItems.filter((item) => {
-    const term = searchTerm.toLowerCase();
+    const term = filter === "ordenes" ? searchTermOrdenes.toLowerCase() : searchTermNotificaciones.toLowerCase();
     const matchDescription =
       (item.descripcion && item.descripcion.toLowerCase().includes(term)) ||
-      (item.descripcionOrden &&
-        item.descripcionOrden.toLowerCase().includes(term));
+      (item.descripcionOrden && item.descripcionOrden.toLowerCase().includes(term));
     const matchMaquinaSerial =
       item.type === "orden" &&
       item.maquina.nroSerieMaquina &&
@@ -107,10 +129,9 @@ const NotificacionesAdmin = () => {
       item.usuario &&
       item.usuario.username &&
       item.usuario.username.toLowerCase().includes(term);
+    const matchNumeroOrden = item.type === "orden" && item.numeroOrden && item.numeroOrden.toLowerCase().includes(term);
 
-    return (
-      matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario
-    );
+    return matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario || matchNumeroOrden;
   });
 
   // Filtrar por tipo (órdenes o notificaciones)
@@ -124,9 +145,7 @@ const NotificacionesAdmin = () => {
     setSelectedItem({
       type: item.type,
       content:
-        item.descripcion ||
-        item.descripcionOrden ||
-        "No hay descripción disponible",
+        item.descripcion || item.descripcionOrden || "No hay descripción disponible",
     });
     setModalVisible(true);
   };
@@ -161,9 +180,7 @@ const NotificacionesAdmin = () => {
       } else if (type === "orden") {
         await axios.delete(`/ordenes/${id}`);
       }
-      setCombinedItems((prevItems) =>
-        prevItems.filter((item) => item._id !== id)
-      );
+      setCombinedItems((prevItems) => prevItems.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Error al eliminar item:", error);
     }
@@ -195,9 +212,7 @@ const NotificacionesAdmin = () => {
         });
         setCombinedItems((prevItems) =>
           prevItems.map((item) =>
-            item._id === id
-              ? { ...item, aceptado: response.data.aceptado }
-              : item
+            item._id === id ? { ...item, aceptado: response.data.aceptado } : item
           )
         );
       } catch (error) {
@@ -253,17 +268,17 @@ const NotificacionesAdmin = () => {
   };
 
   const handleOrderStatusFilterChange = (e) => {
-    setOrderStatusFilter(e.target.value); // Cambiar el filtro por estado de la orden
-    setCurrentOrderPage(1); // Reiniciar a la primera página al cambiar el filtro
+    setOrderStatusFilter(e.target.value);
+    setCurrentOrderPage(1);
   };
 
   // Reiniciar las páginas al cambiar de sección (órdenes o notificaciones)
   const handleSectionChange = (section) => {
     setFilter(section);
     if (section === "ordenes") {
-      setCurrentOrderPage(1); // Resetear la página de órdenes a 1
+      setCurrentOrderPage(1);
     } else {
-      setCurrentNotiPage(1); // Resetear la página de notificaciones a 1
+      setCurrentNotiPage(1);
     }
   };
 
@@ -277,28 +292,22 @@ const NotificacionesAdmin = () => {
 
         <div className="mb-4 flex flex-wrap justify-center gap-4 pt-4 lg:pt-10">
           <button
-            className={`px-4 py-2 rounded-lg ${
-              filter === "ordenes" ? "bg-green-600 text-white" : "bg-gray-300"
-            }`}
+            className={`px-4 py-2 rounded-lg ${filter === "ordenes" ? "bg-green-600 text-white" : "bg-gray-300"}`}
             onClick={() => handleSectionChange("ordenes")}
           >
             Órdenes
           </button>
           <button
-            className={`px-4 py-2 rounded-lg ${
-              filter === "notificaciones"
-                ? "bg-orange-600 text-white"
-                : "bg-gray-300"
-            }`}
+            className={`px-4 py-2 rounded-lg ${filter === "notificaciones" ? "bg-orange-600 text-white" : "bg-gray-300"}`}
             onClick={() => handleSectionChange("notificaciones")}
           >
             Notificaciones
           </button>
         </div>
 
-        {/* Filtro por estado de la orden como lista desplegable */}
+        {/* Filtro por estado de la orden como lista desplegable y el buscador */}
         {filter === "ordenes" && (
-          <div className="mb-4 flex justify-center">
+          <div className="mb-4 flex justify-center gap-4">
             <select
               className="px-4 py-2 border rounded-lg bg-gray-200"
               value={orderStatusFilter}
@@ -309,6 +318,25 @@ const NotificacionesAdmin = () => {
               <option value="Orden en solicitud">Orden en Solicitud</option>
               <option value="Orden finalizada">Orden finalizada</option>
             </select>
+            <input
+              type="text"
+              placeholder="Buscar por número de orden o usuario"
+              className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
+              value={searchTermOrdenes}
+              onChange={handleSearchChangeOrdenes}
+            />
+          </div>
+        )}
+
+        {filter === "notificaciones" && (
+          <div className="mb-4 flex justify-center gap-4">
+            <input
+              type="text"
+              placeholder="Buscar por descripción"
+              className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
+              value={searchTermNotificaciones}
+              onChange={handleSearchChangeNotificaciones}
+            />
           </div>
         )}
 
@@ -409,7 +437,7 @@ const NotificacionesAdmin = () => {
           visible={modalOrdenVisible}
           onClose={closeModalOrden}
           orden={selectedItem}
-          handleSave={fetchData}
+          handleSave={fetchOrdenes}
         />
       )}
       {showSobrantesModal && selectedItem && (
