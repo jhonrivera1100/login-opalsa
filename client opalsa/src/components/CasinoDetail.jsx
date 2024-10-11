@@ -167,9 +167,7 @@ const CasinoDetail = ({
                       >
                         Ver más
                       </button>
-                      <button className="bg-blue-500 text-white font-bold py-1 px-2 rounded text-xs ml-2">
-                        Registros
-                      </button>
+                
                     </div>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap"></td>

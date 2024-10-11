@@ -60,7 +60,7 @@ function AppAdmin() {
         <div className='flex justify-center pt-5'>
           <Header />
         </div>
-        <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
+        <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
 
           {/* Card 1 */}
           <div className='bg-sidebar-100 p-6 rounded-xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-2xl'>
