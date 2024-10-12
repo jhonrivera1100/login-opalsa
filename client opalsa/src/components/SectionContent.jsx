@@ -54,6 +54,17 @@ const SectionContent = ({
 
   // Renderizado de las tarjetas de máquinas usando las filtradas del backend
   const renderMaquinas = useCallback(() => {
+    if (filteredMaquinas.length === 0) {
+      // Mostrar mensaje si no se encuentran máquinas, centrado horizontal y verticalmente
+      return (
+        <div className="flex justify-center items-center w-full h-64">
+          <span className="text-center text-red-600 font-bold text-xl">
+            No se encontraron máquinas.
+          </span>
+        </div>
+      );
+    }
+
     return filteredMaquinas.map((maquina) => (
       <MaquinaCard key={maquina._id} maquina={maquina} />
     ));
