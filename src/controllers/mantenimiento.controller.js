@@ -28,6 +28,7 @@ export const getMantenimientos = async (req, res) => {
 
     const totalMantenimientos = await Mantenimiento.countDocuments(filter); // Contar los documentos filtrados
     const mantenimientos = await Mantenimiento.find(filter)
+      .sort({ fechaMantenimiento: -1 }) // Ordenar por fecha más reciente
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .lean(); // Usar lean para convertir a objetos simples

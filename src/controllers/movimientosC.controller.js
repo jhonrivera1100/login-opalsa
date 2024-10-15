@@ -31,6 +31,7 @@ export const getMovimientosC = async (req, res) => {
       .populate('componenteId')
       .populate('oldMaquinaId')
       .populate('newMaquinaId')
+      .sort({ fechaTransferencia: -1 }) // Ordenar por fecha más reciente
       .skip(skip)
       .limit(parseInt(limit));
 

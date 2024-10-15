@@ -7,6 +7,8 @@ import { getCasinosRequest } from "../api/casinos";
 function TransferirMaquinaModal({ maquina, onClose }) {
   const [selectedCasino, setSelectedCasino] = useState(""); // Estado para el casino seleccionado
   const [casinos, setCasinos] = useState([]);
+  const [loading, setLoading] = useState(false); // Estado para el spinner de carga
+  const [transferSuccess, setTransferSuccess] = useState(false); // Estado para el mensaje de éxito
 
   // Cargar los casinos disponibles cuando el componente se monta
   useEffect(() => {
@@ -29,6 +31,9 @@ function TransferirMaquinaModal({ maquina, onClose }) {
 
   // Función para manejar la transferencia de la máquina
   const handleTransferir = async () => {
+    setLoading(true); // Mostrar el spinner de carga
+    setTransferSuccess(false); // Resetear mensaje de éxito
+
     try {
       // Actualiza la ubicación de la máquina en el backend
       const updatedMaquina = { ...maquina, ubicacionMaquina: selectedCasino };
@@ -52,11 +57,17 @@ function TransferirMaquinaModal({ maquina, onClose }) {
       await axios.post("/moviMaquinas", movimiento);
       console.log("Historial de movimientos guardado");
 
-      onClose(); // Cierra el modal después de transferir
-      window.location.reload(); // Recarga la página para reflejar los cambios
+      setLoading(false); // Ocultar el spinner de carga
+      setTransferSuccess(true); // Mostrar el mensaje de éxito
     } catch (error) {
+      setLoading(false); // Ocultar el spinner si hay un error
       console.error("Error al transferir la máquina:", error);
     }
+  };
+
+  // Función para manejar el botón de regresar y recargar la página
+  const handleRegresar = () => {
+    window.location.reload(); // Recargar la página
   };
 
   // Opciones para el componente Select (React-Select)
@@ -92,36 +103,64 @@ function TransferirMaquinaModal({ maquina, onClose }) {
           Transferir Máquina
         </h2>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Seleccionar Casino:
-          </label>
-          <Select
-            value={options.find((option) => option.value === selectedCasino)}
-            onChange={(selectedOption) =>
-              setSelectedCasino(selectedOption.value)
-            }
-            options={options}
-            placeholder="Seleccionar Casino..."
-            isSearchable={true} // Habilita la búsqueda
-            className="w-full"
-            classNamePrefix="react-select"
-          />
-        </div>
+        {/* Mostrar el spinner de carga o el contenido del modal */}
+        {loading ? (
+          <div className="relative flex justify-center items-center w-12 h-12 mx-auto mb-6">
+            <div className="absolute animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-10 w-10 object-cover"
+              alt="Loader"
+            />
+          </div>
+        ) : transferSuccess ? (
+          // Mostrar el mensaje de éxito si la transferencia fue exitosa
+          <>
+            <div className="text-center text-green-500 font-semibold mb-6">
+              ¡Máquina transferida exitosamente a {selectedCasino}!
+            </div>
+            <button
+              onClick={handleRegresar}
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 transition duration-200 text-white rounded-lg font-semibold"
+            >
+              Regresar
+            </button>
+          </>
+        ) : (
+          // Mostrar el contenido normal del modal
+          <>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Seleccionar Casino:
+              </label>
+              <Select
+                value={options.find((option) => option.value === selectedCasino)}
+                onChange={(selectedOption) =>
+                  setSelectedCasino(selectedOption.value)
+                }
+                options={options}
+                placeholder="Seleccionar Casino..."
+                isSearchable={true} // Habilita la búsqueda
+                className="w-full"
+                classNamePrefix="react-select"
+              />
+            </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleTransferir}
-            disabled={!selectedCasino}
-            className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
-              selectedCasino
-                ? "bg-blue-600 hover:bg-blue-700 transition duration-200"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Transferir
-          </button>
-        </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleTransferir}
+                disabled={!selectedCasino}
+                className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
+                  selectedCasino
+                    ? "bg-blue-600 hover:bg-blue-700 transition duration-200"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
+              >
+                Transferir
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

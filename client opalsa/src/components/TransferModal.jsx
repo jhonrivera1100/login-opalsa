@@ -8,6 +8,8 @@ const TransferModal = ({ onClose, elemento }) => {
   const [selectedCasino, setSelectedCasino] = useState("");
   const [casinos, setCasinos] = useState([]); // Almacena todos los casinos para búsquedas internas
   const [casinosForSelect, setCasinosForSelect] = useState([]); // Almacena casinos para el selector, excluyendo el actual
+  const [loading, setLoading] = useState(false); // Estado para el spinner de carga
+  const [transferSuccess, setTransferSuccess] = useState(false); // Estado para el mensaje de éxito
 
   useEffect(() => {
     fetchCasinos();
@@ -33,7 +35,10 @@ const TransferModal = ({ onClose, elemento }) => {
   const handleTransfer = async () => {
     console.log("Ubicación actual del elemento:", elemento.ubicacionDeElemento);
     console.log("Casino seleccionado para la transferencia:", selectedCasino);
-  
+
+    setLoading(true); // Mostrar el spinner de carga
+    setTransferSuccess(false); // Resetear el estado de éxito
+
     try {
       const movimientoElm = {
         elementoId: elemento._id,
@@ -53,16 +58,11 @@ const TransferModal = ({ onClose, elemento }) => {
       await axios.post("/movimientos-elementos", movimientoElm);
       console.log("Historial de movimientos guardado");
 
-      if (typeof onClose === 'function') {
-        onClose(); // Cierra el modal
-      } else {
-        console.error('onClose no es una función');
-      }
-
-      // Elimina o comenta esta línea si está causando problemas con el cierre del modal
-      window.location.reload(); // Recarga la página para ver los cambios
+      setTransferSuccess(true); // Mostrar mensaje de éxito
     } catch (error) {
       console.error("Error al transferir el elemento:", error);
+    } finally {
+      setLoading(false); // Ocultar el spinner de carga
     }
   };
 
@@ -71,6 +71,11 @@ const TransferModal = ({ onClose, elemento }) => {
     value: casino._id,
     label: casino.nombreCasino,
   }));
+
+  // Función para manejar el botón de regresar y recargar la página
+  const handleRegresar = () => {
+    window.location.reload(); // Recargar la página
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-70 backdrop-blur-sm">
@@ -99,34 +104,59 @@ const TransferModal = ({ onClose, elemento }) => {
           Transferir Elemento
         </h2>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Seleccionar Casino:
-          </label>
-          <Select
-            value={options.find((option) => option.value === selectedCasino)}
-            onChange={(selectedOption) => setSelectedCasino(selectedOption.value)}
-            options={options}
-            placeholder="Seleccionar Casino..."
-            isSearchable={true} // Habilita la búsqueda
-            className="w-full"
-            classNamePrefix="react-select"
-          />
-        </div>
+        {loading ? (
+          <div className="relative flex justify-center items-center w-12 h-12 mx-auto mb-6">
+            <div className="absolute animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+            <img
+              src="https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727359701/vjg0klgqxuqfiesshgdb.jpg"
+              className="rounded-full h-10 w-10 object-cover"
+              alt="Loader"
+            />
+          </div>
+        ) : transferSuccess ? (
+          <>
+            <div className="text-center text-green-500 font-semibold mb-6">
+              ¡Elemento transferido exitosamente!
+            </div>
+            <button
+              onClick={handleRegresar}
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 transition duration-200 text-white rounded-lg font-semibold"
+            >
+              Regresar
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Seleccionar Casino:
+              </label>
+              <Select
+                value={options.find((option) => option.value === selectedCasino)}
+                onChange={(selectedOption) => setSelectedCasino(selectedOption.value)}
+                options={options}
+                placeholder="Seleccionar Casino..."
+                isSearchable={true} // Habilita la búsqueda
+                className="w-full"
+                classNamePrefix="react-select"
+              />
+            </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleTransfer}
-            disabled={!selectedCasino}
-            className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
-              selectedCasino
-                ? "bg-green-600 hover:bg-green-700 transition duration-200"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Transferir
-          </button>
-        </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleTransfer}
+                disabled={!selectedCasino}
+                className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
+                  selectedCasino
+                    ? "bg-green-600 hover:bg-green-700 transition duration-200"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
+              >
+                Transferir
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

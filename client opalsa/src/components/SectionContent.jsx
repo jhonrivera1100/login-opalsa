@@ -39,25 +39,28 @@ const SectionContent = ({
     const fetchFilteredMaquinas = async () => {
       if (section === "Maquinas" && searchQueryMaquina) {
         try {
+          const exact = searchQueryMaquina.length < 3; // Si el número de serie es corto, realizar búsqueda exacta
           const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(
-            searchQueryMaquina
+            searchQueryMaquina,
+            exact
           );
-          if (maquinasFiltradas) {
-            setFilteredMaquinas([maquinasFiltradas]);
+          if (maquinasFiltradas && maquinasFiltradas.length > 0) {
+            setFilteredMaquinas(maquinasFiltradas); // Guardamos todas las coincidencias
           } else {
-            setFilteredMaquinas([]);
+            setFilteredMaquinas([]); // Si no hay coincidencias, lista vacía
           }
         } catch (error) {
-          console.error("Error buscando máquina:", error);
+          console.error("Error buscando máquinas:", error);
           setFilteredMaquinas([]); // En caso de error, establecer filteredMaquinas a una lista vacía
         }
       } else {
-        setFilteredMaquinas(maquinas);
+        setFilteredMaquinas(maquinas); // Si no hay búsqueda, mostrar todas las máquinas
       }
     };
-
+  
     fetchFilteredMaquinas();
   }, [searchQueryMaquina, section, maquinas, buscarMaquinaPorSerieFlexible]);
+  
 
   // Restablecer la página actual al cambiar la búsqueda o el filtro de ciudad
   useEffect(() => {
