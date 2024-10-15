@@ -62,21 +62,8 @@ const Historial = () => {
         }
 
         const { mantenimientos, movimientos, movimientosMaquina, movimientosElementos, totalPages } = response.data;
-
-        // Agrega este bloque para ordenar los elementos por la fecha más reciente
-        const itemsList = mantenimientos || movimientos || movimientosMaquina || movimientosElementos || [];
-        const sortedItems = [...itemsList].sort((a, b) => {
-          const dateA = new Date(
-            a.fechaMantenimiento || a.fechaTransferencia || a.fechaTransferenciaElm || 0
-          );
-          const dateB = new Date(
-            b.fechaMantenimiento || b.fechaTransferencia || b.fechaTransferenciaElm || 0
-          );
-          return dateB - dateA;  // Ordenar de más reciente a más antiguo
-        });
-
-        setItems(sortedItems);
-        setFilteredItems(sortedItems);
+        setItems(mantenimientos || movimientos || movimientosMaquina || movimientosElementos || []);
+        setFilteredItems(mantenimientos || movimientos || movimientosMaquina || movimientosElementos || []);
         setTotalPages(totalPages);
       } catch (error) {
         console.error("Error fetching data:", error);
