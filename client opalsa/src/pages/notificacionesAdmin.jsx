@@ -15,7 +15,7 @@ const ITEMS_PER_PAGE = 8; // Número de elementos por página
 const NotificacionesAdmin = () => {
   const [combinedItems, setCombinedItems] = useState([]);
   const [searchTermOrdenes, setSearchTermOrdenes] = useState(""); // Buscador para órdenes
-  const [searchTermNotificaciones, setSearchTermNotificaciones] = useState(""); // Buscador para notificaciones
+  const [selectedDateNotificaciones, setSelectedDateNotificaciones] = useState(""); // Filtro por fecha para notificaciones
   const [modalVisible, setModalVisible] = useState(false);
   const [modalOrdenVisible, setModalOrdenVisible] = useState(false);
   const [showSobrantesModal, setShowSobrantesModal] = useState(false);
@@ -38,7 +38,7 @@ const NotificacionesAdmin = () => {
       if (filter === "ordenes") {
         fetchOrdenes(currentOrderPage, orderStatusFilter, searchTermOrdenes); // Usar searchTermOrdenes
       } else {
-        fetchNotificaciones(currentNotiPage, searchTermNotificaciones); // Usar searchTermNotificaciones
+        fetchNotificaciones(currentNotiPage, selectedDateNotificaciones); // Usar selectedDateNotificaciones
       }
     }
   }, [
@@ -48,7 +48,7 @@ const NotificacionesAdmin = () => {
     currentNotiPage,
     orderStatusFilter,
     searchTermOrdenes,
-    searchTermNotificaciones,
+    selectedDateNotificaciones,
   ]);
 
   // Fetch para Órdenes
@@ -76,11 +76,11 @@ const NotificacionesAdmin = () => {
     }
   };
 
-  // Fetch para Notificaciones
-  const fetchNotificaciones = async (page = 1, searchTerm = "") => {
+  // Fetch para Notificaciones con filtro de fecha
+  const fetchNotificaciones = async (page = 1, selectedDate = "") => {
     try {
       const response = await axios.get("/recordatorios", {
-        params: { page, limit: ITEMS_PER_PAGE, searchTerm }, // Añadimos searchTerm para notificaciones
+        params: { page, limit: ITEMS_PER_PAGE, fechaRecordatorio: selectedDate }, // Filtro por fecha
       });
 
       const { recordatorios, totalPages } = response.data;
@@ -98,44 +98,20 @@ const NotificacionesAdmin = () => {
     }
   };
 
+  // Manejar cambios en el filtro de fecha de notificaciones
+  const handleDateChangeNotificaciones = (e) => {
+    setSelectedDateNotificaciones(e.target.value);
+    setCurrentNotiPage(1); // Reiniciar a la primera página cuando se cambia la búsqueda por fecha
+  };
+
   // Manejar cambios en el buscador de órdenes
   const handleSearchChangeOrdenes = (e) => {
     setSearchTermOrdenes(e.target.value);
     setCurrentOrderPage(1); // Reiniciar a la primera página cuando se cambia la búsqueda
   };
 
-  // Manejar cambios en el buscador de notificaciones
-  const handleSearchChangeNotificaciones = (e) => {
-    setSearchTermNotificaciones(e.target.value);
-    setCurrentNotiPage(1); // Reiniciar a la primera página cuando se cambia la búsqueda
-  };
-
-  // Filtrado por estado y búsqueda
-  const filteredItems = combinedItems.filter((item) => {
-    const term = filter === "ordenes" ? searchTermOrdenes.toLowerCase() : searchTermNotificaciones.toLowerCase();
-    const matchDescription =
-      (item.descripcion && item.descripcion.toLowerCase().includes(term)) ||
-      (item.descripcionOrden && item.descripcionOrden.toLowerCase().includes(term));
-    const matchMaquinaSerial =
-      item.type === "orden" &&
-      item.maquina.nroSerieMaquina &&
-      item.maquina.nroSerieMaquina.toLowerCase().includes(term);
-    const matchUbicacion =
-      item.type === "orden" &&
-      item.maquina.ubicacionMaquina &&
-      item.maquina.ubicacionMaquina.toLowerCase().includes(term);
-    const matchUsuario =
-      item.type === "orden" &&
-      item.usuario &&
-      item.usuario.username &&
-      item.usuario.username.toLowerCase().includes(term);
-    const matchNumeroOrden = item.type === "orden" && item.numeroOrden && item.numeroOrden.toLowerCase().includes(term);
-
-    return matchDescription || matchMaquinaSerial || matchUbicacion || matchUsuario || matchNumeroOrden;
-  });
-
   // Filtrar por tipo (órdenes o notificaciones)
-  const filteredByState = filteredItems.filter((item) => {
+  const filteredByState = combinedItems.filter((item) => {
     if (filter === "ordenes") return item.type === "orden";
     if (filter === "notificaciones") return item.type === "recordatorio";
     return false;
@@ -308,35 +284,44 @@ const NotificacionesAdmin = () => {
         {/* Filtro por estado de la orden como lista desplegable y el buscador */}
         {filter === "ordenes" && (
           <div className="mb-4 flex justify-center gap-4">
-            <select
-              className="px-4 py-2 border rounded-lg bg-gray-200"
-              value={orderStatusFilter}
-              onChange={handleOrderStatusFilterChange}
-            >
-              <option value="">Todas las Órdenes</option>
-              <option value="Orden aprobada">Orden Aprobada</option>
-              <option value="Orden en solicitud">Orden en Solicitud</option>
-              <option value="Orden finalizada">Orden finalizada</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Buscar por número de orden o usuario"
-              className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
-              value={searchTermOrdenes}
-              onChange={handleSearchChangeOrdenes}
-            />
+            <div>
+              <label className="block text-gray-700">Filtrar por estado:</label>
+              <select
+                className="px-4 py-2 border rounded-lg bg-gray-200"
+                value={orderStatusFilter}
+                onChange={handleOrderStatusFilterChange}
+              >
+                <option value="">Todas las Órdenes</option>
+                <option value="Orden aprobada">Orden Aprobada</option>
+                <option value="Orden en solicitud">Orden en Solicitud</option>
+                <option value="Orden finalizada">Orden finalizada</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-gray-700">Buscar orden:</label>
+              <input
+                type="text"
+                placeholder="Buscar por número de orden o usuario"
+                className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
+                value={searchTermOrdenes}
+                onChange={handleSearchChangeOrdenes}
+              />
+            </div>
           </div>
         )}
 
         {filter === "notificaciones" && (
           <div className="mb-4 flex justify-center gap-4">
-            <input
-              type="text"
-              placeholder="Buscar por descripción"
-              className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
-              value={searchTermNotificaciones}
-              onChange={handleSearchChangeNotificaciones}
-            />
+            <div>
+              <label className="block text-gray-700">Filtrar por fecha:</label>
+              <input
+                type="date"
+                placeholder="Filtrar por fecha"
+                className="px-4 py-2 border rounded-lg w-full sm:w-[300px] md:w-[400px]"
+                value={selectedDateNotificaciones}
+                onChange={handleDateChangeNotificaciones}
+              />
+            </div>
           </div>
         )}
 

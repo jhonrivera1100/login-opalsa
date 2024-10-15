@@ -61,14 +61,16 @@ const SectionContent = ({
 
   const renderMaquinas = useCallback(() => {
     if (filteredMaquinas.length === 0) {
+      // Mostrar mensaje si no se encuentran máquinas, centrado horizontal y verticalmente
       return (
-        
-        <p className="bg-red-100 border border-red-400 text-red-700 px-10 py-3 rounded-md mb-4 flex justify-end">
-          No se encontraron máquinas con ese número de serie.
-        </p>
-        
+        <div className="flex justify-center items-center w-full h-64">
+          <span className="text-center text-red-600 font-bold text-xl">
+            No se encontraron máquinas.
+          </span>
+        </div>
       );
     }
+
     return filteredMaquinas.map((maquina) => (
       <MaquinaCard key={maquina._id} maquina={maquina} />
     ));
