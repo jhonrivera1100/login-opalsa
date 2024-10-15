@@ -163,8 +163,9 @@ function SeccionesHome() {
             </button>
           </div>
 
-          <div className="ml-4 md:ml-12 mt-2 md:mt-0">
+          <div className="ml-4 md:ml-12 mt-2 md:mt-0 flex ">
             <BotonAgregar />
+            <h3 className="flex mt-1 ml-3  font-semibold text-green-600">Agregar</h3>
           </div>
         </div>
       </div>
