@@ -59,6 +59,11 @@ const SectionContent = ({
     fetchFilteredMaquinas();
   }, [searchQueryMaquina, section, maquinas, buscarMaquinaPorSerieFlexible]);
 
+  // Restablecer la página actual al cambiar la búsqueda o el filtro de ciudad
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQueryCasino, cityFilter]);
+
   const renderMaquinas = useCallback(() => {
     if (filteredMaquinas.length === 0) {
       return (
@@ -161,7 +166,7 @@ const SectionContent = ({
             onChange={handleFilterChange}
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
-             <option value="">Todas las marcas</option>
+            <option value="">Todas las marcas</option>
             <option value="AINSWORTH">AINSWORTH</option>
             <option value="NOVOMATIC">NOVOMATIC</option>
             <option value="WILLIAMS">WILLIAMS</option>
@@ -188,13 +193,19 @@ const SectionContent = ({
           <input
             type="text"
             value={searchQueryCasino}
-            onChange={(e) => setSearchQueryCasino(e.target.value)}
+            onChange={(e) => {
+              setSearchQueryCasino(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Buscar por nombre del casino"
             className="px-4 py-2 border rounded-md w-full md:w-1/2 mx-2 mb-2 md:mb-0"
           />
           <select
             value={cityFilter}
-            onChange={handleCityFilterChange}
+            onChange={(e) => {
+              handleCityFilterChange(e);
+              setCurrentPage(1);
+            }}
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las ciudades</option>
@@ -212,7 +223,6 @@ const SectionContent = ({
             <option value="Ipiales">Ipiales</option>
             <option value="Jamundi">Jamundi</option>
             <option value="Buga">Buga</option>
-      
           </select>
         </div>
       )}
