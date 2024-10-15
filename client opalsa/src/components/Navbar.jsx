@@ -96,6 +96,7 @@ function Navbar() {
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
       {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
       {renderLink("/admin", <FaUserShield className={getIconClass("/admin")} />, "Administrador")}
+      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Mis Ordenes")}
     </>
   );
 
@@ -104,7 +105,7 @@ function Navbar() {
       {renderLink("/", <FaHome className={getIconClass("/")} />, "Inicio")}
       {renderLink("/RegistroMantenimiento", <FaTools className={getIconClass("/RegistroMantenimiento")} />, "Reportes")}
       {renderLink("/profile", <FaUser className={getIconClass("/profile")} />, "Perfil")}
-      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Respuestas de Orden")}
+      {renderLink("/RespuestasOrden", <AiFillContainer className={getIconClass("/RespuestasOrden")} />, "Mis Ordenes")}
     </>
   );
 

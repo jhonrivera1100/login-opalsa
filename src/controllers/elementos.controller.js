@@ -43,19 +43,26 @@ export const traerElementosPorCasino = async (req, res) => {
 };
 
 // Crear un nuevo elemento
+// Crear un nuevo elemento
 export const crearElemento = async (req, res) => {
-  const {
-    nombreElemento,
-    codigoElemento,  // Campo nuevo
-    marcaElemento,
-    tipoElemento,
-    ubicacionDeElemento,
-  } = req.body;
-
-  let imgElemento = {};
-  let documentacionElemento = {};
-
   try {
+    const {
+      nombreElemento,
+      codigoElemento,
+      marcaElemento,
+      tipoElemento,
+      ubicacionDeElemento,
+    } = req.body;
+
+    // Validar campos obligatorios
+    if (!nombreElemento || !codigoElemento || !marcaElemento || !tipoElemento || !ubicacionDeElemento) {
+      return res.status(400).json({ message: "Todos los campos obligatorios deben ser proporcionados" });
+    }
+
+    let imgElemento = undefined;
+    let documentacionElemento = undefined;
+
+    // Manejo de imagen opcional
     if (req.files && req.files.imgElemento) {
       const result = await uploadImage(req.files.imgElemento.tempFilePath);
       await fs.remove(req.files.imgElemento.tempFilePath);
@@ -65,6 +72,7 @@ export const crearElemento = async (req, res) => {
       };
     }
 
+    // Manejo de documentación opcional
     if (req.files && req.files.documentacionElemento) {
       const result = await uploadFile(req.files.documentacionElemento.tempFilePath, 'Documentos');
       await fs.remove(req.files.documentacionElemento.tempFilePath);
@@ -74,18 +82,20 @@ export const crearElemento = async (req, res) => {
       };
     }
 
+    // Crear un nuevo elemento en la base de datos
     const newElemento = new Elementos({
       nombreElemento,
-      codigoElemento,  // Campo nuevo
+      codigoElemento,
       marcaElemento,
       tipoElemento,
-      imgElemento,
-      documentacionElemento,
       ubicacionDeElemento,
+      ...(imgElemento && { imgElemento }), // Añadir imgElemento solo si está definido
+      ...(documentacionElemento && { documentacionElemento }), // Añadir documentacionElemento solo si está definido
     });
 
     const elementoGuardado = await newElemento.save();
     res.json(elementoGuardado);
+
   } catch (error) {
     res.status(500).json({
       message: "Error al guardar el elemento",
@@ -96,6 +106,10 @@ export const crearElemento = async (req, res) => {
 
 
 
+
+
+
+// Actualizar un elemento existente
 // Actualizar un elemento existente
 export const actualizarElemento = async (req, res) => {
   const {
@@ -115,11 +129,31 @@ export const actualizarElemento = async (req, res) => {
   };
 
   try {
+    // Verificar si se va a actualizar la imagen
+    if (req.files && req.files.imgElemento) {
+      const result = await uploadImage(req.files.imgElemento.tempFilePath);
+      await fs.remove(req.files.imgElemento.tempFilePath);
+      updatedFields.imgElemento = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
+
+    // Verificar si se va a actualizar la documentación
+    if (req.files && req.files.documentacionElemento) {
+      const result = await uploadFile(req.files.documentacionElemento.tempFilePath, 'Documentos');
+      await fs.remove(req.files.documentacionElemento.tempFilePath);
+      updatedFields.documentacionElemento = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
+
     // Actualizar el elemento con los campos actualizados, incluyendo la ubicación
     const updatedElemento = await Elementos.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
 
     if (!updatedElemento) return res.status(404).json({ message: "No se encuentra el elemento" });
-    
+
     res.json(updatedElemento);
   } catch (error) {
     res.status(500).json({
@@ -128,6 +162,7 @@ export const actualizarElemento = async (req, res) => {
     });
   }
 };
+
 
 
 

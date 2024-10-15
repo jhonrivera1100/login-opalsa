@@ -3,8 +3,9 @@ import { useForm } from "react-hook-form";
 import { useCasinos } from "../context/CasinosContext";
 
 function FormCasino({ onClose }) {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const { createCasino } = useCasinos();
+  const [isSuccess, setIsSuccess] = useState(false); // Nuevo estado para mostrar el mensaje de éxito
 
   const [formData, setFormData] = useState({
     nombreCasino: "",
@@ -67,6 +68,7 @@ function FormCasino({ onClose }) {
       });
 
       await createCasino(formDataToSend);
+      setIsSuccess(true);
       window.location.reload();
     } catch (error) {
       console.error("Error creating casino:", error);
@@ -102,6 +104,15 @@ function FormCasino({ onClose }) {
         </div>
       )}
 
+      {isSuccess && (
+        <div className="flex items-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <svg className="fill-current w-6 h-6 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M10 15l-5.5-5.5L6 8l4 4 8-8 1.5 1.5L10 15z"/>
+          </svg>
+          <span className="block sm:inline font-semibold">¡Casino creado exitosamente!</span>
+        </div>
+      )}
+
       {/* Formulario */}
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -118,13 +129,16 @@ function FormCasino({ onClose }) {
             type="text"
             name="nombreCasino"
             value={formData.nombreCasino}
-            {...register("nombreCasino")}
+            {...register("nombreCasino", { required: "El nombre del casino es obligatorio" })}
             placeholder="Nombre del Casino"
             onChange={(e) =>
               setFormData({ ...formData, nombreCasino: e.target.value })
             }
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.nombreCasino && (
+            <p className="text-red-500">{errors.nombreCasino.message}</p>
+          )}
         </div>
         <div>
           <label
@@ -137,13 +151,16 @@ function FormCasino({ onClose }) {
             type="text"
             name="ciudadCasino"
             value={formData.ciudadCasino}
-            {...register("ciudadCasino")}
+            {...register("ciudadCasino", { required: "La ciudad del casino es obligatoria" })}
             placeholder="Ciudad del Casino"
             onChange={(e) =>
               setFormData({ ...formData, ciudadCasino: e.target.value })
             }
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.ciudadCasino && (
+            <p className="text-red-500">{errors.ciudadCasino.message}</p>
+          )}
         </div>
         <div>
           <label
@@ -156,13 +173,16 @@ function FormCasino({ onClose }) {
             type="text"
             name="direccionCasino"
             value={formData.direccionCasino}
-            {...register("direccionCasino")}
+            {...register("direccionCasino", { required: "La dirección del casino es obligatoria" })}
             placeholder="Dirección del Casino"
             onChange={(e) =>
               setFormData({ ...formData, direccionCasino: e.target.value })
             }
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.direccionCasino && (
+            <p className="text-red-500">{errors.direccionCasino.message}</p>
+          )}
         </div>
         <div>
           <label
@@ -174,11 +194,15 @@ function FormCasino({ onClose }) {
           <input
             type="file"
             name="imgCasino"
+            {...register("imgCasino", { required: "La imagen del casino es obligatoria" })}
             onChange={(e) =>
               setFormData({ ...formData, imgCasino: e.target.files })
             }
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.imgCasino && (
+            <p className="text-red-500">{errors.imgCasino.message}</p>
+          )}
         </div>
 
         {/* Campos dinámicos de archivos con categorías */}

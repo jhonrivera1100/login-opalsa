@@ -175,9 +175,12 @@ const ModalRespOrden = ({ isOpen, onClose, orden }) => {
 </div>
 
         </form>
-        <button className="mt-4 bg-teal-500 text-white px-4 py-2 rounded" onClick={onClose}>
+        
+        <div className="flex justify-center mt-5">
+        <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={onClose}>
           Cerrar
         </button>
+        </div>
       </div>
     </div>
   );

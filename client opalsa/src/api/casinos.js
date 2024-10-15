@@ -19,3 +19,12 @@ export const updateCasinoRequest = (casinoId, formData) => {
 };
 
 export const deleteCasinoRequest = (id) => axios.delete(`/casinos/${id}`);
+
+export const deleteCasinoDocumentRequest = (casinoId, publicId, category) => {
+  return axios.delete(`/casinos/${casinoId}/document`, {
+    data: { publicId, category }, // Los datos que enviamos en la solicitud DELETE
+  });
+};
+
+
+

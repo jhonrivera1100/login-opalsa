@@ -13,6 +13,7 @@ function FormMaquina({ onClose }) {
   } = useForm(); // Usamos `errors` para la validación
   const { createMaquina } = useMaquinas();
   const [casinos, setCasinos] = useState([]);
+  const [ubicacionError, setUbicacionError] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Spinner de carga
   const [isSuccess, setIsSuccess] = useState(false); // Estado para el éxito
   const [error, setError] = useState(null); // Estado para el error
@@ -64,29 +65,36 @@ function FormMaquina({ onClose }) {
   const handleSelectChange = (selectedOption) => {
     setFormData({
       ...formData,
-      ubicacionMaquina: selectedOption ? selectedOption.value : "",
+      ubicacionMaquina: selectedOption ? selectedOption.value : "", // Mantener vacío si no hay selección
     });
   };
 
-  // Función para enviar los datos
   const onSubmit = async () => {
     setIsLoading(true); // Activamos el spinner
     setIsSuccess(false); // Reseteamos el estado de éxito
     setError(null); // Reseteamos el estado de error
-
+    setUbicacionError(null); // Reseteamos el mensaje de error de ubicación
+  
+    // Verificar si se ha seleccionado una ubicación
+    if (!formData.ubicacionMaquina) {
+      setUbicacionError("Por favor, seleccione una ubicación.");
+      setIsLoading(false); // Desactivamos el spinner
+      return; // Detener el envío del formulario
+    }
+  
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach((key) => {
         formDataToSend.append(key, formData[key]);
       });
-
+  
       // Intentamos crear la máquina
-      const response = await createMaquina(formDataToSend);
-
+      await createMaquina(formDataToSend);
+  
       // Si la creación fue exitosa
       setIsSuccess(true); // Mostramos mensaje de éxito
       setError(null); // Aseguramos que no hay error
-
+  
       // Resetear el formulario al estado inicial
       reset();  // Resetear el formulario usando react-hook-form
       setFormData({
@@ -97,11 +105,17 @@ function FormMaquina({ onClose }) {
         precioMaquina: "",
         juegoMaquina: "",
         estadoMaquina: "activo",
-        ubicacionMaquina: "",
+        ubicacionMaquina: "", // Restablecer el valor de ubicacionMaquina
         fechaInstalacionMaquina: "",
         proveedorMaquina: "",
         documentoMaquina: null,
       });
+  
+      // Hacer que el mensaje de éxito desaparezca después de 5 segundos
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 5000);
+  
     } catch (error) {
       setError("Error al crear la máquina. Por favor, intente nuevamente.");
       setIsSuccess(false); // Nos aseguramos de que no haya éxito
@@ -110,23 +124,8 @@ function FormMaquina({ onClose }) {
       setIsLoading(false); // Desactivamos el spinner
     }
   };
+  
 
-  const handleReset = () => {
-    reset();
-    setFormData({
-      imgMaquina: null,
-      nroSerieMaquina: "",
-      modeloMaquina: "",
-      marcaMaquina: "",
-      precioMaquina: "",
-      juegoMaquina: "",
-      estadoMaquina: "activo",
-      ubicacionMaquina: "",
-      fechaInstalacionMaquina: "",
-      proveedorMaquina: "",
-      documentoMaquina: null,
-    });
-  };
 
   // Formateo de precio en COP
   const formatPrice = (value) => {
@@ -144,6 +143,8 @@ function FormMaquina({ onClose }) {
     label: casino.nombreCasino,
   }));
 
+
+  
 
   return (
     <>
@@ -262,7 +263,7 @@ function FormMaquina({ onClose }) {
             <p className="text-red-500">{errors.marcaMaquina.message}</p>
           )}
         </div>
-         <div>
+        <div>
           <label htmlFor="precioMaquina" className="text-black font-bold block mb-1">
             Precio de la Máquina (COP):
           </label>
@@ -306,10 +307,7 @@ function FormMaquina({ onClose }) {
           )}
         </div>
         <div className="mt-4">
-          <label
-            htmlFor="ubicacionMaquina"
-            className="text-black font-bold block mb-1"
-          >
+          <label htmlFor="ubicacionMaquina" className="text-black font-bold block mb-1">
             Ubicación de la Máquina:
           </label>
           <Select
@@ -321,10 +319,11 @@ function FormMaquina({ onClose }) {
             className="w-full text-gray-900 rounded-lg focus:outline-none"
             placeholder="Selecciona una ubicación"
           />
-          {errors.ubicacionMaquina && (
-            <p className="text-red-500">Este campo es obligatorio</p>
+          {ubicacionError && (
+            <p className="text-red-500">{ubicacionError}</p>
           )}
         </div>
+
         <div>
           <label
             htmlFor="fechaInstalacionMaquina"

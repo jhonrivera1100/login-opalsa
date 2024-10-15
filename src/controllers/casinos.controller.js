@@ -29,7 +29,6 @@ export const getCasinoById = async (req, res) => {
   }
 };
 
-// Crear un nuevo casino
 export const createCasino = async (req, res) => {
   const { nombreCasino, ciudadCasino, direccionCasino } = req.body;
 
@@ -40,7 +39,7 @@ export const createCasino = async (req, res) => {
   let otrosDocumentos = [];
 
   try {
-    // Manejo de la imagen de casino
+    // Manejo de la imagen del casino (si se provee)
     if (req.files && req.files.imgCasino) {
       const result = await uploadImage(req.files.imgCasino.tempFilePath);
       await fs.remove(req.files.imgCasino.tempFilePath);
@@ -50,17 +49,25 @@ export const createCasino = async (req, res) => {
       };
     }
 
-    // Procesar los documentos con sus categorías
+    // Procesar los documentos con sus categorías (asegurarse de que todos se suban a Cloudinary)
     for (const [key, file] of Object.entries(req.files)) {
       if (key !== "imgCasino") {
+        // Obtener la categoría del documento del cuerpo de la solicitud
         const category =
           req.body[`documents[${key.split("[")[1]?.split("]")[0]}][category]`];
 
+        if (!category) {
+          return res.status(400).json({ message: "Categoría de documento no especificada." });
+        }
+
+        // Subir el archivo a Cloudinary y remover el archivo temporal
         const result = await uploadFile(file.tempFilePath, category);
         await fs.remove(file.tempFilePath);
 
+        // Crear la información del documento con URL y public_id de Cloudinary
         const docInfo = { url: result.secure_url, public_id: result.public_id };
 
+        // Asignar el documento a su categoría correspondiente
         switch (category) {
           case "documentacionLegal":
             documentacionLegal.push(docInfo);
@@ -75,25 +82,28 @@ export const createCasino = async (req, res) => {
             otrosDocumentos.push(docInfo);
             break;
           default:
-            break;
+            return res.status(400).json({ message: "Categoría de documento no válida." });
         }
       }
     }
 
+    // Crear el nuevo casino con todos los datos proporcionados
     const newCasino = new Casino({
       nombreCasino,
-      imgCasino,
       ciudadCasino,
       direccionCasino,
+      imgCasino,
       documentacionLegal,
       usoDeSuelos,
       colJuegos,
       otrosDocumentos,
     });
 
+    // Guardar el casino en la base de datos
     const casinoGuardado = await newCasino.save();
     res.json(casinoGuardado);
   } catch (error) {
+    console.error("Error al guardar el casino:", error);
     res.status(500).json({
       message: "Error al guardar el casino",
       error: error.message,
@@ -101,97 +111,107 @@ export const createCasino = async (req, res) => {
   }
 };
 
-// Actualizar un casino existente
+
 export const updateCasino = async (req, res) => {
-  const { nombreCasino, ciudadCasino, direccionCasino, maquinas } = req.body;
+  try {
+    const { nombreCasino, ciudadCasino, direccionCasino, maquinas } = req.body;
 
-  let updatedFields = {
-    nombreCasino,
-    ciudadCasino,
-    direccionCasino,
-    maquinas,
-  };
+    let updatedFields = {
+      nombreCasino,
+      ciudadCasino,
+      direccionCasino,
+      maquinas,
+    };
 
-  // Manejo de la imagen del casino
-  if (req.files && req.files.imgCasino) {
     const casino = await Casino.findById(req.params.id);
-    if (casino.imgCasino && casino.imgCasino.public_id) {
-      await deleteImage(casino.imgCasino.public_id);
+    if (!casino) {
+      return res.status(404).json({ message: "Casino no encontrado" });
     }
 
-    const result = await uploadImage(req.files.imgCasino.tempFilePath);
-    await fs.remove(req.files.imgCasino.tempFilePath);
-    updatedFields.imgCasino = {
-      url: result.secure_url,
-      public_id: result.public_id,
-    };
-  }
+    // Manejo de la imagen del casino
+    if (req.files && req.files.imgCasino) {
+      if (casino.imgCasino && casino.imgCasino.public_id) {
+        await deleteImage(casino.imgCasino.public_id);
+      }
 
-  // Manejo de los documentos de casino (se añaden nuevos documentos sin eliminar los anteriores)
-  if (req.files) {
-    const casino = await Casino.findById(req.params.id);
+      const result = await uploadImage(req.files.imgCasino.tempFilePath);
+      await fs.remove(req.files.imgCasino.tempFilePath);
+      updatedFields.imgCasino = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    }
 
-    const documentCategories = [
-      "documentacionLegal",
-      "usoDeSuelos",
-      "colJuegos",
-      "otrosDocumentos",
-    ];
+    // Manejo de los documentos de casino
+    if (req.files) {
+      for (const [key, file] of Object.entries(req.files)) {
+        if (key !== "imgCasino") {
+          const category =
+            req.body[`documents[${key.split("[")[1]?.split("]")[0]}][category]`];
 
-    // Inicializa los arrays de documentos si no están presentes
-    documentCategories.forEach((category) => {
-      if (!casino[category]) casino[category] = [];
-    });
+          if (!category) {
+            return res
+              .status(400)
+              .json({ message: "Categoría de documento no especificada." });
+          }
 
-    for (const [key, file] of Object.entries(req.files)) {
-      if (key !== "imgCasino") {
-        const category =
-          req.body[`documents[${key.split("[")[1]?.split("]")[0]}][category]`];
+          const result = await uploadFile(file.tempFilePath, category);
+          await fs.remove(file.tempFilePath);
 
-        const result = await uploadFile(file.tempFilePath, category);
-        await fs.remove(file.tempFilePath);
+          const docInfo = { url: result.secure_url, public_id: result.public_id };
 
-        const docInfo = { url: result.secure_url, public_id: result.public_id };
-
-        // Agregar los documentos a su respectiva categoría
-        switch (category) {
-          case "documentacionLegal":
-            casino.documentacionLegal.push(docInfo);
-            break;
-          case "usoDeSuelos":
-            casino.usoDeSuelos.push(docInfo);
-            break;
-          case "colJuegos":
-            casino.colJuegos.push(docInfo);
-            break;
-          case "otrosDocumentos":
-            casino.otrosDocumentos.push(docInfo);
-            break;
+          // Agregar el documento a la categoría correspondiente
+          switch (category) {
+            case "documentacionLegal":
+              casino.documentacionLegal.push(docInfo);
+              break;
+            case "usoDeSuelos":
+              casino.usoDeSuelos.push(docInfo);
+              break;
+            case "colJuegos":
+              casino.colJuegos.push(docInfo);
+              break;
+            case "otrosDocumentos":
+              casino.otrosDocumentos.push(docInfo);
+              break;
+            default:
+              return res.status(400).json({ message: "Categoría de documento no válida." });
+          }
         }
       }
+
+      // Actualizamos los campos de documentos en updatedFields
+      updatedFields.documentacionLegal = casino.documentacionLegal;
+      updatedFields.usoDeSuelos = casino.usoDeSuelos;
+      updatedFields.colJuegos = casino.colJuegos;
+      updatedFields.otrosDocumentos = casino.otrosDocumentos;
     }
 
-    updatedFields.documentacionLegal = casino.documentacionLegal;
-    updatedFields.usoDeSuelos = casino.usoDeSuelos;
-    updatedFields.colJuegos = casino.colJuegos;
-    updatedFields.otrosDocumentos = casino.otrosDocumentos;
-  }
-
-  try {
+    // Actualizar el casino en la base de datos
     const updatedCasino = await Casino.findByIdAndUpdate(
       req.params.id,
       updatedFields,
       { new: true }
     );
-    if (!updatedCasino)
+
+    if (!updatedCasino) {
       return res.status(404).json({ message: "Casino no encontrado" });
-    res.json(updatedCasino);
+    }
+
+    // Log para verificar qué se está devolviendo
+    console.log("Casino actualizado:", updatedCasino);
+
+    res.json(updatedCasino); // Retornar el casino actualizado para reflejar los cambios
   } catch (error) {
+    console.error("Error al actualizar el casino:", error);
     res
       .status(500)
       .json({ message: "Error al actualizar el casino", error: error.message });
   }
 };
+
+
+
 
 export const getCasinoElementos = async (req, res) => {
   try {
@@ -256,3 +276,38 @@ export const deleteCasino = async (req, res) => {
       .json({ message: "Error al eliminar el casino", error: error.message });
   }
 };
+
+
+export const deleteCasinoDocument = async (req, res) => {
+  const { casinoId } = req.params;
+  const { publicId, category } = req.body; // Public ID del documento en Cloudinary y la categoría a la que pertenece
+
+  try {
+    const casino = await Casino.findById(casinoId);
+    if (!casino) {
+      return res.status(404).json({ message: "Casino no encontrado" });
+    }
+    
+
+    // Eliminar el documento de Cloudinary
+    const result = await deleteImage(publicId);
+
+    if (result.result !== "ok") {
+      return res.status(500).json({ message: "Error al eliminar el documento en Cloudinary" });
+    }
+
+    // Eliminar el documento de la categoría correspondiente en la base de datos
+    casino[category] = casino[category].filter((doc) => doc.public_id !== publicId);
+
+    await casino.save(); // Guardar los cambios en la base de datos
+
+    res.json({ message: "Documento eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al eliminar el documento",
+      error: error.message,
+    });
+  }
+};
+
+

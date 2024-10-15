@@ -1,29 +1,25 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMapMarkerAlt,
-  faMapMarkedAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faMapMarkerAlt, faMapMarkedAlt } from "@fortawesome/free-solid-svg-icons";
 import { useElementos } from "../context/ElementosContext";
-import { useMaquinas } from "../context/MaquinasContext"; // Para cargar las máquinas filtradas desde el backend
+import { useMaquinas } from "../context/MaquinasContext";
 import ElementsModal from "./ElementsModal";
 import ConfirmModal from "./ConfirmModal";
 import { deleteCasinoRequest } from "../api/casinos";
 
 const CasinoDetail = ({
   selectedCasino,
-  searchQuery,
-  handleSearch,
   selectedBrand,
   handleFilterChange,
   abrirDocumento,
   setSelectedMaquina,
   setSelectedCasino,
 }) => {
-  const { getElementosByCasino } = useElementos(); // Contexto para obtener los elementos del casino
-  const { loadMaquinasByCasino, maquinas, noMaquinas } = useMaquinas(); // Añadir el estado noMaquinas
+  const { getElementosByCasino } = useElementos();
+  const { loadMaquinasByCasino, maquinas, noMaquinas } = useMaquinas();
+  const [searchQueryMaquina, setSearchQueryMaquina] = useState(""); // Nuevo estado para la búsqueda de máquinas
   const [showModal, setShowModal] = useState(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para el modal de confirmación
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,9 +28,9 @@ const CasinoDetail = ({
   // Filtrar máquinas basadas en la búsqueda y el filtro de marca
   const filteredMaquinas = useMemo(() => {
     return maquinas.filter((maquina) => {
-      const matchesSearch = searchQuery
-        ? (maquina.nroSerieMaquina?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           maquina.nombreMaquina?.toLowerCase().includes(searchQuery.toLowerCase()))
+      const matchesSearch = searchQueryMaquina
+        ? (maquina.nroSerieMaquina?.toLowerCase().includes(searchQueryMaquina.toLowerCase()) || 
+           maquina.nombreMaquina?.toLowerCase().includes(searchQueryMaquina.toLowerCase()))
         : true;
 
       const matchesBrand = selectedBrand
@@ -43,22 +39,22 @@ const CasinoDetail = ({
 
       return matchesSearch && matchesBrand;
     });
-  }, [maquinas, searchQuery, selectedBrand]);
+  }, [maquinas, searchQueryMaquina, selectedBrand]);
 
   // Cálculo de las máquinas a mostrar por página (después del filtrado)
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentMaquinas = filteredMaquinas.slice(indexOfFirstItem, indexOfLastItem); // Utilizamos las máquinas filtradas
+  const currentMaquinas = filteredMaquinas.slice(indexOfFirstItem, indexOfLastItem);
 
   // Estado de carga para las imágenes de las máquinas
   const [loadingImages, setLoadingImages] = useState(
-    new Array(currentMaquinas.length).fill(true) // Inicializamos el estado de carga para cada máquina
+    new Array(currentMaquinas.length).fill(true)
   );
 
   // Cargar máquinas filtradas por el casino cuando se seleccione un casino
   useEffect(() => {
     if (selectedCasino && selectedCasino.nombreCasino) {
-      loadMaquinasByCasino(selectedCasino.nombreCasino); // Cargar máquinas filtradas desde el backend
+      loadMaquinasByCasino(selectedCasino.nombreCasino);
     }
   }, [selectedCasino]);
 
@@ -74,7 +70,7 @@ const CasinoDetail = ({
           newLoadingImages[index] = false;
           return newLoadingImages;
         });
-      }, 1000); // Simula un retraso de 1 segundo
+      }, 1000);
     });
 
     return () => timers.forEach((timer) => clearTimeout(timer));
@@ -92,16 +88,18 @@ const CasinoDetail = ({
     setShowModal(true);
   };
 
-  // Función para eliminar el casino
-  const handleDeleteCasino = async () => {
-    try {
-      await deleteCasinoRequest(selectedCasino._id);
-      setSelectedCasino(null);
-      setIsConfirmModalOpen(false);
-    } catch (error) {
-      console.error("Error al eliminar el casino:", error);
-    }
-  };
+ // Función para eliminar el casino
+const handleDeleteCasino = async () => {
+  try {
+    await deleteCasinoRequest(selectedCasino._id);
+    setSelectedCasino(null);
+    setIsConfirmModalOpen(false);
+    window.location.reload(); // Recargar la página después de eliminar el casino
+  } catch (error) {
+    console.error("Error al eliminar el casino:", error);
+  }
+};
+
 
   return (
     <div className="mx-auto w-10/12 h-144 overflow-auto p-4 bg-casino-background bg-cover bg-center">
@@ -154,10 +152,11 @@ const CasinoDetail = ({
             Elementos en el casino
           </button>
 
+          {/* Buscador de máquinas solo en esta sección */}
           <input
             type="text"
-            value={searchQuery}
-            onChange={handleSearch}
+            value={searchQueryMaquina}
+            onChange={(e) => setSearchQueryMaquina(e.target.value)} // Actualiza el estado de búsqueda
             placeholder="Buscar por nombre o número de serie"
             className="px-4 py-2 border rounded-md w-1/2 mx-2"
           />
@@ -165,12 +164,25 @@ const CasinoDetail = ({
           <select
             value={selectedBrand}
             onChange={handleFilterChange}
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md md:w-auto"
           >
             <option value="">Todas las marcas</option>
             <option value="AINSWORTH">AINSWORTH</option>
             <option value="NOVOMATIC">NOVOMATIC</option>
-            <option value="OTRO">OTRO</option>
+            <option value="WILLIAMS">WILLIAMS</option>
+            <option value="IGT">IGT</option>
+            <option value="GOLD CLUB">GOLD CLUB</option>
+            <option value="R FRANCO">R FRANCO</option>
+            <option value="HOTBOX">HOTBOX</option>
+            <option value="BALLY">BALLY</option>
+            <option value="SPIELO">SPIELO</option>
+            <option value="ZITRO">ZITRO</option>
+            <option value="POKER">POKER</option>
+            <option value="ALFA STREET">ALFA STREET</option>
+            <option value="MERKUR">MERKUR</option>
+            <option value="GTS">GTS</option>
+            <option value="KONAMI">KONAMI</option>
+            <option value="ARISTOCRAT">ARISTOCRAT</option>
           </select>
         </div>
 
