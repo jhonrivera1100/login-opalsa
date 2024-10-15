@@ -61,16 +61,12 @@ const SectionContent = ({
 
   const renderMaquinas = useCallback(() => {
     if (filteredMaquinas.length === 0) {
-      // Mostrar mensaje si no se encuentran máquinas, centrado horizontal y verticalmente
       return (
-        <div className="flex justify-center items-center w-full h-64">
-          <span className="text-center text-red-600 font-bold text-xl">
-            No se encontraron máquinas.
-          </span>
-        </div>
+        <p className="text-red-500 font-bold text-center w-full p-4 bg-gray-200 rounded-lg">
+          No se encontraron máquinas con ese número de serie.
+        </p>
       );
     }
-
     return filteredMaquinas.map((maquina) => (
       <MaquinaCard key={maquina._id} maquina={maquina} />
     ));
@@ -99,7 +95,7 @@ const SectionContent = ({
     const casinosFiltrados = paginatedCasinos();
     if (casinosFiltrados.length === 0) {
       return (
-        <p className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4">
+        <p className="text-red-500 font-bold text-center w-full p-4 bg-gray-200 rounded-lg">
           No se encontraron casinos con ese nombre.
         </p>
       );
@@ -165,8 +161,23 @@ const SectionContent = ({
             onChange={handleFilterChange}
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
-            <option value="">Todas las marcas</option>
-            {/* Opciones de marcas */}
+             <option value="">Todas las marcas</option>
+            <option value="AINSWORTH">AINSWORTH</option>
+            <option value="NOVOMATIC">NOVOMATIC</option>
+            <option value="WILLIAMS">WILLIAMS</option>
+            <option value="IGT">IGT</option>
+            <option value="GOLD CLUB">GOLD CLUB</option>
+            <option value="R FRANCO">R FRANCO</option>
+            <option value="HOTBOX">HOTBOX</option>
+            <option value="BALLY">BALLY</option>
+            <option value="SPIELO">SPIELO</option>
+            <option value="ZITRO">ZITRO</option>
+            <option value="POKER">POKER</option>
+            <option value="ALFA STREET">ALFA STREET</option>
+            <option value="MERKUR">MERKUR</option>
+            <option value="GTS">GTS</option>
+            <option value="KONAMI">KONAMI</option>
+            <option value="ARISTOCRAT">ARISTOCRAT</option>
           </select>
         </div>
       )}
@@ -187,7 +198,21 @@ const SectionContent = ({
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las ciudades</option>
-            {/* Opciones de ciudades */}
+            <option value="popayan">Popayan</option>
+            <option value="Cali">Cali</option>
+            <option value="Pasto">Pasto</option>
+            <option value="Palmira">Palmira</option>
+            <option value="Santander">Santander</option>
+            <option value="Tulua">Tulua</option>
+            <option value="Buenaventura">Buenaventura</option>
+            <option value="Tuquerres">Tuquerres</option>
+            <option value="Tumaco">Tumaco</option>
+            <option value="Bordo">Bordo</option>
+            <option value="Florida">Florida</option>
+            <option value="Ipiales">Ipiales</option>
+            <option value="Jamundi">Jamundi</option>
+            <option value="Buga">Buga</option>
+      
           </select>
         </div>
       )}
