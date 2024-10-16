@@ -40,6 +40,37 @@ export const getComponentes = async (req, res) => {
   }
 };
 
+export const uploadComponenteImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const componente = await Componente.findById(id);
+    if (!componente) {
+      return res.status(404).json({ message: "Componente no encontrado" });
+    }
+
+    if (req.files && req.files.imagenComponente) {
+      if (componente.imagenComponente.public_id) {
+        await deleteImage(componente.imagenComponente.public_id);
+      }
+
+      const result = await uploadFile(req.files.imagenComponente.tempFilePath, "Imagenes");
+      await fs.remove(req.files.imagenComponente.tempFilePath);
+
+      componente.imagenComponente = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+
+      const componenteActualizado = await componente.save();
+      res.json(componenteActualizado);
+    } else {
+      res.status(400).json({ message: "No se ha subido ninguna imagen" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error al subir la imagen", error: error.message });
+  }
+};
 
 export const getComponenteBySerial = async (req, res) => {
   try {
