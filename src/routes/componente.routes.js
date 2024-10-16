@@ -7,6 +7,7 @@ import {
   deleteComponenteById,
   updateComponenteById,
   getComponenteBySerial, // Nueva función
+  uploadComponenteImage,
 } from "../controllers/componentes.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { createComponenteSchema } from "../schemas/componente.schema.js";
@@ -22,6 +23,7 @@ router.post(
   validateSchema(createComponenteSchema),
   createComponente
 );
+router.post("/componentes/:id/upload-image", authRequired, uploadComponenteImage); 
 router.delete("/componentes/:id", authRequired, deleteComponenteById);
 router.put("/componentes/:id", authRequired, updateComponenteById);
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 
-
 // Helper para generar URL optimizada desde Cloudinary
 const getOptimizedImageUrl = (
   url,
@@ -22,6 +21,7 @@ function ComponentesTable({
   handleCancelClick,
   handleDeleteComponente,
   abrirDocumento,
+  handleImageUpload, // Nueva prop para manejar la subida de imágenes
 }) {
   const [tooltipSerial, setTooltipSerial] = useState(null); // Estado para manejar el tooltip del serial
   const [tooltipUser, setTooltipUser] = useState(null);
@@ -84,6 +84,14 @@ function ComponentesTable({
 
   const handleSerialMouseLeave = () => {
     setTooltipSerial(null); // Oculta el tooltip del serial
+  };
+
+  // Función para manejar la subida de la imagen
+  const handleImageChange = (e, componente) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleImageUpload(componente._id, file); // Subir la imagen usando la prop
+    }
   };
 
   return (
@@ -161,6 +169,13 @@ function ComponentesTable({
                           onMouseLeave={handleMouseLeave}
                           loading="lazy" // Lazy loading
                         />
+                      ) : editComponentId === componente._id ? (
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageChange(e, componente)}
+                          className="text-sm text-gray-500"
+                        />
                       ) : (
                         <span className="text-sm text-gray-500">
                           No Disponible
@@ -209,7 +224,6 @@ function ComponentesTable({
                         </div>
                       )}
 
-                      {/* Tooltip para mostrar el serial completo */}
                       {tooltipSerial === serialComponente && (
                         <div className="absolute bg-white border border-gray-300 p-2 rounded shadow-lg z-10">
                           {serialComponente}
@@ -268,20 +282,7 @@ function ComponentesTable({
                             }`}
                             disabled={isAssigned}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                              />
-                            </svg>
+                            Guardar
                           </button>
                           <button
                             onClick={handleCancelClick}
@@ -290,20 +291,7 @@ function ComponentesTable({
                             }`}
                             disabled={isAssigned}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
+                            Cancelar
                           </button>
                         </div>
                       ) : (
@@ -328,20 +316,7 @@ function ComponentesTable({
                                 className="text-gray-600 hover:text-gray-900"
                                 disabled={isAssigned}
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  className="h-6 w-6"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                                  />
-                                </svg>
+                                Editar
                               </button>
                               <button
                                 onClick={() =>
@@ -350,20 +325,7 @@ function ComponentesTable({
                                 className="text-red-600 hover:text-red-900"
                                 disabled={isAssigned}
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  className="h-6 w-6"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M3 6h18m-1 0v12.75a1.125 1.125 0 01-1.125 1.125H4.125A1.125 1.125 0 013 18.75V6zm4.875-3a.375.375 0 01.375.375V6h6V3.375a.375.375 0 01.375-.375h3.375a.375.375 0 01.375.375V6h2.25a.375.375 0 01.375.375V6H20.25a.375.375 0 01.375.375V18.75a.375.375 0 01-.375.375H4.125a.375.375 0 01-.375-.375V6a.375.375 0 01.375-.375h2.25v2.25a.375.375 0 01.375.375v-2.25h.375z"
-                                  />
-                                </svg>
+                                Eliminar
                               </button>
                             </>
                           )}
@@ -377,7 +339,23 @@ function ComponentesTable({
           </table>
 
           {/* Paginación */}
-
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => paginate(index + 1)}
+                  className={`mx-1 px-4 py-2 rounded-md ${
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          )}
 
           {tooltipVisible && tooltipUser && (
             <div
@@ -391,27 +369,17 @@ function ComponentesTable({
               <h3 className="text-lg text-center font-semibold">
                 Usuario a cargo
               </h3>
-              <p className="text-sm text-gray-600">
-                Nombre: {tooltipUser.username}
-              </p>
-              <p className="text-sm text-gray-600">
-                Email: {tooltipUser.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                Cédula: {tooltipUser.cedula}
-              </p>
-              <p className="text-sm text-gray-600">
-                Cargo: {tooltipUser.cargo}
-              </p>
-              <p className="text-sm text-gray-600">
-                Ciudad: {tooltipUser.ciudad}
-              </p>
+              <p className="text-sm text-gray-600">Nombre: {tooltipUser.username}</p>
+              <p className="text-sm text-gray-600">Email: {tooltipUser.email}</p>
+              <p className="text-sm text-gray-600">Cédula: {tooltipUser.cedula}</p>
+              <p className="text-sm text-gray-600">Cargo: {tooltipUser.cargo}</p>
+              <p className="text-sm text-gray-600">Ciudad: {tooltipUser.ciudad}</p>
             </div>
           )}
 
           {/* Mostrar la vista previa de la imagen */}
           {zoomedImage && (
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50   rounded-lg w-96 h-96 flex items-center justify-center">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 rounded-lg w-96 h-96 flex items-center justify-center">
               <img
                 src={zoomedImage}
                 alt="Vista Previa"
