@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import path from 'path';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.routes.js';
 import recordatorioRoutes from './routes/recordatorio.routes.js';
@@ -15,8 +16,10 @@ import mantenimientoRoutes from './routes/mantenimiento.routes.js';
 import movimientosCRoutes from './routes/movimientosC.routes.js';
 import moviMaquinasRoutes from './routes/moviMaquinas.routes.js';
 import ordenRoutes from './routes/orden.routes.js';
-import elementosRoutes from './routes/elementos.routes.js'; // Rutas para elementos
-import movimientosElementosRoutes from './routes/movimientosElementos.routes.js'; // Rutas para movimientos de elementos
+import elementosRoutes from './routes/elementos.routes.js'; 
+import movimientosElementosRoutes from './routes/movimientosElementos.routes.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -24,16 +27,21 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Usar la variable de entorno para CORS
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173', // Fallback si no está definida
   credentials: true,
 }));
+
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Usar la variable de entorno para el directorio temporal de archivos
 app.use(fileUpload({
   useTempFiles: true,
-  tempFileDir: './upload',
+  tempFileDir: process.env.TEMP_FILE_DIR || './upload', // Fallback si no está definida
 }));
+
 app.use(cookieParser());
 
 // Rutas de la API
@@ -47,8 +55,8 @@ app.use('/api', mantenimientoRoutes);
 app.use('/api', movimientosCRoutes);
 app.use('/api', moviMaquinasRoutes);
 app.use('/api', ordenRoutes); 
-app.use('/api', elementosRoutes); // Agrega las rutas de elementos
-app.use('/api', movimientosElementosRoutes); // Agrega las rutas de movimientos de elementos
+app.use('/api', elementosRoutes);
+app.use('/api', movimientosElementosRoutes);
 
 // Middleware para servir archivos estáticos
 app.use('/upload', express.static(path.join(__dirname, 'upload')));
