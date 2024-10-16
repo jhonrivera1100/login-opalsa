@@ -30,6 +30,7 @@ export const getMovimientosElementos = async (req, res) => {
       .populate('elementoId')
       .populate('oldUbicacionId')
       .populate('newUbicacionId')
+      .sort({ fechaTransferenciaElm: -1 }) // Ordenar por fecha más reciente
       .skip(skip)
       .limit(parseInt(limit));
 

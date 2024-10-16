@@ -3,9 +3,13 @@ import { useForm } from "react-hook-form";
 import { useElementos } from "../context/ElementosContext";
 import { getCasinosRequest } from "../api/casinos";
 
-
 function FormElemento({ closeModal }) {
-  const { register, handleSubmit, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
   const { createElemento } = useElementos();
   const [casinos, setCasinos] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // Estado para el spinner de carga
@@ -49,18 +53,18 @@ function FormElemento({ closeModal }) {
       formDataToSend.append("marcaElemento", data.marcaElemento);
       formDataToSend.append("tipoElemento", data.tipoElemento);
       formDataToSend.append("ubicacionDeElemento", data.ubicacionDeElemento);
-
-      if (data.imgElemento) {
+  
+      if (data.imgElemento && data.imgElemento.length > 0) {
         formDataToSend.append("imgElemento", data.imgElemento[0]);
       }
-      if (data.documentacionElemento) {
+      if (data.documentacionElemento && data.documentacionElemento.length > 0) {
         formDataToSend.append("documentacionElemento", data.documentacionElemento[0]);
       }
-
+  
       await createElemento(formDataToSend);
       closeModal(); // Cerrar modal tras el envío exitoso
     } catch (error) {
-      console.error("Error creating element:", error);
+      console.error("Error creando elemento:", error);
     } finally {
       setIsLoading(false); // Desactivamos el spinner de carga
       reset(); // Resetear el formulario
@@ -102,11 +106,14 @@ function FormElemento({ closeModal }) {
           <input
             type="text"
             name="nombreElemento"
-            {...register("nombreElemento", { required: true })}
+            {...register("nombreElemento", { required: "El nombre del elemento es obligatorio" })}
             placeholder="Nombre del Elemento"
             onChange={(e) => handleInputChange(e)}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.nombreElemento && (
+            <p className="text-red-500">{errors.nombreElemento.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="codigoElemento" className="text-black font-bold block mb-1">
@@ -115,11 +122,14 @@ function FormElemento({ closeModal }) {
           <input
             type="text"
             name="codigoElemento"
-            {...register("codigoElemento", { required: true })}
+            {...register("codigoElemento", { required: "El código del elemento es obligatorio" })}
             placeholder="Código del Elemento"
             onChange={(e) => handleInputChange(e)}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.codigoElemento && (
+            <p className="text-red-500">{errors.codigoElemento.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="marcaElemento" className="text-black font-bold block mb-1">
@@ -128,11 +138,14 @@ function FormElemento({ closeModal }) {
           <input
             type="text"
             name="marcaElemento"
-            {...register("marcaElemento", { required: true })}
+            {...register("marcaElemento", { required: "La marca del elemento es obligatoria" })}
             placeholder="Marca del Elemento"
             onChange={(e) => handleInputChange(e)}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.marcaElemento && (
+            <p className="text-red-500">{errors.marcaElemento.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="tipoElemento" className="text-black font-bold block mb-1">
@@ -141,11 +154,14 @@ function FormElemento({ closeModal }) {
           <input
             type="text"
             name="tipoElemento"
-            {...register("tipoElemento", { required: true })}
+            {...register("tipoElemento", { required: "El tipo del elemento es obligatorio" })}
             placeholder="Tipo del Elemento"
             onChange={(e) => handleInputChange(e)}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           />
+          {errors.tipoElemento && (
+            <p className="text-red-500">{errors.tipoElemento.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="ubicacionDeElemento" className="text-black font-bold block mb-1">
@@ -153,7 +169,7 @@ function FormElemento({ closeModal }) {
           </label>
           <select
             name="ubicacionDeElemento"
-            {...register("ubicacionDeElemento", { required: true })}
+            {...register("ubicacionDeElemento", { required: "La ubicación del elemento es obligatoria" })}
             onChange={(e) => handleInputChange(e)}
             className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
           >
@@ -164,10 +180,13 @@ function FormElemento({ closeModal }) {
               </option>
             ))}
           </select>
+          {errors.ubicacionDeElemento && (
+            <p className="text-red-500">{errors.ubicacionDeElemento.message}</p>
+          )}
         </div>
         <div>
           <label htmlFor="imgElemento" className="text-black font-bold block mb-1">
-            Imagen del Elemento:
+            Imagen del Elemento (Opcional):
           </label>
           <input
             type="file"
@@ -179,7 +198,7 @@ function FormElemento({ closeModal }) {
         </div>
         <div>
           <label htmlFor="documentacionElemento" className="text-black font-bold block mb-1">
-            Documentación del Elemento:
+            Documentación del Elemento (Opcional):
           </label>
           <input
             type="file"

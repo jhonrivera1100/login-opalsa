@@ -1,7 +1,7 @@
 import React from "react";
 import { FaTools } from "react-icons/fa";
 import { MdAutoAwesomeMotion } from "react-icons/md";
-import { BsBox } from "react-icons/bs"; // Ícono para el movimiento de elementos
+import { MdOutlineHomeRepairService } from "react-icons/md";
 
 const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => {
   // Formateo seguro de la fecha. Usamos la propiedad correspondiente a cada tipo de movimiento.
@@ -37,10 +37,8 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
       >
         {isMantenimiento ? (
           <FaTools className="h-8 w-8" />
-        ) : isMovimientoComponente || isMovimientoMaquina ? (
+        ) : isMovimientoComponente || isMovimientoMaquina || isMovimientoElemento ? (
           <MdAutoAwesomeMotion className="h-8 w-8" />
-        ) : isMovimientoElemento ? (
-          <BsBox className="h-8 w-8" />
         ) : null}
       </div>
 
@@ -61,11 +59,24 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
         {isMantenimiento ? (
           <>
             <div className="flex space-x-2 text-gray-400 text-sm">
-              <span>Tipo:</span>
+            <MdOutlineHomeRepairService className="w-5 h-5"/>
               <p>{item.tipoMantenimiento || "N/A"}</p>
             </div>
             <div className="flex space-x-2 text-gray-400 text-sm my-1">
-              <span>Fecha:</span>
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></path>
+          </svg>
               <p>{formattedDate}</p>
             </div>
             <div className="my-1">

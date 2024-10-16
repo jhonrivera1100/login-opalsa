@@ -1,71 +1,73 @@
 import React from "react";
-import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import notificar from "../assets/images/notificar.png";
-import perfil from "../assets/images/perfil.png";
-import actualizar from "../assets/images/actualizar datos.png";
+import { FaTools } from "react-icons/fa"; // Ícono de "Reportes"
+import { AiFillContainer } from "react-icons/ai"; // Ícono de "Respuestas de Orden"
 
 function HomePage() {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,         
-    autoplaySpeed: 2500,
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar /> {/* Componente Navbar */}
 
+      {/* Imagen de fondo con texto centrado */}
+      <section
+        className="relative bg-cover bg-center h-[400px] flex items-center justify-center"
+        style={{
+          backgroundImage: `url('https://res.cloudinary.com/dtqiwgbbp/image/upload/v1727471920/wmijfcuvu84ysxyniaew.jpg')`,
+        }}
+      >
+        {/* Capa oscura para opacidad */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        {/* Texto centrado sobre la imagen */}
+        <div className="relative z-10 text-center text-white">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">BIENVENIDO A OPALSA APP</h1>
+          <p className="text-lg md:text-2xl">
+            CONOCE MÁS SOBRE EL GESTOR DE SALAS Y PROCEDIMIENTOS DE OPALSA
+          </p>
+        </div>
+      </section>
+
       <main className="container mx-auto py-12 w-[80%]">
-        <section className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">¡Bienvenido a Opalsa App!</h2>
-          <p className="text-lg">Conoce las salas de casinos con las que cuenta Opalsa y las máquinas con las que contamos actualmente.</p>
-        </section>
-
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-2">Notificar al Administrador</h3>
-              <p className="text-gray-700">Hazle saber al administrador si has hecho un cambio de algún componente o si una máquina ha sido trasladada, informa de los mantenimientos que se le han realizado a las máquinas.</p>
+          {/* Card 1 con el ícono de Reportes en la esquina izquierda */}
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
+            {/* Ícono de Reportes en la esquina izquierda */}
+            <FaTools className="absolute top-4 left-4 text-blue-600 text-4xl" />
+
+            <div className="p-6 pl-16">
+              <h3 className="text-2xl text-blue-600 font-bold mb-2">Seccion de Reportes</h3>
+              <p className="text-gray-700">
+                En esta sección, se permite registrar los mantenimientos realizados, generar solicitudes de órdenes para la ejecución de procedimientos específicos, y crear recordatorios dirigidos al administrador para la gestión eficiente de las tareas operativas.
+              </p>
             </div>
           </div>
 
-          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-2">Actualiza Datos</h3>
-              <p className="text-gray-700">Puedes actualizar los datos de tu perfil si lo ves necesario gracias a su función Actualizar Datos.</p>
+          {/* Card 2 con el ícono de Respuestas de Orden en la esquina izquierda */}
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
+            {/* Ícono de Respuestas de Orden en la esquina izquierda */}
+            <AiFillContainer className="absolute top-4 left-4 text-blue-600 text-4xl" />
+
+            <div className="p-6 pl-16">
+              <h3 className="text-2xl text-blue-600 font-bold mb-2">Seccion de Respuestas de orden</h3>
+              <p className="text-gray-700">
+              En esta sección podrás visualizar todas las órdenes que has generado, organizadas según su estado actual. Adicionalmente, aquí recibirás las respuestas del administrador a cada una de tus solicitudes. Es recomendable revisar esta sección con regularidad si tienes órdenes pendientes de respuesta.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Carrusel de imágenes */}
-        <section className="mb-12">
-          <Slider {...settings}>
-            <div className="rounded-xl">
-              <img src={notificar} alt="Imagen 1" className="w-full h-auto rounded-xl" />
-            </div>
-            <div>
-              <img src={perfil} alt="Imagen 2" className="w-full h-auto rounded-xl" />
-            </div>
-            <div>
-              <img src={actualizar} alt="Imagen 3" className="w-full h-auto rounded-xl" />
-            </div>
-          </Slider>
-        </section>
-
-        <section className="bg-blue-900 text-white py-12 shadow-2xl">
+        <section className="bg-blue-900 rounded text-white py-12 shadow-2xl">
           <div className="container mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Tu Perfil</h2>
-            <p className="mb-6">En la sección de perfil encontrarás todos tus datos los cuales podrás modificar si lo ves necesario, recuerda siempre poner datos reales.</p>
+            <p className="mb-6">
+              En la sección de perfil encontrarás todos tus datos los cuales
+              podrás modificar si lo ves necesario, recuerda siempre poner datos
+              reales.
+            </p>
             <Link to="/profile">
-              <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Ver Perfil</button>
+              <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
+                Ver Perfil
+              </button>
             </Link>
           </div>
         </section>

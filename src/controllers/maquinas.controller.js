@@ -86,18 +86,19 @@ export const buscarMaquinaPorSerieFlexible = async (req, res) => {
       query.nroSerieMaquina = { $regex: nroSerieMaquina, $options: 'i' }; // Coincidencia parcial (insensible a mayúsculas)
     }
 
-    // Buscar la máquina en la base de datos
-    const maquina = await Maquinas.findOne(query).select('nroSerieMaquina marcaMaquina ubicacionMaquina fechaInstalacionMaquina estadoMaquina imgMaquina.url');
+    // Buscar las máquinas en la base de datos
+    const maquinas = await Maquinas.find(query); // Usamos find() para traer todas las coincidencias
 
-    if (!maquina) {
-      return res.status(404).json({ message: 'No se encontró la máquina con ese número de serie' });
+    if (maquinas.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron máquinas con ese número de serie' });
     }
 
-    res.json(maquina);
+    res.json(maquinas);
   } catch (error) {
-    res.status(500).json({ message: 'Error al buscar la máquina', error: error.message });
+    res.status(500).json({ message: 'Error al buscar las máquinas', error: error.message });
   }
 };
+
 
 
 

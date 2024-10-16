@@ -98,7 +98,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
           // Agregar los nuevos componentes a la lista seleccionada
           if (nuevosComponentes.length > 0) {
             setSelectedComponentes([...selectedComponentes, ...nuevosComponentes]);
-            setSearchMessage(`Componentes con serial ${serialSearch} agregados.`);
+            setSearchMessage(`Componentes con serial ${serialSearch} encontrado.`);
             setSearchError('');
           } else {
             setSearchError(`Todos los componentes con serial ${serialSearch} ya han sido agregados.`);
@@ -337,17 +337,17 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
             </button>
           </div>
 
-          <div className="mt-4 flex justify-end space-x-2">
+          <div className="mt-4 flex justify-center space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded"
+              className="px-4 py-2 bg-red-500 text-white rounded"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded"
+              className="px-4 py-2 bg-green-700 text-white rounded"
             >
               Guardar Orden
             </button>

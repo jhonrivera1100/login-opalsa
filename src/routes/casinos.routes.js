@@ -6,6 +6,7 @@ import {
   updateCasino,
   deleteCasino,
   getCasinoById,
+  deleteCasinoDocument,
 } from "../controllers/casinos.controller.js";
 import { validateSchema } from "../middlewares/validator.js";
 import { getCasinoElementos } from "../controllers/casinos.controller.js";
@@ -23,5 +24,10 @@ router.post(
 );
 router.delete("/casinos/:id", authRequired, deleteCasino);
 router.put("/casinos/:id", authRequired, updateCasino);
+router.delete('/casinos/:casinoId/document', authRequired, deleteCasinoDocument);
+
+
+
+
 
 export default router;

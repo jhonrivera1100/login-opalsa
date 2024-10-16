@@ -2,21 +2,19 @@ import React, { useState, useEffect, useCallback } from "react";
 import MaquinaCard from "../components/MaquinaCard";
 import CasinoCard from "./CasinoCard";
 import CasinoDetail from "../components/CasinoDetail";
-import { useMaquinas } from "../context/MaquinasContext"; // Importamos el contexto
+import { useMaquinas } from "../context/MaquinasContext";
 
 const SectionContent = ({
   section,
   selectedCasino,
-  maquinas, // Ya no se usará directamente para filtrar por serie
+  maquinas,
   casinos,
-  searchQuery,
   selectedBrand,
   cityFilter,
   currentPageMaquinas,
   totalPagesMaquinas,
   currentPageCasinos,
   itemsPerPage,
-  handleSearch,
   handleFilterChange,
   handleCityFilterChange,
   setSelectedCasino,
@@ -28,71 +26,122 @@ const SectionContent = ({
   handlePreviousPageCasinos,
   handleNextPageCasinos,
 }) => {
-  const { buscarMaquinaPorSerieFlexible } = useMaquinas(); // Hook para acceder a la función de búsqueda flexible
+  const { buscarMaquinaPorSerieFlexible } = useMaquinas();
 
-  const [filteredMaquinas, setFilteredMaquinas] = useState(maquinas); // Estado local para almacenar máquinas filtradas
+  const [searchQueryCasino, setSearchQueryCasino] = useState(""); // Estado para búsqueda de casinos
+  const [searchQueryMaquina, setSearchQueryMaquina] = useState(""); // Estado para búsqueda de máquinas en la sección "Maquinas"
+  const [filteredMaquinas, setFilteredMaquinas] = useState(maquinas);
+  const [currentPage, setCurrentPage] = useState(1); // Estado para la página actual de casinos
+  const itemsPerPageCasinos = 12; // Definir 12 casinos por página
 
-  // Efecto para buscar máquinas por número de serie en el backend cuando cambia el query
+  // Efecto para filtrar máquinas en la sección "Maquinas"
   useEffect(() => {
     const fetchFilteredMaquinas = async () => {
-      if (section === "Maquinas" && searchQuery) {
-        const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(
-          searchQuery
-        ); // Eliminado el parámetro exactSearch
-        if (maquinasFiltradas) {
-          setFilteredMaquinas([maquinasFiltradas]); // Guardar la máquina encontrada
-        } else {
-          setFilteredMaquinas([]); // Si no se encuentra nada, lista vacía
+      if (section === "Maquinas" && searchQueryMaquina) {
+        try {
+          const exact = searchQueryMaquina.length < 3; // Si el número de serie es corto, realizar búsqueda exacta
+          const maquinasFiltradas = await buscarMaquinaPorSerieFlexible(
+            searchQueryMaquina,
+            exact
+          );
+          if (maquinasFiltradas && maquinasFiltradas.length > 0) {
+            setFilteredMaquinas(maquinasFiltradas); // Guardamos todas las coincidencias
+          } else {
+            setFilteredMaquinas([]); // Si no hay coincidencias, lista vacía
+          }
+        } catch (error) {
+          console.error("Error buscando máquinas:", error);
+          setFilteredMaquinas([]); // En caso de error, establecer filteredMaquinas a una lista vacía
         }
       } else {
-        setFilteredMaquinas(maquinas); // Resetear las máquinas si no hay búsqueda activa
+        setFilteredMaquinas(maquinas); // Si no hay búsqueda, mostrar todas las máquinas
       }
     };
-
+  
     fetchFilteredMaquinas();
-  }, [searchQuery, section, maquinas, buscarMaquinaPorSerieFlexible]);
+  }, [searchQueryMaquina, section, maquinas, buscarMaquinaPorSerieFlexible]);
+  
 
-  // Renderizado de las tarjetas de máquinas usando las filtradas del backend
+  // Restablecer la página actual al cambiar la búsqueda o el filtro de ciudad
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQueryCasino, cityFilter]);
+
   const renderMaquinas = useCallback(() => {
+    if (filteredMaquinas.length === 0) {
+      return (
+        <p className="text-red-500 font-bold text-center w-full p-4 bg-gray-200 rounded-lg">
+          No se encontraron máquinas con ese número de serie.
+        </p>
+      );
+    }
     return filteredMaquinas.map((maquina) => (
       <MaquinaCard key={maquina._id} maquina={maquina} />
     ));
   }, [filteredMaquinas]);
 
-  // Memoizamos los casinos filtrados basados en los filtros de búsqueda y ciudad
   const filteredCasinos = useCallback(() => {
     return casinos.filter(
       (casino) =>
-        casino.nombreCasino.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        casino.nombreCasino
+          .toLowerCase()
+          .includes(searchQueryCasino.toLowerCase()) &&
         (cityFilter === "" ||
           casino.ciudadCasino.toLowerCase().includes(cityFilter.toLowerCase()))
     );
-  }, [casinos, searchQuery, cityFilter]);
+  }, [casinos, searchQueryCasino, cityFilter]);
+
+  // Obtener los casinos de la página actual
+  const paginatedCasinos = useCallback(() => {
+    const filtered = filteredCasinos();
+    const startIndex = (currentPage - 1) * itemsPerPageCasinos;
+    const endIndex = startIndex + itemsPerPageCasinos;
+    return filtered.slice(startIndex, endIndex);
+  }, [filteredCasinos, currentPage, itemsPerPageCasinos]);
 
   const renderCasinos = useCallback(() => {
-    return filteredCasinos().map((casino) => (
+    const casinosFiltrados = paginatedCasinos();
+    if (casinosFiltrados.length === 0) {
+      return (
+        <p className="text-red-500 font-bold text-center w-full p-4 bg-gray-200 rounded-lg">
+          No se encontraron casinos con ese nombre.
+        </p>
+      );
+    }
+    return casinosFiltrados.map((casino) => (
       <CasinoCard
         key={casino._id}
         casino={casino}
         onVerMas={() => {
           if (selectedCasino?._id !== casino._id) {
-            // Prevenir múltiples selecciones del mismo casino
-            setSelectedCasino(casino);
+            setSelectedCasino(casino); // Cambiamos el casino seleccionado
           }
         }}
         onVerDocumentos={() => handleVerDocumentos(casino)}
       />
     ));
-  }, [filteredCasinos, selectedCasino]);
+  }, [paginatedCasinos, selectedCasino]);
+
+  const totalPagesCasinos = Math.ceil(filteredCasinos().length / itemsPerPageCasinos);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPagesCasinos) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   if (selectedCasino) {
     return (
       <div className="font-poppins">
         <CasinoDetail
           selectedCasino={selectedCasino}
-          filteredMaquinas={filteredMaquinas}
-          searchQuery={searchQuery}
-          handleSearch={handleSearch}
+          filteredMaquinas={maquinas} // Pasamos todas las máquinas
           selectedBrand={selectedBrand}
           handleFilterChange={handleFilterChange}
           abrirDocumento={abrirDocumento}
@@ -105,19 +154,19 @@ const SectionContent = ({
 
   return (
     <div className="font-poppins mx-auto bg-gray-100 w-11/12 md:w-10/12 h-144 overflow-auto p-4">
-      {/* Filtros de máquinas */}
+      {/* Filtros de máquinas en la sección "Maquinas" */}
       {section === "Maquinas" && (
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
             type="text"
-            value={searchQuery}
-            onChange={handleSearch}
+            value={searchQueryMaquina}
+            onChange={(e) => setSearchQueryMaquina(e.target.value)}
             placeholder="Buscar por número de serie"
             className="px-4 py-2 border rounded-md w-full md:w-1/2 mx-2 mb-2 md:mb-0"
           />
           <select
             value={selectedBrand}
-            onChange={handleFilterChange} // Mantiene la lógica para actualizar la marca seleccionada
+            onChange={handleFilterChange}
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las marcas</option>
@@ -146,32 +195,47 @@ const SectionContent = ({
         <div className="flex flex-wrap justify-center items-center mb-4 w-full">
           <input
             type="text"
-            value={searchQuery}
-            onChange={handleSearch}
+            value={searchQueryCasino}
+            onChange={(e) => {
+              setSearchQueryCasino(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Buscar por nombre del casino"
             className="px-4 py-2 border rounded-md w-full md:w-1/2 mx-2 mb-2 md:mb-0"
           />
           <select
             value={cityFilter}
-            onChange={handleCityFilterChange}
+            onChange={(e) => {
+              handleCityFilterChange(e);
+              setCurrentPage(1);
+            }}
             className="px-4 py-2 border rounded-md w-full md:w-auto"
           >
             <option value="">Todas las ciudades</option>
+            <option value="popayan">Popayan</option>
             <option value="Cali">Cali</option>
-            <option value="Popayan">Popayan</option>
             <option value="Pasto">Pasto</option>
+            <option value="Palmira">Palmira</option>
+            <option value="Santander">Santander</option>
             <option value="Tulua">Tulua</option>
+            <option value="Buenaventura">Buenaventura</option>
+            <option value="Tuquerres">Tuquerres</option>
+            <option value="Tumaco">Tumaco</option>
+            <option value="Bordo">Bordo</option>
+            <option value="Florida">Florida</option>
+            <option value="Ipiales">Ipiales</option>
+            <option value="Jamundi">Jamundi</option>
+            <option value="Buga">Buga</option>
           </select>
         </div>
       )}
 
-      {/* Renderizado de las tarjetas de máquinas o casinos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {section === "Maquinas" && renderMaquinas()}
         {section === "Casinos" && renderCasinos()}
       </div>
 
-      {/* Controles de paginación para máquinas */}
+      {/* Paginación para máquinas */}
       {section === "Maquinas" && (
         <div className="flex justify-between mt-4">
           <button
@@ -194,21 +258,22 @@ const SectionContent = ({
         </div>
       )}
 
-      {/* Controles de paginación para casinos */}
+      {/* Paginación para casinos */}
       {section === "Casinos" && (
         <div className="flex justify-between mt-4">
           <button
-            onClick={handlePreviousPageCasinos}
-            disabled={currentPageCasinos === 1}
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Anterior
           </button>
+          <span>
+            Página {currentPage} de {totalPagesCasinos}
+          </span>
           <button
-            onClick={handleNextPageCasinos}
-            disabled={
-              currentPageCasinos * itemsPerPage >= filteredCasinos().length
-            }
+            onClick={handleNextPage}
+            disabled={currentPage >= totalPagesCasinos}
             className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Siguiente

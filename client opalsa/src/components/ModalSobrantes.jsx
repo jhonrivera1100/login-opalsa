@@ -200,17 +200,17 @@ const ModalSobrantes = ({ item, onClose }) => {
               />
             </div>
           </div>
-          <div className="flex justify-end space-x-2 mt-5">
+          <div className="flex justify-center space-x-2 mt-5">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
             >
               Guardar
             </button>

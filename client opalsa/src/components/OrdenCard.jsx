@@ -133,7 +133,7 @@ const OrdenCard = ({
           <div className="flex justify-center mt-2 space-x-2">
             {(estadoOrden === "Orden en solicitud" ) && (
               <button
-                className="bg-green-500 text-white py-1 px-4 rounded-md hover:bg-green-700 transition-colors duration-300"
+                className="bg-green-700 text-white py-1 px-4 rounded-md hover:bg-green-600 transition-colors duration-300"
                 onClick={() => handleAcceptOrder(item)}
               >
                 Aprobar orden
@@ -142,7 +142,7 @@ const OrdenCard = ({
             )}
             {(estadoOrden === "Orden en solicitud" ) && (
               <button
-              className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+              className="bg-red-600 text-white py-1 px-4 rounded-md hover:bg-red-500 transition-colors duration-300"
               onClick={() => handleDeleteItem(_id, "orden")}
             >
               Descartar Orden
@@ -152,7 +152,7 @@ const OrdenCard = ({
             {estadoOrden === "Orden aprobada" && (
               
               <button
-              className="bg-green-500 text-white py-1 px-4 rounded-md hover:bg-green-700 transition-colors duration-300"
+              className="bg-blue-700 text-white py-1 px-4 rounded-md hover:bg-blue-500 transition-colors duration-300"
               onClick={() => openModal(item)}
             >
               Inspeccionar orden
@@ -162,7 +162,7 @@ const OrdenCard = ({
               
               <button
                 onClick={() => handleOpenSobrantesModal(item)}
-                className="bg-sky-500 rounded-md py-1 px-4 text-white hover:bg-sky-700 transition-colors duration-300"
+                className="bg-green-700 rounded-md py-1 px-4 text-white hover:bg-green-600 transition-colors duration-300"
               >
                 Finalizar orden
               </button>
@@ -170,13 +170,13 @@ const OrdenCard = ({
             {estadoOrden === "Orden finalizada" && (
               <div className="flex justify-between mt-2 space-x-2">
                 <button
-                  className="bg-sky-500 text-white py-1 px-4 rounded-md hover:bg-sky-700 transition-colors duration-300"
+                  className="bg-blue-700 text-white py-1 px-4 rounded-md hover:bg-blue-500 transition-colors duration-300"
                   onClick={openModal}
                 >
                   Resumen
                 </button>
                 <button
-                  className="bg-red-500 text-white py-1 px-4 rounded-md hover:bg-red-700 transition-colors duration-300"
+                  className="bg-red-600 text-white py-1 px-4 rounded-md hover:bg-red-500 transition-colors duration-300"
                   onClick={() => handleDeleteItem(_id, "orden")}
                 >
                   Eliminar

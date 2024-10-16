@@ -95,7 +95,7 @@ export const createComponente = async (req, res) => {
     req.body;
 
   let documentoComponente = {};
-  let imagenComponente = {}; // Nuevo campo para la imagen
+  let imagenComponente = {}; // Nuevo campo para la imagen con valor predeterminado vacío
   let usuarioEncargado = null;
 
   try {
@@ -126,12 +126,20 @@ export const createComponente = async (req, res) => {
       };
     }
 
+    // Si no hay imagen, asignar un objeto vacío para mantener el campo presente
+    if (!req.files || !req.files.imagenComponente) {
+      imagenComponente = {
+        url: "", // O un valor predeterminado, como una URL de una imagen genérica
+        public_id: "",
+      };
+    }
+
     const nuevoComponente = new Componente({
       serialComponente,
       nombreComponente,
       marcaComponente,
       documentoComponente,
-      imagenComponente, // Guardar la imagen
+      imagenComponente, // Guardar la imagen o el campo vacío
       maquina,
       usuarioEncargado,
     });
@@ -146,9 +154,10 @@ export const createComponente = async (req, res) => {
 
     res.status(201).json(componenteGuardado);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error al crear el componente", error: error.message });
+    res.status(400).json({
+      message: "Error al crear el componente",
+      error: error.message,
+    });
   }
 };
 

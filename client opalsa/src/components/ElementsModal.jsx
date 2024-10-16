@@ -16,6 +16,8 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
   const [editedData, setEditedData] = useState({});
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [elementToTransfer, setElementToTransfer] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [elementToDelete, setElementToDelete] = useState(null);
 
   useEffect(() => {
     if (isOpen && casinoId) {
@@ -50,7 +52,7 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
       nombreElemento: elemento.nombreElemento,
       marcaElemento: elemento.marcaElemento,
       tipoElemento: elemento.tipoElemento,
-      codigoElemento: elemento.codigoElemento, // Nuevo campo
+      codigoElemento: elemento.codigoElemento,
     });
   };
 
@@ -64,9 +66,14 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este elemento?")) {
-      deleteElemento(id);
-    }
+    setElementToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteElemento(elementToDelete);
+    setIsDeleteModalOpen(false);
+    setElementToDelete(null);
   };
 
   const handleOpenTransferModal = (elemento) => {
@@ -75,7 +82,12 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
   };
 
   const handleCloseTransferModal = () => {
-    setIsTransferModalOpen(false); // Cierra el modal
+    setIsTransferModalOpen(false);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setElementToDelete(null);
   };
 
   return (
@@ -85,7 +97,7 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
         onRequestClose={onRequestClose}
         contentLabel="Elementos Modal"
         className="fixed inset-0 flex items-center justify-center z-50 font-poppins"
-       overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
       >
         <div className="relative bg-white p-4 rounded-lg w-full max-w-6xl h-3/4 overflow-y-auto">
           <button
@@ -294,6 +306,33 @@ const ElementsModal = ({ isOpen, onRequestClose, casinoId }) => {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal de eliminación */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onRequestClose={handleCloseDeleteModal}
+        contentLabel="Confirmar eliminación"
+        className="fixed inset-0 flex items-center justify-center z-50 font-poppins"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
+      >
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-bold mb-4">¿Deseas eliminar este elemento?</h3>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={handleCloseDeleteModal}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            >
+              Eliminar
+            </button>
           </div>
         </div>
       </Modal>

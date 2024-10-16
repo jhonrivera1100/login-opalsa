@@ -70,7 +70,7 @@ function AppAdmin() {
   };
 
   return (
-    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins'> {/* Se añadió font-poppins */}
+    <div className='grid lg:grid-cols-4 xl:grid-cols-6 min-h-screen font-poppins '> {/* Se añadió font-poppins */}
       <Sidebar/>
       <main className='lg:col-span-3 xl:col-span-5 bg-gray-100 p-4 md:p-8'>
         <div className='flex justify-center pt-5'>

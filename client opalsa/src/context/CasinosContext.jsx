@@ -2,8 +2,10 @@ import React, { createContext, useContext, useState } from "react";
 import {
   createCasinoRequest,
   updateCasinoRequest,
-  deleteCasinoRequest, // Importamos la función para eliminar
-} from "../api/casinos"; 
+  deleteCasinoRequest,
+  deleteCasinoDocumentRequest,
+  getCasinoRequest // Importamos la función para obtener un casino por ID
+} from "../api/casinos";
 
 const CasinosContext = createContext();
 
@@ -22,7 +24,6 @@ export function CasinosProvider({ children }) {
   const createCasino = async (casinoData) => {
     try {
       const res = await createCasinoRequest(casinoData);
-      console.log("Casino creado:", res.data);
       setCasinos([...casinos, res.data]); // Actualizamos el estado local
     } catch (error) {
       console.error("Error al crear el casino:", error);
@@ -34,13 +35,19 @@ export function CasinosProvider({ children }) {
   const updateCasino = async (casinoId, updatedData) => {
     try {
       const res = await updateCasinoRequest(casinoId, updatedData);
-      console.log("Casino actualizado:", res.data);
-      // Actualizamos el estado local si es necesario
-      setCasinos((prevCasinos) =>
-        prevCasinos.map((casino) =>
-          casino._id === casinoId ? res.data : casino
-        )
-      );
+
+      if (res.status === 200 && res.data) {
+        // Actualizamos el estado local si la respuesta es exitosa
+        setCasinos((prevCasinos) =>
+          prevCasinos.map((casino) =>
+            casino._id === casinoId ? res.data : casino
+          )
+        );
+        return res; // Retornar la respuesta para manejar en el frontend
+      } else {
+        console.error("Error al actualizar el casino: Respuesta inesperada del servidor.");
+        throw new Error("Error inesperado en la respuesta del servidor.");
+      }
     } catch (error) {
       console.error("Error al actualizar el casino:", error);
       throw error;
@@ -61,13 +68,51 @@ export function CasinosProvider({ children }) {
     }
   };
 
+  // Función para eliminar un documento específico del casino
+  const deleteDocument = async (casinoId, publicId, category) => {
+    try {
+      await deleteCasinoDocumentRequest(casinoId, publicId, category); // Realizamos la solicitud al backend
+      // Actualiza el estado local para reflejar el documento eliminado
+      setCasinos((prevCasinos) =>
+        prevCasinos.map((casino) => {
+          if (casino._id === casinoId) {
+            return {
+              ...casino,
+              [category]: casino[category].filter(
+                (doc) => doc.public_id !== publicId
+              ),
+            };
+          }
+          return casino;
+        })
+      );
+      console.log(`Documento con public_id ${publicId} eliminado del casino.`);
+    } catch (error) {
+      console.error("Error al eliminar el documento:", error);
+      throw error;
+    }
+  };
+
+  // Función para obtener un casino por ID
+  const getCasinoById = async (casinoId) => {
+    try {
+      const res = await getCasinoRequest(casinoId);
+      return res; // Devolver la respuesta para manejar en el frontend
+    } catch (error) {
+      console.error("Error al obtener el casino por ID:", error);
+      throw error;
+    }
+  };
+
   return (
     <CasinosContext.Provider
       value={{
         casinos,
         createCasino,
         updateCasino,
-        deleteCasino, // Hacemos disponible la función de eliminar
+        deleteCasino,
+        deleteDocument,
+        getCasinoById, // Hacemos disponible la función para obtener un casino por ID
       }}
     >
       {children}
