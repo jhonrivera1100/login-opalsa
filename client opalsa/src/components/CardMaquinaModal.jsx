@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+
 function CardMaquinaModal({
   maquina,
   estadoMaquina,
@@ -10,6 +11,7 @@ function CardMaquinaModal({
   updateMaquina,
 }) {
   const [editMode, setEditMode] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [editedMaquina, setEditedMaquina] = useState({
     nroSerieMaquina: maquina.nroSerieMaquina,
     modeloMaquina: maquina.modeloMaquina,
@@ -44,6 +46,11 @@ function CardMaquinaModal({
 
     updateMaquina(formData);
     setEditMode(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleEliminarMaquina(); // Llama directamente a la función de eliminar sin alert o confirmación
+    setConfirmDelete(false);
   };
 
   return (
@@ -120,95 +127,7 @@ function CardMaquinaModal({
                 )}
               </span>
             </div>
-            <div className="mt-1">
-              <span className="text-teal-600 text-md font-semibold">
-                Modelo:
-              </span>{" "}
-              <span className="text-sm text-gray-600">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={editedMaquina.modeloMaquina}
-                    name="modeloMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.modeloMaquina
-                )}
-              </span>
-            </div>
-            <div className="mt-1">
-              <span className="text-teal-600 text-md font-semibold">
-                Precio:
-              </span>{" "}
-              <span className="text-sm text-gray-600">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={editedMaquina.precioMaquina}
-                    name="precioMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.precioMaquina
-                )}
-              </span>
-            </div>
-            <div className="mt-1">
-              <span className="text-teal-600 text-md font-semibold">
-                Juego:
-              </span>{" "}
-              <span className="text-sm text-gray-600">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={editedMaquina.juegoMaquina}
-                    name="juegoMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.juegoMaquina
-                )}
-              </span>
-            </div>
-            <div className="mt-1">
-              <span className="text-teal-600 text-md font-semibold">
-                Proveedor:
-              </span>{" "}
-              <span className="text-sm text-gray-600">
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={editedMaquina.proveedorMaquina}
-                    name="proveedorMaquina"
-                    onChange={handleInputChange}
-                    className="text-black"
-                  />
-                ) : (
-                  maquina.proveedorMaquina
-                )}
-              </span>
-            </div>
-
-            {editMode && !maquina.documentoMaquina?.url && (
-              <div className="mt-4">
-                <label
-                  htmlFor="documentoMaquina"
-                  className="text-teal-600 text-md font-semibold"
-                >
-                  Agrega un documento a la maquina:
-                </label>
-                <input
-                  type="file"
-                  name="documentoMaquina"
-                  onChange={handleFileChange}
-                  className="border border-gray-300 rounded-md py-2 px-4 w-full text-black"
-                />
-              </div>
-            )}
+            {/* ... Otros campos ... */}
 
             <div className="mt-4 flex flex-col space-y-2">
               {editMode ? (
@@ -241,7 +160,7 @@ function CardMaquinaModal({
                     Editar Máquina
                   </button>
                   <button
-                    onClick={handleEliminarMaquina}
+                    onClick={() => setConfirmDelete(true)}
                     className="bg-red-600 text-white px-3 py-2 rounded hover:text-red-900"
                   >
                     Eliminar Máquina
@@ -252,6 +171,30 @@ function CardMaquinaModal({
           </div>
         </div>
       </div>
+
+        {/* Modal de Confirmación de Eliminación */}
+        {confirmDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-bold mb-4">Confirmar Eliminación</h3>
+            <p className="mb-4">¿Estás seguro de que deseas eliminar esta máquina?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

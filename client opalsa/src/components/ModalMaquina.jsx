@@ -80,19 +80,15 @@ function ModalMaquina({ maquina, onClose }) {
   };
 
   const handleEliminarMaquina = async () => {
-    const confirmDelete = window.confirm(
-      "¿Seguro que deseas eliminar esta máquina?"
-    );
-    if (confirmDelete) {
-      try {
-        await deleteMaquinasRequest(maquina._id);
-        onClose();
-        window.location.reload();
-      } catch (error) {
-        console.error("Error al eliminar la máquina:", error);
-      }
+    try {
+      await deleteMaquinasRequest(maquina._id);
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al eliminar la máquina:", error);
     }
   };
+  
 
   const abrirDocumento = (url) => {
     window.open(url, "_blank");
