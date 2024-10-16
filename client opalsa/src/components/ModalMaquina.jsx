@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { updateComponentesRequest, deleteComponentesRequest } from "../api/componentes";
+import {
+  updateComponentesRequest,
+  deleteComponentesRequest,
+  uploadComponenteImageRequest, // Nueva función para subir imagen
+} from "../api/componentes";
 import { useComponentes } from "../context/ComponentesContext";
 import AgregarComponenteModal from "./AgregarComponenteModal";
 import TransferirComponenteModal from "./TransferirComponenteModal";
@@ -12,7 +16,7 @@ function ModalMaquina({ maquina, onClose }) {
   const { componentes, getComponentes, pagination, loading } = useComponentes();
   const [showAgregarModal, setShowAgregarModal] = useState(false);
   const [showTransferirModal, setShowTransferirModal] = useState(false);
-  const [showTransferirMaquinaModal, setShowTransferirMaquinaModal] = useState(false); // Transferir máquina
+  const [showTransferirMaquinaModal, setShowTransferirMaquinaModal] = useState(false);
   const [estadoMaquina, setEstadoMaquina] = useState(maquina.estadoMaquina);
   const [editComponentId, setEditComponentId] = useState(null);
   const [editedComponent, setEditedComponent] = useState({});
@@ -94,6 +98,18 @@ function ModalMaquina({ maquina, onClose }) {
     window.open(url, "_blank");
   };
 
+  const handleImageUpload = async (componenteId, file) => {
+    try {
+      const formData = new FormData();
+      formData.append("imagenComponente", file);
+
+      await uploadComponenteImageRequest(componenteId, formData);
+      getComponentes(maquina._id, currentPage); // Recargar los componentes
+    } catch (error) {
+      console.error("Error al subir la imagen del componente:", error);
+    }
+  };
+
   const updateMaquina = async (editedMaquina) => {
     try {
       await updateMaquinasRequest(maquina._id, editedMaquina);
@@ -131,7 +147,7 @@ function ModalMaquina({ maquina, onClose }) {
           maquina={maquina}
           estadoMaquina={estadoMaquina}
           toggleEstadoMaquina={toggleEstadoMaquina}
-          handleEliminarMaquina={handleEliminarMaquina}
+          handleEliminarMaquina={handleEliminarMaquina} // Eliminar máquina
           setShowTransferirMaquinaModal={setShowTransferirMaquinaModal} // Mostrar modal para transferir máquina
           updateMaquina={updateMaquina}
         />
@@ -164,6 +180,7 @@ function ModalMaquina({ maquina, onClose }) {
                 handleCancelClick={handleCancelClick}
                 handleDeleteComponente={handleDeleteComponente}
                 abrirDocumento={abrirDocumento}
+                handleImageUpload={handleImageUpload} // Función para subir imagen
               />
 
               {/* Controles de paginación */}
@@ -219,7 +236,7 @@ function ModalMaquina({ maquina, onClose }) {
         />
       )}
 
-      {showTransferirMaquinaModal && ( // Modal para transferir máquina
+      {showTransferirMaquinaModal && (
         <TransferirMaquinaModal
           maquina={maquina}
           onClose={() => setShowTransferirMaquinaModal(false)} // Cerrar el modal

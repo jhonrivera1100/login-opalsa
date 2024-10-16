@@ -76,7 +76,7 @@ function AppAdmin() {
         <div className='flex justify-center pt-5'>
           <Header />
         </div>
-        <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
+        <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-3 xl:grid-cols-4 mt-10 pt-[80px] gap-4'>
 
           {/* Card 1 */}
           <div className='bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white flex items-center flex-col gap-6 w-full h-full drop-shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl'>
