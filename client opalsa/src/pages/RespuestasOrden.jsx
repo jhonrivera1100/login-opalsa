@@ -4,6 +4,7 @@ import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import HeaderRespuestas from "../components/HeaderRespOrd";
 import ModalRespOrden from "../components/modalRespOrden";
+import { FaUser } from "react-icons/fa"; // Icono de usuario
 
 const RespuestasOrden = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -112,9 +113,13 @@ const RespuestasOrden = () => {
               filteredOrdenes.map((orden) => (
                 <div
                   key={orden._id}
-                  className={`w-full sm:w-[300px] rounded-xl p-6 text-center shadow-xl h-[400px] ${
+                  className={`w-full sm:w-[300px] rounded-xl p-6 text-center shadow-xl h-[450px] ${
                     orden.estadoOrden === "Orden aprobada"
-                      ? "bg-green-200"
+                      ? "bg-green-50"
+                      : orden.estadoOrden === "Orden finalizada"
+                      ? "bg-blue-50" // Color especial para orden finalizada
+                      : orden.estadoOrden === "Orden en solicitud"
+                      ? "bg-yellow-50" // Color especial para orden en solicitud
                       : "bg-white"
                   }`}
                 >
@@ -135,15 +140,44 @@ const RespuestasOrden = () => {
                     <h4 className="text-xl font-semibold text-gray-800">
                       Numero de orden <br /> {orden.numeroOrden}
                     </h4>
-                    <p className="mt-1 text-gray-600">
-                      Estado: {orden.estadoOrden}
+                    {/* Mostrar información de la máquina si está disponible */}
+                    {orden.maquina && (
+                      <div className="mt-2">
+                        <h5 className="text-lg  font-bold text-black">
+                          Maquina a intervenir:
+                        </h5>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-bold">Número de Serie:</span> {orden.maquina.nroSerieMaquina}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-bold">Marca:</span> {orden.maquina.marcaMaquina}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-bold">Ubicación:</span> {orden.maquina.ubicacionMaquina}
+                        </p>
+                        <p className="mt-1 text-black">
+                      <span className="font-bold">Fecha de solicitud:</span> {""}
+                      {formatDate(orden.fechaOrden)}
                     </p>
-                    <p className="mt-1 text-gray-600">
-                      Fecha: {formatDate(orden.fechaOrden)}
-                    </p>
-                    <p className="mt-1 text-gray-600">
-                      Usuario: {orden.usuario.username}
-                    </p>
+                      </div>
+                    )}
+
+                    {/* Mensajes según el estado de la orden */}
+                    {orden.estadoOrden === "Orden finalizada" && (
+                      <p className="mt-1 text-blue-600 font-bold">
+                        La orden ha sido finalizada.
+                      </p>
+                    )}
+                    {orden.estadoOrden === "Orden aprobada" && (
+                      <p className="mt-1 text-green-600 font-bold">
+                        La orden fue aprobada, revisa los elementos asignados.
+                      </p>
+                    )}
+                    {orden.estadoOrden === "Orden en solicitud" && (
+                      <p className="mt-1 text-yellow-600 font-bold">
+                        Orden solicitada en espera de respuesta.
+                      </p>
+                    )}
                     <button
                       className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                       onClick={() => handleShowMore(orden)}
