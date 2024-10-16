@@ -79,25 +79,28 @@ function TransferirMaquinaModal({ maquina, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-70 backdrop-blur-sm">
       <div className="relative bg-white shadow-2xl rounded-lg p-8 w-[400px] transform transition-all ease-out duration-300 scale-100 hover:scale-105">
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition duration-200"
-          onClick={onClose}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="h-6 w-6"
+        {/* Mostrar el botón de cerrar solo si la transferencia no ha sido exitosa */}
+        {!transferSuccess && (
+          <button
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition duration-200"
+            onClick={onClose}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
 
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
           Transferir Máquina

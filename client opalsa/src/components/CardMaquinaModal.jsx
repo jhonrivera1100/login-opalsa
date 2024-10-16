@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+
 function CardMaquinaModal({
   maquina,
   estadoMaquina,
@@ -10,6 +11,7 @@ function CardMaquinaModal({
   updateMaquina,
 }) {
   const [editMode, setEditMode] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [editedMaquina, setEditedMaquina] = useState({
     nroSerieMaquina: maquina.nroSerieMaquina,
     modeloMaquina: maquina.modeloMaquina,
@@ -44,6 +46,11 @@ function CardMaquinaModal({
 
     updateMaquina(formData);
     setEditMode(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleEliminarMaquina(); // Llama directamente a la función de eliminar sin alert o confirmación
+    setConfirmDelete(false);
   };
 
   return (
@@ -199,7 +206,7 @@ function CardMaquinaModal({
                   htmlFor="documentoMaquina"
                   className="text-teal-600 text-md font-semibold"
                 >
-                  Agrega un documento a la maquina:
+                  Agrega un documento a la máquina:
                 </label>
                 <input
                   type="file"
@@ -241,7 +248,7 @@ function CardMaquinaModal({
                     Editar Máquina
                   </button>
                   <button
-                    onClick={handleEliminarMaquina}
+                    onClick={() => setConfirmDelete(true)}
                     className="bg-red-600 text-white px-3 py-2 rounded hover:text-red-900"
                   >
                     Eliminar Máquina
@@ -252,6 +259,30 @@ function CardMaquinaModal({
           </div>
         </div>
       </div>
+
+        {/* Modal de Confirmación de Eliminación */}
+        {confirmDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-bold mb-4">Confirmar Eliminación</h3>
+            <p className="mb-4">¿Estás seguro de que deseas eliminar esta máquina?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
