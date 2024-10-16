@@ -41,7 +41,7 @@ const NotificacionesCard = ({
     <div
       key={recordatorio._id}
       className={`relative py-6 px-6 rounded-3xl w-[250px] my-4 shadow-xl ${
-        recordatorio.visto ? "bg-green-200" : "bg-white"
+        recordatorio.visto ? "bg-green-100" : "bg-white"
       }`}
     >
       <div className="flex items-center justify-end space-x-2 mb-4">
