@@ -86,8 +86,8 @@ export const buscarMaquinaPorSerieFlexible = async (req, res) => {
       query.nroSerieMaquina = { $regex: nroSerieMaquina, $options: 'i' }; // Coincidencia parcial (insensible a mayúsculas)
     }
 
-    // Buscar las máquinas en la base de datos
-    const maquinas = await Maquinas.find(query); // Usamos find() para traer todas las coincidencias
+    // Buscar las máquinas en la base de datos y limitar a 8 resultados
+    const maquinas = await Maquinas.find(query).limit(8); // Limitar el número de resultados a 8
 
     if (maquinas.length === 0) {
       return res.status(404).json({ message: 'No se encontraron máquinas con ese número de serie' });

@@ -68,14 +68,14 @@ const CrearNotificacion = () => {
       )}
       <div className="w-full p-6 my-4 lg:w-8/12 lg:p-12 rounded-2xl shadow-2xl bg-white mx-auto">
         <div className="flex justify-center">
-          <h2 className="font-bold uppercase text-3xl md:text-4xl text-center">
+          <h1 className="font-bold uppercase text-3xl md:text-4xl text-center">
             Recordatorios para el administrador
-          </h2>
+          </h1>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-5 mt-5">
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 font-bold mb-2">
                 Título
               </label>
               <input
@@ -89,7 +89,7 @@ const CrearNotificacion = () => {
               />
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 font-bold mb-2">
                 Descripción
               </label>
               <textarea
@@ -102,7 +102,7 @@ const CrearNotificacion = () => {
               ></textarea>
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 font-bold mb-2">
                 Fecha de Recordatorio
               </label>
               <input
@@ -114,7 +114,7 @@ const CrearNotificacion = () => {
               />
             </div>
             <div className="col-span-1">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block text-gray-700 font-bold mb-2">
                 {"Documento (Opcional)"}
               </label>
               <input

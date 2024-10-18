@@ -194,7 +194,7 @@ const MantenimientoRegistro = () => {
             ></textarea>
           </div>
           <div className="mt-4">
-            <label className="block font-bold mb-2">Archivo Adjunto</label>
+            <label className="block font-bold mb-2">Archivo Adjunto {"(Opcional)"}</label>
             <input
               type="file"
               onChange={(e) => setArchivo(e.target.files[0])}
