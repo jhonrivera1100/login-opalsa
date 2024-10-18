@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import backgroundImage from "../assets/images/background login.jpg";
 
 function RegisterPage() {
   const {
@@ -57,7 +56,7 @@ function RegisterPage() {
   return (
     <div
       className="min-h-screen bg-cover bg-center flex flex-col justify-center sm:py-12"
-      style={{ backgroundImage: `url(${backgroundImage})` }} // Aquí usamos la imagen importada
+      style={{ backgroundImage: `url("https://res.cloudinary.com/dtqiwgbbp/image/upload/v1729280502/apgft6gkdtuetbblmbdq.jpg")` }} // Aquí usamos la imagen importada
     >
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-300 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
