@@ -12,19 +12,21 @@ function AppAdmin() {
   const [latestUser, setLatestUser] = useState(null);
 
   // Función para calcular los días restantes para el recordatorio
-  const calcularDiasRestantes = (fechaRecordatorio) => {
-    const fechaActual = new Date();
-    const fecha = new Date(fechaRecordatorio);
+const calcularDiasRestantes = (fechaRecordatorio) => {
+  const fechaActual = new Date();
+  fechaActual.setUTCHours(0, 0, 0, 0); // Establecer la hora a 0 en UTC
 
-    // Establecemos las horas a 0 para comparar solo la fecha
-    fechaActual.setHours(0, 0, 0, 0);
-    fecha.setHours(0, 0, 0, 0);
+  const fecha = new Date(fechaRecordatorio);
+  fecha.setUTCHours(0, 0, 0, 0); // Establecer la hora a 0 en UTC
 
-    const diferencia = fecha - fechaActual; // Diferencia en milisegundos
-    const diasRestantes = Math.round(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días completos
+  // Calcular la diferencia en milisegundos
+  const diferencia = fecha.getTime() - fechaActual.getTime(); // Diferencia en milisegundos
+  const diasRestantes = Math.round(diferencia / (1000 * 60 * 60 * 24)); // Convertir a días completos
 
-    return diasRestantes;
-  };
+  return diasRestantes;
+};
+
+  
 
   useEffect(() => {
     const fetchLatestUser = async () => {
@@ -89,37 +91,45 @@ function AppAdmin() {
             </div>
           </div>
 
-          {/* Card 2 */}
-          <div className='col-span-2 flex flex-col items-center'>
-            <div className='w-full'>
-              <h2 className="text-2xl font-bold mb-4 text-center">Recordatorios próximos a cumplir su fecha</h2>
-              <ul className='w-full overflow-y-auto max-h-[315px]'>
-                {recordatorios.length === 0 ? (
-                  <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
-                ) : (
-                  recordatorios.map(recordatorio => {
-                    const diasRestantes = calcularDiasRestantes(recordatorio.fechaRecordatorio);
+         {/* Card 2 */}
+<div className='col-span-2 flex flex-col items-center'>
+  <div className='w-full'>
+    <h2 className="text-2xl font-bold mb-4 text-center">Recordatorios próximos a cumplir su fecha</h2>
+    <ul className='w-full overflow-y-auto max-h-[315px]'>
+      {recordatorios.length === 0 ? (
+        <p className="text-center text-xl text-gray-500 mt-10">No hay recordatorios aún</p>
+      ) : (
+        recordatorios.map(recordatorio => {
+          const diasRestantes = calcularDiasRestantes(recordatorio.fechaRecordatorio);
 
-                    return (
-                      <li key={recordatorio._id} className={`bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg  duration-300 hover:scale-100 hover:shadow-2xl ${diasRestantes < 0 ? 'border-l-4 border-red-600' : 'border-l-4 border-green-600'}`}>
-                        <div>
-                          <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                            {diasRestantes < 0
-                              ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
-                              : diasRestantes === 0
-                              ? 'Recordatorio del día de hoy'
-                              : `Faltan ${diasRestantes} días`}
-                          </span>
-                          <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
-                          <p>{new Date(recordatorio.fechaRecordatorio).toLocaleDateString()}</p>
-                        </div>
-                      </li>
-                    );
-                  })
-                )}
-              </ul>
-            </div>
-          </div>
+          return (
+            <li key={recordatorio._id} className={`bg-white p-4 mb-4 rounded flex justify-between items-center shadow-lg duration-300 hover:scale-100 hover:shadow-2xl ${diasRestantes < 0 ? 'border-l-4 border-red-600' : 'border-l-4 border-green-600'}`}>
+              <div>
+                <span className={`block mb-2 font-bold ${diasRestantes < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  {diasRestantes < 0
+                    ? `El recordatorio venció hace ${Math.abs(diasRestantes)} días`
+                    : diasRestantes === 0
+                    ? 'Recordatorio del día de hoy'
+                    : `Faltan ${diasRestantes} días`}
+                </span>
+                <h3 className='text-lg font-bold'>{recordatorio.titulo}</h3>
+                <p>
+            {new Date(
+              new Date(recordatorio.fechaRecordatorio).getTime() +
+                new Date(recordatorio.fechaRecordatorio).getTimezoneOffset() *
+                  60000
+            ).toLocaleDateString()}
+          </p>
+              </div>
+            </li>
+          );
+        })
+      )}
+    </ul>
+  </div>
+</div>
+
+
 
           {/* Card 3 */}
           <div className="p-6 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-2xl w-full h-full shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">

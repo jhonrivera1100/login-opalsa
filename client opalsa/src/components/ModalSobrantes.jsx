@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 
-const ModalSobrantes = ({ item, onClose }) => {
+const ModalSobrantes = ({ item, onClose, handleFinalizarOrder }) => {
   const [selectedElementos, setSelectedElementos] = useState([]);
   const [elementoOrden, setElementoOrden] = useState([]);
   const [elementoOrdenSobrantes, setElementoOrdenSobrantes] = useState([]);
@@ -12,15 +12,28 @@ const ModalSobrantes = ({ item, onClose }) => {
   const [fechaCumplimiento, setFechaCumplimiento] = useState("");
 
   useEffect(() => {
-    if (item) {
-      setTareaRealizada(item.tareaRealizada || "");
-      setElementoOrden(item.elementoOrden || []);
-      setElementoOrdenSobrantes(item.elementoOrdenSobrantes || []);
-      setComponentesAsignados(item.componentesAsignados || []);
-      setFechaCumplimiento(item.fechaCumplimiento || "");
-      setSelectedElementos([]);
-    }
-  }, [item]);
+    const fetchData = async () => {
+      if (item) {
+          try {
+              // Suponiendo que tienes un endpoint para obtener los detalles de la orden
+              const response = await axios.get(`http://localhost:4000/api/ordenes/${item._id}`);
+              const { tareaRealizada, elementoOrden, elementoOrdenSobrantes, componentesAsignados, fechaCumplimiento } = response.data;
+
+              // Actualiza el estado con los datos obtenidos
+              setTareaRealizada(tareaRealizada || "");
+              setElementoOrden(elementoOrden || []);
+              setElementoOrdenSobrantes(elementoOrdenSobrantes || []);
+              setComponentesAsignados(componentesAsignados || []);
+              setFechaCumplimiento(fechaCumplimiento || "");
+              setSelectedElementos([]);
+          } catch (error) {
+              console.error("Error al cargar los datos:", error);
+          }
+      }
+  };
+
+  fetchData();
+}, [item]);
 
   const elementoOptions = elementoOrden.map((elemento) => ({
     value: elemento.nombre,
@@ -86,6 +99,7 @@ const ModalSobrantes = ({ item, onClose }) => {
         data
       );
       console.log("Orden actualizada:", response.data);
+      handleFinalizarOrder(item)
     } catch (error) {
       console.error(
         "Error al actualizar la orden:",

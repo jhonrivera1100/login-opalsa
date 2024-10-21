@@ -6,7 +6,7 @@ const CrearNotificacion = () => {
   const { user } = useAuth();
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [fechaMantenimiento, setFechaMantenimiento] = useState("");
+  const [fechaRecordatorio, setFechaRecordatorio] = useState("");
   const [documentoRecordatorio, setDocumentoRecordatorio] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -23,7 +23,7 @@ const CrearNotificacion = () => {
     const formData = new FormData();
     formData.append("titulo", titulo);
     formData.append("descripcion", descripcion);
-    formData.append("fechaRecordatorio", fechaMantenimiento);
+    formData.append("fechaRecordatorio", fechaRecordatorio);
     formData.append("usuario", user.username);
     formData.append("documentoRecordatorio", documentoRecordatorio);
 
@@ -38,7 +38,7 @@ const CrearNotificacion = () => {
       setSuccessMessage("Notificación creada exitosamente");
       setTitulo("");
       setDescripcion("");
-      setFechaMantenimiento("");
+      setFechaRecordatorio("");
       setDocumentoRecordatorio(null);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
@@ -107,8 +107,8 @@ const CrearNotificacion = () => {
               </label>
               <input
                 type="date"
-                value={fechaMantenimiento}
-                onChange={(e) => setFechaMantenimiento(e.target.value)}
+                value={fechaRecordatorio}
+                onChange={(e) => setFechaRecordatorio(e.target.value)}
                 className="w-full bg-gray-100 text-gray-900 mt-2 p-3 rounded-lg focus:outline-none focus:shadow-outline"
                 required
               />

@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { useAuth } from '../context/AuthContext';
 import { useComponentes } from '../context/ComponentesContext';
 
-const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
+const ModalOrden = ({ onClose, orden, handleAcceptOrder }) => {
   const { getComponenteBySerial, componentes, loading } = useComponentes();
   const [selectedComponentes, setSelectedComponentes] = useState([]);
   const [descripcionOrden, setDescripcionOrden] = useState(orden.descripcionOrden || '');
@@ -141,8 +141,8 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
         componentesAsignados,
       });
 
-      if (typeof onOrderAccepted === 'function') {
-        onOrderAccepted(response.data);
+      if (typeof handleAcceptOrder === 'function') {
+        handleAcceptOrder(response.data);
       }
       setSuccessMessage('Orden aceptada y enviada exitosamente');
       setTimeout(() => {
@@ -160,6 +160,7 @@ const ModalOrden = ({ onClose, orden, onOrderAccepted }) => {
     marca: componente.marcaComponente,
     imagen: componente.imagenComponente?.url,
   }));
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">

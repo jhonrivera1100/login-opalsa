@@ -264,14 +264,14 @@ export const deleteOrden = async (req, res) => {
 export const updateAceptar = async (req, res) => {
   try {
     const { id } = req.params;
-    const { aceptado } = req.body;
+    const { estadoOrden } = req.body; // Usar estadoOrden en lugar de aceptado
 
     const orden = await Orden.findById(id);
     if (!orden) {
       return res.status(404).json({ message: "Orden no encontrada." });
     }
 
-    orden.estadoOrden = aceptado;
+    orden.estadoOrden = estadoOrden; // Actualizar con estadoOrden
     await orden.save();
 
     res.status(200).json(orden);
@@ -281,7 +281,7 @@ export const updateAceptar = async (req, res) => {
   }
 };
 
-// Actualizar la orden incluyendo sobrantes y tarea realizada
+
 // Actualizar la orden incluyendo sobrantes, tarea realizada y fecha de cumplimiento
 export const updateOrdenSobrantes = async (req, res) => {
   try {

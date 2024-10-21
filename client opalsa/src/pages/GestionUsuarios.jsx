@@ -91,19 +91,23 @@ function GestionUsuarios() {
                   className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-4 bg-white items-start lg:items-center p-4 drop-shadow-xl'
                 >
                   {/* Nombre con tooltip */}
-                  <div 
-                    className="relative lg:flex lg:space-x-2 text-gray-400 text-sm" 
-                    onMouseEnter={() => setTooltipId(user._id)} 
-                    onMouseLeave={() => setTooltipId(null)}
-                  >
-                    <FaRegUser className="h-5 w-5" />
-                    <p>{user.username.length > 8 ? user.username.slice(0, 15) + '...' : user.username}</p>
-                    {tooltipId === user._id && (
-                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
-                        {user.username}
-                      </div>
-                    )}
-                  </div>
+<div 
+  className="relative lg:flex lg:space-x-2 text-gray-400 text-sm" 
+  onMouseEnter={() => setTooltipId(user._id)} 
+  onMouseLeave={() => setTooltipId(null)}
+>
+  <FaRegUser className="h-5 w-5" />
+  <p>{user.username.length > 8 ? user.username.slice(0, 15) + '...' : user.username}</p>
+  {tooltipId === user._id && (
+    <div 
+      className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg" 
+      style={{ zIndex: 10, whiteSpace: 'nowrap' }} // Evitar el salto de línea
+    >
+      {user.username}
+    </div>
+  )}
+</div>
+
 
                   {/* Cédula */}
                   <div className="lg:flex lg:space-x-2">
@@ -139,7 +143,9 @@ function GestionUsuarios() {
                   >
                     <p>{user.cargo.length > 8 ? user.cargo.slice(0, 8) + '...' : user.cargo}</p>
                     {tooltipId === user._id + '-cargo' && (
-                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg">
+                      <div className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg"
+                      style={{ zIndex: 10, whiteSpace: 'nowrap' }} // Evitar el salto de línea
+                      >
                         {user.cargo}
                       </div>
                     )}

@@ -133,11 +133,29 @@ const NotificacionesAdmin = () => {
     });
     setModalVisible(true);
   };
-
-  const handleAcceptOrder = (item) => {
+  const handleAbrirModalOrder = (item) => {
     setSelectedItem(item);
     setModalOrdenVisible(true);
   };
+
+  const handleAcceptOrder = async (item) => {
+    // Actualización optimista
+    setCombinedItems((prevItems) =>
+        prevItems.map((orden) =>
+            orden._id === item._id ? { ...orden, estadoOrden: 'Orden aprobada' } : orden
+        )
+    );
+};
+
+const handleFinalizarOrder = (item) => {
+  // Actualización directa en el frontend
+  setCombinedItems((prevItems) =>
+      prevItems.map((orden) =>
+          orden._id === item._id ? { ...orden, estadoOrden: 'Orden finalizada' } : orden
+      )
+  );
+};
+
 
   const closeModal = () => {
     setModalVisible(false);
@@ -180,23 +198,7 @@ const NotificacionesAdmin = () => {
     []
   );
 
-  const handleCheckboxAceptar = useCallback(
-    debounce(async (id, aceptar) => {
-      try {
-        const response = await axios.patch(`/ordenes/${id}/aceptar`, {
-          aceptado: !aceptar,
-        });
-        setCombinedItems((prevItems) =>
-          prevItems.map((item) =>
-            item._id === id ? { ...item, aceptado: response.data.aceptado } : item
-          )
-        );
-      } catch (error) {
-        console.error("Error al actualizar el estado de aceptado:", error);
-      }
-    }, 50),
-    []
-  );
+  
 
   const handleOpenSobrantesModal = (item) => {
     setSelectedItem(item);
@@ -333,10 +335,10 @@ const NotificacionesAdmin = () => {
                   <OrdenCard
                     key={item._id}
                     item={item}
-                    handleCheckboxAceptar={handleCheckboxAceptar}
                     handleDescriptionClick={handleDescriptionClick}
                     handleUserClick={handleUserClick}
                     handleAcceptOrder={handleAcceptOrder}
+                    handleAbrirModalOrder={handleAbrirModalOrder}
                     handleDeleteItem={handleDeleteItem}
                     handleOpenSobrantesModal={handleOpenSobrantesModal}
                   />
@@ -422,7 +424,7 @@ const NotificacionesAdmin = () => {
           visible={modalOrdenVisible}
           onClose={closeModalOrden}
           orden={selectedItem}
-          handleSave={fetchOrdenes}
+          handleAcceptOrder={handleAcceptOrder}
         />
       )}
       {showSobrantesModal && selectedItem && (
@@ -431,6 +433,7 @@ const NotificacionesAdmin = () => {
           onClose={closeSobrantesModal}
           item={selectedItem}
           onSave={handleSaveSobrantes}
+          handleFinalizarOrder={handleFinalizarOrder}
         />
       )}
     </div>

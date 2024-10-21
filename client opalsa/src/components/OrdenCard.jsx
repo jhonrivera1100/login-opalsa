@@ -9,6 +9,8 @@ const OrdenCard = ({
   handleAcceptOrder,
   handleDeleteItem,
   handleOpenSobrantesModal,
+  handleAbrirModalOrder,
+  
 }) => {
   const {
     numeroOrden ="",
@@ -134,7 +136,7 @@ const OrdenCard = ({
             {(estadoOrden === "Orden en solicitud" ) && (
               <button
                 className="bg-green-700 text-white py-1 px-4 rounded-md hover:bg-green-600 transition-colors duration-300"
-                onClick={() => handleAcceptOrder(item)}
+                onClick={() => handleAbrirModalOrder(item)}
               >
                 Aprobar orden
               </button>

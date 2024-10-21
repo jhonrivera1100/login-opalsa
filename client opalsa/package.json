@@ -26,7 +26,7 @@
     "react-router-dom": "^6.23.0",
     "react-select": "^5.8.0",
     "react-slick": "^0.30.2",
-    "react-tooltip": "^5.26.4",
+    "react-tooltip": "^5.28.0",
     "react-window": "^1.8.10",
     "slick-carousel": "^1.8.1"
   },

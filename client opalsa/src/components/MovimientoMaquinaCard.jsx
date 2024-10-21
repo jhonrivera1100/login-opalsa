@@ -1,10 +1,12 @@
-import React from "react";
+import React , { useState } from "react";
 import { FaTools } from "react-icons/fa";
 import { MdAutoAwesomeMotion } from "react-icons/md";
 import { MdOutlineHomeRepairService } from "react-icons/md";
 
+
 const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => {
   // Formateo seguro de la fecha. Usamos la propiedad correspondiente a cada tipo de movimiento.
+  const [tooltipId, setTooltipId] = useState(null);
   const formattedDate = item.fechaMantenimiento
     ? new Date(item.fechaMantenimiento).toLocaleDateString()
     : item.fechaTransferencia || item.fechaTransferenciaElm
@@ -16,6 +18,33 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
   const isMovimientoMaquina = item.oldCasinoNombre && item.newCasinoNombre; // Movimientos de máquinas
   const isMovimientoComponente = item.serialComponente && item.nombreComponente; // Movimientos de componentes
   const isMovimientoElemento = item.oldUbicacionNombre && item.newUbicacionNombre && item.codigoElemento; // Movimientos de elementos
+
+
+  // Función para truncar texto a 25 caracteres
+  const truncateText = (text) => {
+    return text.length > 25 ? text.slice(0, 25) + "..." : text;
+  };
+
+
+   // Renderiza un texto con tooltip
+   const renderTextWithTooltip = (text, id) => (
+    <div
+        className="relative lg:flex lg:space-x-2 text-gray-400 text-sm"
+        onMouseEnter={() => setTooltipId(id)}
+        onMouseLeave={() => setTooltipId(null)}
+    >
+        <p>{truncateText(text)}</p>
+        {tooltipId === id && (
+            <div
+                className="absolute left-0 top-full mt-1 p-2 bg-black text-white text-sm rounded-md shadow-lg"
+                style={{ zIndex: 10 }} // Asegura que el tooltip esté en la parte superior
+            >
+                {text}
+            </div>
+        )}
+    </div>
+);
+
 
   return (
     <div
@@ -81,7 +110,7 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Número de Serie</p>
-              <p className="text-sm text-gray-500">{item.nroSerieMaquina || "N/A"}</p>
+              <p className="text-sm text-gray-500"> {renderTextWithTooltip(item.nroSerieMaquina || "N/A", `nroSerie-${item._id}`)}</p>
             </div>
             {item.nombreMaquina && (
               <div className="my-1">
@@ -135,7 +164,7 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Serial Componente</p>
-              <p className="text-sm text-gray-500">{item.serialComponente || "N/A"}</p>
+              <p className="text-sm text-gray-500"> {renderTextWithTooltip(item.serialComponente || "N/A", `nroSerie-${item._id}`)}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Serial Máquina Inicial</p>
@@ -155,7 +184,7 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             {/* Movimiento de Máquina */}
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Serial Máquina</p>
-              <p className="text-sm text-gray-500">{item.serialMaquina || "N/A"}</p>
+              <p className="text-sm text-gray-500">{renderTextWithTooltip(item.serialMaquina || "N/A", `nroSerie-${item._id}`)}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Marca Máquina</p>
@@ -179,7 +208,7 @@ const MovimientoMaquinaCard = ({ item, handleDescriptionClick, deleteItem }) => 
             {/* Movimiento de Elemento */}
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Código Elemento</p>
-              <p className="text-sm text-gray-500">{item.codigoElemento || "N/A"}</p>
+              <p className="text-sm text-gray-500">{renderTextWithTooltip(item.codigoElemento || "N/A", `nroSerie-${item._id}`)}</p>
             </div>
             <div className="my-1">
               <p className="font-semibold text-base mb-1">Nombre Elemento</p>
